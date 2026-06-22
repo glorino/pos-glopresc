@@ -16,6 +16,7 @@ import {
   Bell,
   ChevronLeft,
   ChevronRight,
+  Store,
 } from "lucide-react";
 
 type UserRole =
@@ -47,6 +48,7 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
     {
       items: [
         { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/owner" },
+        { icon: Store, label: "Shop", href: "/shop" },
       ],
     },
     {
@@ -62,6 +64,7 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
     {
       items: [
         { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/manager" },
+        { icon: Store, label: "Shop", href: "/shop" },
       ],
     },
     {

@@ -13,7 +13,25 @@ import {
   Unlock,
   Receipt,
   Eye,
+  Search,
+  CreditCard,
+  Banknote,
+  Smartphone,
+  Clock,
+  Zap,
+  Package,
+  BarChart3,
 } from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 interface CashierData {
   todaySales: number;
@@ -39,6 +57,12 @@ interface CashierData {
 export default function CashierDashboard() {
   const [data, setData] = useState<CashierData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [animatedValues, setAnimatedValues] = useState({
+    todaySales: 0,
+    transactions: 0,
+    averageSale: 0,
+  });
 
   useEffect(() => {
     async function fetchData() {
@@ -46,13 +70,13 @@ export default function CashierDashboard() {
         const res = await fetch("/api/dashboard/manager");
         if (res.ok) {
           const json = await res.json();
+          const todaySales = json.todayRevenue ?? 0;
+          const transactions = json.todaySales ?? 0;
+          const averageSale = transactions > 0 ? Math.round(todaySales / transactions) : 0;
           setData({
-            todaySales: json.todayRevenue ?? 0,
-            transactions: json.todaySales ?? 0,
-            averageSale:
-              json.todaySales > 0
-                ? Math.round((json.todayRevenue ?? 0) / json.todaySales)
-                : 0,
+            todaySales,
+            transactions,
+            averageSale,
             openDrawer: true,
             pendingOrders: 0,
             recentSales: [],
@@ -72,9 +96,31 @@ export default function CashierDashboard() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (!data) return;
+    const duration = 1200;
+    const steps = 40;
+    const interval = duration / steps;
+    let step = 0;
+
+    const timer = setInterval(() => {
+      step++;
+      const progress = step / steps;
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setAnimatedValues({
+        todaySales: Math.round((data.todaySales ?? 0) * eased),
+        transactions: Math.round((data.transactions ?? 0) * eased),
+        averageSale: Math.round((data.averageSale ?? 0) * eased),
+      });
+      if (step >= steps) clearInterval(timer);
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, [data]);
+
   if (loading) {
     return (
-      <DashboardLayout role="SALES_REP" title="Cashier Dashboard">
+      <DashboardLayout role="SALES_REP" title="Sales Rep Dashboard">
         <div className="flex h-[60vh] items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4a843] border-t-transparent" />
         </div>
@@ -82,246 +128,285 @@ export default function CashierDashboard() {
     );
   }
 
+  const paymentMethods = [
+    { name: "Cash", count: 45, color: "#10b981" },
+    { name: "Card", count: 28, color: "#3b82f6" },
+    { name: "Transfer", count: 18, color: "#8b5cf6" },
+    { name: "Mobile", count: 12, color: "#f59e0b" },
+  ];
+
   const stats = [
     {
       label: "Today's Sales",
-      value: formatCurrency(data?.todaySales ?? 0),
+      value: formatCurrency(animatedValues.todaySales),
       icon: DollarSign,
-      color: "from-[#d4a843]/20 to-[#d4a843]/5",
-      iconColor: "text-[#d4a843]",
+      gradient: "from-[#d4a843] to-[#b8942f]",
+      bgGradient: "from-[#d4a843]/15 via-[#d4a843]/5 to-transparent",
+      iconColor: "text-white",
     },
     {
       label: "Transactions",
-      value: (data?.transactions ?? 0).toLocaleString(),
+      value: animatedValues.transactions.toLocaleString(),
       icon: ShoppingCart,
-      color: "from-[#3b82f6]/20 to-[#3b82f6]/5",
-      iconColor: "text-[#3b82f6]",
+      gradient: "from-[#3b82f6] to-[#2563eb]",
+      bgGradient: "from-[#3b82f6]/15 via-[#3b82f6]/5 to-transparent",
+      iconColor: "text-white",
     },
     {
       label: "Average Sale",
-      value: formatCurrency(data?.averageSale ?? 0),
+      value: formatCurrency(animatedValues.averageSale),
       icon: TrendingUp,
-      color: "from-[#8b5cf6]/20 to-[#8b5cf6]/5",
-      iconColor: "text-[#8b5cf6]",
+      gradient: "from-[#8b5cf6] to-[#7c3aed]",
+      bgGradient: "from-[#8b5cf6]/15 via-[#8b5cf6]/5 to-transparent",
+      iconColor: "text-white",
     },
     {
-      label: "Open Drawer",
+      label: "Cash Drawer",
       value: data?.drawerStatus.isOpen ? "Open" : "Closed",
       icon: data?.drawerStatus.isOpen ? Unlock : Lock,
-      color: data?.drawerStatus.isOpen
-        ? "from-[#10b981]/20 to-[#10b981]/5"
-        : "from-[#f43f5e]/20 to-[#f43f5e]/5",
-      iconColor: data?.drawerStatus.isOpen
-        ? "text-[#10b981]"
-        : "text-[#f43f5e]",
+      gradient: data?.drawerStatus.isOpen ? "from-[#10b981] to-[#059669]" : "from-[#f43f5e] to-[#e11d48]",
+      bgGradient: data?.drawerStatus.isOpen ? "from-[#10b981]/15 via-[#10b981]/5 to-transparent" : "from-[#f43f5e]/15 via-[#f43f5e]/5 to-transparent",
+      iconColor: "text-white",
     },
     {
       label: "Pending Orders",
       value: (data?.pendingOrders ?? 0).toLocaleString(),
       icon: Receipt,
-      color: "from-[#f59e0b]/20 to-[#f59e0b]/5",
-      iconColor: "text-[#f59e0b]",
-    },
-  ];
-
-  const quickActions = [
-    {
-      label: "Open POS Terminal",
-      href: "/dashboard/pos",
-      icon: ShoppingCart,
-      primary: true,
-    },
-    {
-      label: "Open Drawer",
-      href: "#",
-      icon: Unlock,
-      primary: false,
-    },
-    {
-      label: "Close Drawer",
-      href: "#",
-      icon: Lock,
-      primary: false,
-    },
-    {
-      label: "View My Sales",
-      href: "/dashboard/my-sales",
-      icon: Eye,
-      primary: false,
+      gradient: "from-[#f59e0b] to-[#d97706]",
+      bgGradient: "from-[#f59e0b]/15 via-[#f59e0b]/5 to-transparent",
+      iconColor: "text-white",
     },
   ];
 
   return (
-    <DashboardLayout role="SALES_REP" title="Cashier Dashboard">
+    <DashboardLayout role="SALES_REP" title="Sales Rep Dashboard">
       <div className="space-y-6">
+        {/* Hero POS Card */}
+        <div className="glass-card relative overflow-hidden p-8">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#d4a843]/10 via-[#d4a843]/5 to-transparent" />
+          <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#d4a843]/10 blur-3xl" />
+          <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-[#d4a843]/5 blur-3xl" />
+          <div className="relative flex flex-col items-center gap-6 sm:flex-row sm:justify-between">
+            <div className="text-center sm:text-left">
+              <h2 className="text-2xl font-bold text-[#f0f0f5]">
+                Ready to sell?
+              </h2>
+              <p className="mt-2 text-[#9090a0]">
+                Open your POS terminal to start processing transactions
+              </p>
+            </div>
+            <Link
+              href="/dashboard/pos"
+              className="group flex items-center gap-4 rounded-2xl bg-gradient-to-r from-[#d4a843] to-[#b8942f] px-8 py-5 text-lg font-bold text-black shadow-lg shadow-[#d4a843]/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-[#d4a843]/30"
+            >
+              <ShoppingCart size={24} className="transition-transform group-hover:rotate-12" />
+              Open POS Terminal
+              <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Stats Grid */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {stats.map((stat) => {
             const Icon = stat.icon;
             return (
-              <div key={stat.label} className="stat-card">
-                <div className={`stat-icon bg-gradient-to-br ${stat.color}`}>
-                  <Icon size={20} className={stat.iconColor} />
+              <div
+                key={stat.label}
+                className="glass-card group relative overflow-hidden p-5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-black/20"
+              >
+                <div className={`absolute inset-0 bg-gradient-to-br ${stat.bgGradient} opacity-0 transition-opacity duration-300 group-hover:opacity-100`} />
+                <div className="relative">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${stat.gradient} shadow-lg`}>
+                    <Icon size={18} className={stat.iconColor} />
+                  </div>
+                  <p className="mt-3 text-2xl font-bold text-[#f0f0f5]">
+                    {stat.value}
+                  </p>
+                  <p className="mt-1 text-sm text-[#9090a0]">{stat.label}</p>
                 </div>
-                <p className="mt-3 text-2xl font-bold text-[#f0f0f5]">
-                  {stat.value}
-                </p>
-                <p className="mt-1 text-sm text-[#9090a0]">{stat.label}</p>
               </div>
             );
           })}
         </div>
 
-        <div className="glass-card p-8">
-          <div className="text-center">
-            <h3 className="mb-2 text-lg font-semibold text-[#f0f0f5]">
-              POS Terminal
-            </h3>
-            <p className="mb-6 text-sm text-[#9090a0]">
-              Start a new sale transaction
-            </p>
-            <Link
-              href="/dashboard/pos"
-              className="btn-primary btn-lg inline-flex items-center gap-3 rounded-2xl px-12 py-6 text-lg font-bold"
-            >
-              <ShoppingCart size={24} />
-              Open POS Terminal
-            </Link>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <div className="glass-card p-6">
-            <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-              Drawer Status
-            </h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
-                <div className="flex items-center gap-3">
-                  {data?.drawerStatus.isOpen ? (
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#10b981]/15">
-                      <Unlock size={20} className="text-[#10b981]" />
-                    </div>
-                  ) : (
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f43f5e]/15">
-                      <Lock size={20} className="text-[#f43f5e]" />
-                    </div>
-                  )}
-                  <div>
-                    <p className="text-sm font-medium text-[#f0f0f5]">
-                      Cash Drawer
-                    </p>
-                    <p className="text-xs text-[#606070]">
-                      {data?.drawerStatus.isOpen
-                        ? "Drawer is open"
-                        : "Drawer is closed"}
-                    </p>
-                  </div>
-                </div>
-                <span
-                  className={`badge ${
-                    data?.drawerStatus.isOpen ? "badge-success" : "badge-danger"
-                  }`}
-                >
-                  {data?.drawerStatus.isOpen ? "OPEN" : "CLOSED"}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-3">
-                  <p className="text-xs text-[#606070]">Opening Balance</p>
-                  <p className="text-lg font-bold text-[#d4a843]">
-                    {formatCurrency(data?.drawerStatus.openingBalance ?? 0)}
-                  </p>
-                </div>
-                <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-3">
-                  <p className="text-xs text-[#606070]">Opened At</p>
-                  <p className="text-sm font-medium text-[#f0f0f5]">
-                    {data?.drawerStatus.openedAt
-                      ? formatDateTime(data.drawerStatus.openedAt)
-                      : "N/A"}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-card p-6">
-            <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-              Quick Actions
-            </h3>
-            <div className="grid grid-cols-2 gap-3">
-              {quickActions.map((action) => {
-                const Icon = action.icon;
-                return (
-                  <Link
-                    key={action.label}
-                    href={action.href}
-                    className={`flex items-center justify-center gap-2 rounded-xl border p-4 transition-all ${
-                      action.primary
-                        ? "border-[#d4a843]/30 bg-gradient-to-br from-[#d4a843]/20 to-[#d4a843]/5 text-[#d4a843] hover:from-[#d4a843]/30 hover:to-[#d4a843]/10"
-                        : "border-[#2a2a3a] bg-[#1c1c28] text-[#9090a0] hover:border-[#3a3a4a] hover:text-[#f0f0f5]"
-                    }`}
-                  >
-                    <Icon size={20} />
-                    <span className="text-sm font-medium">{action.label}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
+        {/* Quick Product Search */}
         <div className="glass-card p-6">
-          <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-            Today's Recent Sales
-          </h3>
-          <div className="table-container">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Invoice</th>
-                  <th>Amount</th>
-                  <th>Payment</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data?.recentSales?.map((sale) => (
-                  <tr key={sale.id}>
-                    <td className="font-medium text-[#f0f0f5]">
-                      {sale.invoiceNumber}
-                    </td>
-                    <td className="font-medium text-[#d4a843]">
-                      {formatCurrency(sale.total)}
-                    </td>
-                    <td className="text-[#9090a0]">{sale.paymentMethod}</td>
-                    <td className="text-[#9090a0]">
-                      {formatDateTime(sale.createdAt)}
-                    </td>
-                    <td>
-                      <span
-                        className={`badge ${
-                          sale.status === "COMPLETED"
-                            ? "badge-success"
-                            : "badge-warning"
-                        }`}
-                      >
-                        {sale.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-                {(!data?.recentSales || data.recentSales.length === 0) && (
-                  <tr>
-                    <td colSpan={5} className="text-center text-[#606070]">
-                      No sales recorded today
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843] to-[#b8942f]">
+              <Search size={18} className="text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-[#f0f0f5]">Quick Search</h3>
+              <p className="text-sm text-[#9090a0]">Find products by name, barcode, or SKU</p>
+            </div>
           </div>
+          <div className="relative">
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#606070]" />
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-xl border border-[#2a2a3a] bg-[#1c1c28] py-3 pl-12 pr-4 text-[#f0f0f5] placeholder-[#606070] outline-none transition-all focus:border-[#d4a843]/50 focus:ring-1 focus:ring-[#d4a843]/30"
+            />
+          </div>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+          {/* Recent Transactions */}
+          <div className="glass-card p-6 xl:col-span-2">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-[#f0f0f5]">
+                Today&apos;s Transactions
+              </h3>
+              <Link
+                href="/dashboard/my-sales"
+                className="flex items-center gap-1 text-sm text-[#d4a843] transition-colors hover:text-[#b8942f]"
+              >
+                View All <ArrowRight size={14} />
+              </Link>
+            </div>
+            <div className="table-container">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Invoice</th>
+                    <th>Amount</th>
+                    <th>Payment</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data?.recentSales?.map((sale) => (
+                    <tr key={sale.id}>
+                      <td className="font-medium text-[#f0f0f5]">
+                        {sale.invoiceNumber}
+                      </td>
+                      <td className="font-medium text-[#d4a843]">
+                        {formatCurrency(sale.total)}
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-2">
+                          {sale.paymentMethod === "CASH" && <Banknote size={14} className="text-[#10b981]" />}
+                          {sale.paymentMethod === "CARD" && <CreditCard size={14} className="text-[#3b82f6]" />}
+                          {sale.paymentMethod === "TRANSFER" && <Banknote size={14} className="text-[#8b5cf6]" />}
+                          {sale.paymentMethod === "MOBILE" && <Smartphone size={14} className="text-[#f59e0b]" />}
+                          <span className="text-[#9090a0]">{sale.paymentMethod}</span>
+                        </div>
+                      </td>
+                      <td className="text-[#9090a0]">
+                        {formatDateTime(sale.createdAt)}
+                      </td>
+                      <td>
+                        <span
+                          className={`badge ${
+                            sale.status === "COMPLETED"
+                              ? "badge-success"
+                              : sale.status === "PENDING"
+                              ? "badge-warning"
+                              : "badge-danger"
+                          }`}
+                        >
+                          {sale.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                  {(!data?.recentSales || data.recentSales.length === 0) && (
+                    <tr>
+                      <td colSpan={5} className="text-center text-[#606070]">
+                        No transactions yet today
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Payment Method Breakdown */}
+          <div className="glass-card p-6">
+            <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
+              Payment Methods
+            </h3>
+            <p className="mb-4 text-sm text-[#9090a0]">Today&apos;s breakdown</p>
+            <div className="h-[200px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={paymentMethods} layout="vertical" barCategoryGap="20%">
+                  <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3a" horizontal={false} />
+                  <XAxis type="number" stroke="#606070" fontSize={12} />
+                  <YAxis type="category" dataKey="name" stroke="#606070" fontSize={12} width={70} />
+                  <Tooltip
+                    contentStyle={{
+                      background: "#16161f",
+                      border: "1px solid #2a2a3a",
+                      borderRadius: "8px",
+                      color: "#f0f0f5",
+                    }}
+                  />
+                  <Bar dataKey="count" radius={[0, 6, 6, 0]}>
+                    {paymentMethods.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              {paymentMethods.map((method) => (
+                <div key={method.name} className="flex items-center justify-between rounded-lg bg-[#1c1c28]/50 px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full" style={{ backgroundColor: method.color }} />
+                    <span className="text-xs text-[#9090a0]">{method.name}</span>
+                  </div>
+                  <span className="text-xs font-medium text-[#f0f0f5]">{method.count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions Grid */}
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <Link
+            href="/dashboard/pos"
+            className="group glass-card flex flex-col items-center gap-3 p-5 transition-all duration-300 hover:scale-[1.02]"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843] to-[#b8942f] shadow-lg">
+              <ShoppingCart size={22} className="text-white" />
+            </div>
+            <span className="text-sm font-medium text-[#f0f0f5]">POS Terminal</span>
+          </Link>
+          <Link
+            href="/dashboard/my-sales"
+            className="group glass-card flex flex-col items-center gap-3 p-5 transition-all duration-300 hover:scale-[1.02]"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#3b82f6] to-[#2563eb] shadow-lg">
+              <BarChart3 size={22} className="text-white" />
+            </div>
+            <span className="text-sm font-medium text-[#f0f0f5]">My Sales</span>
+          </Link>
+          <Link
+            href="/dashboard/products"
+            className="group glass-card flex flex-col items-center gap-3 p-5 transition-all duration-300 hover:scale-[1.02]"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#8b5cf6] to-[#7c3aed] shadow-lg">
+              <Package size={22} className="text-white" />
+            </div>
+            <span className="text-sm font-medium text-[#f0f0f5]">Products</span>
+          </Link>
+          <Link
+            href="/dashboard/customers"
+            className="group glass-card flex flex-col items-center gap-3 p-5 transition-all duration-300 hover:scale-[1.02]"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#10b981] to-[#059669] shadow-lg">
+              <Receipt size={22} className="text-white" />
+            </div>
+            <span className="text-sm font-medium text-[#f0f0f5]">Customers</span>
+          </Link>
         </div>
       </div>
     </DashboardLayout>
