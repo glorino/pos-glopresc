@@ -593,7 +593,7 @@ export default function POSTerminal() {
 
             <div className="rounded-xl border border-[#2a2a3a] bg-[#0a0a0f] p-4">
               <div className="mb-3 text-center">
-                <p className="text-lg font-bold text-[#d4a843]">GLOPRESC</p>
+                <p className="text-lg font-bold text-[#d4a843]">SSV SHOP</p>
                 <p className="text-xs text-[#606070]">POS Receipt</p>
               </div>
               <div className="mb-3 border-t border-dashed border-[#2a2a3a] pt-3">
@@ -643,7 +643,7 @@ export default function POSTerminal() {
                 )}
               </div>
               <div className="mt-3 border-t border-dashed border-[#2a2a3a] pt-3 text-center">
-                <p className="text-[10px] text-[#606070]">Thank you for shopping with Glopresc!</p>
+                <p className="text-[10px] text-[#606070]">Thank you for shopping with SSV Shop!</p>
               </div>
             </div>
 

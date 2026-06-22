@@ -48,7 +48,7 @@ export default function LoginPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843] to-[#c49a38]">
               <span className="text-lg font-bold text-black">G</span>
             </div>
-            <span className="text-xl font-bold text-[#f0f0f5]">Glopresc</span>
+            <span className="text-xl font-bold text-[#f0f0f5]">SSV Shop</span>
           </Link>
           <h1 className="mt-4 text-xl font-semibold text-[#f0f0f5]">
             Welcome back

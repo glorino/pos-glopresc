@@ -3,9 +3,9 @@ import Providers from "@/components/providers/Providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Glopresc POS — Modern Point of Sale System",
+  title: "SSV Shop POS — Point of Sale System",
   description:
-    "Glopresc POS is a modern point-of-sale system built for growing businesses in Nigeria. Manage sales, inventory, customers, and finances — all in one place.",
+    "SSV Shop POS is a complete point-of-sale system. Manage sales, inventory, customers, and finances — all in one place.",
   keywords: [
     "POS system",
     "point of sale",
@@ -13,13 +13,13 @@ export const metadata: Metadata = {
     "sales tracking",
     "business management",
     "Nigeria POS",
-    "Glopresc",
+    "SSV Shop",
   ],
   openGraph: {
-    title: "Glopresc POS — Modern Point of Sale System",
+    title: "SSV Shop POS — Point of Sale System",
     description:
-      "The all-in-one POS platform for growing businesses. Sales, inventory, customers, and financial reporting.",
-    siteName: "Glopresc POS",
+      "The all-in-one POS platform. Sales, inventory, customers, and financial reporting.",
+    siteName: "SSV Shop POS",
     type: "website",
   },
 };

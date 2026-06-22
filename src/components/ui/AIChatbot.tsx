@@ -34,7 +34,7 @@ const BOT_RESPONSES: Record<string, string> = {
   "how do i view audit logs?":
     "To view audit logs:\n\n1. Go to Auditor > Audit Logs\n2. View all system activities\n3. Filter by user, action type, or date\n4. Click on any entry for full details\n5. Export logs for compliance reporting",
   "what roles are available?":
-    "Available roles in Glopresc POS:\n\n1. Owner - Full system access\n2. Manager - Operations & management\n3. Sales Manager - Sales oversight\n4. Cashier - POS terminal operations\n5. Inventory Manager - Stock management\n6. Procurement - Supplier & ordering\n7. Accountant - Financial management\n8. Auditor - System audit & compliance\n9. Customer - Self-service portal",
+    "Available roles in SSV Shop POS:\n\n1. Owner - Full system access\n2. Manager - Operations & management\n3. Sales Manager - Sales oversight\n4. Cashier - POS terminal operations\n5. Inventory Manager - Stock management\n6. Procurement - Supplier & ordering\n7. Accountant - Financial management\n8. Auditor - System audit & compliance\n9. Customer - Self-service portal",
   "how do i close the register?":
     "To close the cash register:\n\n1. Go to POS Terminal\n2. Click 'Close Drawer' in the top bar\n3. Count the physical cash in the drawer\n4. Enter the actual balance\n5. The system calculates any difference\n6. Confirm to close\n\nA summary report is generated automatically.",
   "how do i run a stock take?":
@@ -92,7 +92,7 @@ function getBotResponse(input: string): string {
     return BOT_RESPONSES["how do i close the register?"];
   }
   if (lower.includes("hello") || lower.includes("hi") || lower.includes("hey")) {
-    return "Hello! I'm the Glopresc AI Assistant. I can help you with POS operations, inventory management, sales, reporting, and more. What would you like to know?";
+    return "Hello! I'm the SSV Shop AI Assistant. I can help you with POS operations, inventory management, sales, reporting, and more. What would you like to know?";
   }
   if (lower.includes("help")) {
     return "Here are some things I can help with:\n\n• Processing sales\n• Adding products\n• Managing inventory\n• Generating reports\n• Handling refunds\n• Managing customers & suppliers\n• Expense tracking\n• Audit logs\n\nJust ask a question!";
@@ -109,7 +109,7 @@ export default function AIChatbot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: generateId(),
-      text: "Hello! I'm the Glopresc AI Assistant. How can I help you today?",
+      text: "Hello! I'm the SSV Shop AI Assistant. How can I help you today?",
       sender: "bot",
       timestamp: new Date(),
     },
@@ -181,7 +181,7 @@ export default function AIChatbot() {
             <Bot size={16} className="text-black" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-[#f0f0f5]">Glopresc AI Assistant</h3>
+            <h3 className="text-sm font-semibold text-[#f0f0f5]">SSV Shop AI Assistant</h3>
             <p className="text-[10px] text-[#10b981]">● Online</p>
           </div>
         </div>

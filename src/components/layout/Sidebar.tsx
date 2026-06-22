@@ -221,7 +221,7 @@ export default function Sidebar({ role, currentPath }: SidebarProps) {
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#d4a843] to-[#c49a38]">
           <span className="text-sm font-bold text-black">G</span>
         </div>
-        <span className="text-lg font-bold text-[#f0f0f5]">Glopresc</span>
+        <span className="text-lg font-bold text-[#f0f0f5]">SSV Shop</span>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4">

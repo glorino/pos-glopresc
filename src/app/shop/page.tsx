@@ -122,7 +122,7 @@ export default function ShopPage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#d4a843] to-[#c49a38]">
               <span className="text-sm font-bold text-black">G</span>
             </div>
-            <span className="text-lg font-bold text-[#f0f0f5]">Glopresc Shop</span>
+            <span className="text-lg font-bold text-[#f0f0f5]">SSV Shop</span>
           </Link>
 
           <div className="hidden max-w-md flex-1 px-8 md:block">
@@ -179,7 +179,7 @@ export default function ShopPage() {
           <h1 className="text-3xl font-bold text-[#f0f0f5] sm:text-5xl">
             Welcome to{" "}
             <span className="bg-gradient-to-r from-[#d4a843] to-[#c49a38] bg-clip-text text-transparent">
-              Glopresc Shop
+              SSV Shop
             </span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-[#9090a0]">
@@ -382,7 +382,7 @@ export default function ShopPage() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#d4a843] to-[#c49a38]">
                 <span className="text-sm font-bold text-black">G</span>
               </div>
-              <span className="text-lg font-bold text-[#f0f0f5]">Glopresc</span>
+              <span className="text-lg font-bold text-[#f0f0f5]">SSV Shop</span>
             </div>
             <div className="flex gap-6 text-sm text-[#606070]">
               <Link href="/" className="hover:text-[#d4a843]">Home</Link>
@@ -390,7 +390,7 @@ export default function ShopPage() {
               <Link href="/booking" className="hover:text-[#d4a843]">Book a Service</Link>
             </div>
             <p className="text-xs text-[#606070]">
-              &copy; {new Date().getFullYear()} Glopresc. All rights reserved.
+              &copy; {new Date().getFullYear()} SSV Shop. All rights reserved.
             </p>
           </div>
         </div>

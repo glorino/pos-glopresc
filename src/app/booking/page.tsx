@@ -152,7 +152,7 @@ export default function BookingPage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#d4a843] to-[#c49a38]">
               <span className="text-sm font-bold text-black">G</span>
             </div>
-            <span className="text-lg font-bold text-[#f0f0f5]">Glopresc</span>
+            <span className="text-lg font-bold text-[#f0f0f5]">SSV Shop</span>
           </Link>
           <div className="flex items-center gap-6">
             <Link href="/shop" className="text-sm text-[#9090a0] hover:text-[#d4a843]">
@@ -374,7 +374,7 @@ export default function BookingPage() {
       <footer className="border-t border-[#2a2a3a] bg-[#111118] py-8">
         <div className="mx-auto max-w-7xl px-4 text-center">
           <p className="text-xs text-[#606070]">
-            &copy; {new Date().getFullYear()} Glopresc. All rights reserved.
+            &copy; {new Date().getFullYear()} SSV Shop. All rights reserved.
           </p>
         </div>
       </footer>

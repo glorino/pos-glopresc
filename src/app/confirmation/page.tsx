@@ -39,7 +39,7 @@ function ConfirmationContent() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#d4a843] to-[#c49a38]">
               <span className="text-sm font-bold text-black">G</span>
             </div>
-            <span className="text-lg font-bold text-[#f0f0f5]">Glopresc</span>
+            <span className="text-lg font-bold text-[#f0f0f5]">SSV Shop</span>
           </Link>
         </div>
       </nav>
@@ -131,7 +131,7 @@ function ConfirmationContent() {
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#d4a843]/10 text-[10px] font-bold text-[#d4a843]">
                 4
               </span>
-              <span>For urgent inquiries, contact us at support@glopresc.com.</span>
+              <span>For urgent inquiries, contact us at support@ssvshop.com.</span>
             </li>
           </ol>
         </div>
@@ -151,7 +151,7 @@ function ConfirmationContent() {
       <footer className="border-t border-[#2a2a3a] bg-[#111118] py-8">
         <div className="mx-auto max-w-7xl px-4 text-center">
           <p className="text-xs text-[#606070]">
-            &copy; {new Date().getFullYear()} Glopresc. All rights reserved.
+            &copy; {new Date().getFullYear()} SSV Shop. All rights reserved.
           </p>
         </div>
       </footer>

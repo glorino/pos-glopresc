@@ -40,7 +40,7 @@ export default function DashboardLayout({
   const displayUser = user || {
     name: "User",
     role: role.replace("_", " "),
-    email: "user@glopresc.com",
+    email: "user@ssvshop.com",
   };
 
   useEffect(() => {

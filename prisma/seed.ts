@@ -13,15 +13,15 @@ async function main() {
   const hashedPassword = await hash(DEFAULT_PASSWORD, 12);
 
   const usersData = [
-    { email: "owner@glopresc.com", firstName: "Chukwuma", lastName: "Okafor", role: UserRole.OWNER },
-    { email: "manager@glopresc.com", firstName: "Amina", lastName: "Abdullahi", role: UserRole.MANAGER },
-    { email: "sales@glopresc.com", firstName: "Emeka", lastName: "Nwosu", role: UserRole.SALES_MANAGER },
-    { email: "cashier@glopresc.com", firstName: "Fatima", lastName: "Bello", role: UserRole.CASHIER },
-    { email: "inventory@glopresc.com", firstName: "Tunde", lastName: "Adeyemi", role: UserRole.INVENTORY_MANAGER },
-    { email: "procurement@glopresc.com", firstName: "Ngozi", lastName: "Okonkwo", role: UserRole.PROCUREMENT },
-    { email: "accountant@glopresc.com", firstName: "Yusuf", lastName: "Lawal", role: UserRole.ACCOUNTANT },
-    { email: "auditor@glopresc.com", firstName: "Aisha", lastName: "Mohammed", role: UserRole.AUDITOR },
-    { email: "customer@glopresc.com", firstName: "Chidera", lastName: "Eze", role: UserRole.CUSTOMER },
+    { email: "owner@ssvshop.com", firstName: "Chukwuma", lastName: "Okafor", role: UserRole.OWNER },
+    { email: "manager@ssvshop.com", firstName: "Amina", lastName: "Abdullahi", role: UserRole.MANAGER },
+    { email: "sales@ssvshop.com", firstName: "Emeka", lastName: "Nwosu", role: UserRole.SALES_MANAGER },
+    { email: "cashier@ssvshop.com", firstName: "Fatima", lastName: "Bello", role: UserRole.CASHIER },
+    { email: "inventory@ssvshop.com", firstName: "Tunde", lastName: "Adeyemi", role: UserRole.INVENTORY_MANAGER },
+    { email: "procurement@ssvshop.com", firstName: "Ngozi", lastName: "Okonkwo", role: UserRole.PROCUREMENT },
+    { email: "accountant@ssvshop.com", firstName: "Yusuf", lastName: "Lawal", role: UserRole.ACCOUNTANT },
+    { email: "auditor@ssvshop.com", firstName: "Aisha", lastName: "Mohammed", role: UserRole.AUDITOR },
+    { email: "customer@ssvshop.com", firstName: "Chidera", lastName: "Eze", role: UserRole.CUSTOMER },
   ];
 
   const users: Record<string, string> = {};
@@ -264,7 +264,7 @@ async function main() {
     const sale = await prisma.sale.create({
       data: {
         invoiceNumber: invoiceNum,
-        userId: users["cashier@glopresc.com"],
+        userId: users["cashier@ssvshop.com"],
         customerId,
         subtotal,
         discount,
@@ -326,7 +326,7 @@ async function main() {
 
     await prisma.expense.create({
       data: {
-        userId: users["accountant@glopresc.com"],
+        userId: users["accountant@ssvshop.com"],
         categoryId: expenseCategories[catName],
         description,
         amount,
@@ -378,7 +378,7 @@ async function main() {
         status,
         expectedDate: new Date(orderDate.getTime() + 14 * 24 * 60 * 60 * 1000),
         notes: `Order from ${supplierName}`,
-        createdBy: users["procurement@glopresc.com"],
+        createdBy: users["procurement@ssvshop.com"],
         createdAt: orderDate,
         items: {
           create: poItems,
@@ -392,7 +392,7 @@ async function main() {
   console.log("\n🏧 Seeding cash drawers...");
   await prisma.cashDrawer.create({
     data: {
-      userId: users["cashier@glopresc.com"],
+        userId: users["cashier@ssvshop.com"],
       openingBalance: 50000,
       closingBalance: 87500,
       actualBalance: 87500,
@@ -405,7 +405,7 @@ async function main() {
 
   await prisma.cashDrawer.create({
     data: {
-      userId: users["cashier@glopresc.com"],
+        userId: users["cashier@ssvshop.com"],
       openingBalance: 50000,
       status: DrawerStatus.OPEN,
       openedAt: new Date(),
@@ -502,14 +502,14 @@ async function main() {
   // ── Settings ───────────────────────────────────────────
   console.log("\n⚙️ Seeding settings...");
   const settingsData = [
-    { key: "business_name", value: "Glopresc POS", group: "business" },
+    { key: "business_name", value: "SSV Shop", group: "business" },
     { key: "business_address", value: "15 Broad Street, Lagos Island, Lagos, Nigeria", group: "business" },
     { key: "business_phone", value: "+2348012345678", group: "business" },
-    { key: "business_email", value: "info@glopresc.com", group: "business" },
+    { key: "business_email", value: "info@ssvshop.com", group: "business" },
     { key: "currency", value: "NGN", group: "business" },
     { key: "currency_symbol", value: "₦", group: "business" },
     { key: "tax_rate", value: "7.5", group: "finance" },
-    { key: "receipt_footer", value: "Thank you for shopping with Glopresc POS!", group: "receipt" },
+    { key: "receipt_footer", value: "Thank you for shopping with SSV Shop!", group: "receipt" },
     { key: "low_stock_threshold", value: "10", group: "inventory" },
     { key: "loyalty_points_rate", value: "1", group: "loyalty" },
     { key: "default_payment_method", value: "CASH", group: "payment" },
@@ -573,7 +573,7 @@ async function main() {
     await prisma.stockAdjustment.create({
       data: {
         productId: products[sku],
-        userId: users["inventory@glopresc.com"],
+        userId: users["inventory@ssvshop.com"],
         type: adjTypes[Math.floor(Math.random() * adjTypes.length)],
         quantity: 1 + Math.floor(Math.random() * 20),
         reason: adjReasons[Math.floor(Math.random() * adjReasons.length)],
@@ -651,7 +651,7 @@ async function main() {
     await prisma.supplyRequest.create({
       data: {
         supplierId: suppliers[supplierName],
-        requestedBy: users["procurement@glopresc.com"],
+        requestedBy: users["procurement@ssvshop.com"],
         description: `Urgent supply request for ${supplierName} - batch ${i + 1}`,
         status: supplyRequestStatuses[i % supplyRequestStatuses.length] as any,
         urgency: urgencyLevels[i % urgencyLevels.length] as any,

@@ -32,7 +32,7 @@ const defaultSettings: Settings = {
     taxInclusive: "false",
   },
   receipt: {
-    header: "Glopresc POS",
+    header: "SSV Shop",
     footer: "Thank you for your purchase!",
     paperSize: "80mm",
   },

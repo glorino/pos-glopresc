@@ -9,8 +9,6 @@ import {
   BarChart3,
   Shield,
   Activity,
-  ChevronRight,
-  Play,
   ArrowRight,
   Menu,
   X,
@@ -57,62 +55,12 @@ const features = [
 
 const stats = [
   { value: "10K+", label: "Transactions" },
-  { value: "500+", label: "Businesses" },
+  { value: "100%", label: "Secure" },
   { value: "99.9%", label: "Uptime" },
   { value: "24/7", label: "Support" },
 ];
 
-const plans = [
-  {
-    name: "Starter",
-    price: "₦15,000",
-    period: "/mo",
-    description: "Perfect for small shops and solo entrepreneurs.",
-    features: [
-      "1 register",
-      "Up to 500 products",
-      "Basic reporting",
-      "Email support",
-      "Inventory tracking",
-    ],
-    cta: "Get Started",
-    highlighted: false,
-  },
-  {
-    name: "Professional",
-    price: "₦35,000",
-    period: "/mo",
-    description: "For growing businesses that need more power and flexibility.",
-    features: [
-      "Up to 5 registers",
-      "Unlimited products",
-      "Advanced analytics",
-      "Priority support",
-      "Multi-role access",
-      "Customer management",
-      "Expense tracking",
-    ],
-    cta: "Start Free Trial",
-    highlighted: true,
-  },
-  {
-    name: "Enterprise",
-    price: "Custom",
-    period: "",
-    description: "Tailored solutions for large operations and franchises.",
-    features: [
-      "Unlimited registers",
-      "Unlimited everything",
-      "Dedicated account manager",
-      "Custom integrations",
-      "API access",
-      "On-site training",
-      "SLA guarantee",
-    ],
-    cta: "Contact Sales",
-    highlighted: false,
-  },
-];
+
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -126,7 +74,7 @@ export default function LandingPage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#d4a843] to-[#c49a38]">
               <span className="text-sm font-bold text-black">G</span>
             </div>
-            <span className="text-lg font-bold text-[#f0f0f5]">Glopresc</span>
+            <span className="text-lg font-bold text-[#f0f0f5]">SSV Shop</span>
           </Link>
 
           <div className="hidden items-center gap-8 md:flex">
@@ -135,12 +83,6 @@ export default function LandingPage() {
               className="text-sm font-medium text-[#9090a0] transition-colors hover:text-[#f0f0f5]"
             >
               Features
-            </a>
-            <a
-              href="#pricing"
-              className="text-sm font-medium text-[#9090a0] transition-colors hover:text-[#f0f0f5]"
-            >
-              Pricing
             </a>
             <a
               href="#about"
@@ -157,8 +99,8 @@ export default function LandingPage() {
             >
               Login
             </Link>
-            <Link href="/login" className="btn btn-primary !py-2 !px-4 text-sm">
-              Get Started
+            <Link href="/dashboard/owner" className="btn btn-primary !py-2 !px-4 text-sm">
+              Go to Dashboard
             </Link>
           </div>
 
@@ -176,9 +118,6 @@ export default function LandingPage() {
               <a href="#features" className="text-sm text-[#9090a0] hover:text-[#f0f0f5]">
                 Features
               </a>
-              <a href="#pricing" className="text-sm text-[#9090a0] hover:text-[#f0f0f5]">
-                Pricing
-              </a>
               <a href="#about" className="text-sm text-[#9090a0] hover:text-[#f0f0f5]">
                 About
               </a>
@@ -186,8 +125,8 @@ export default function LandingPage() {
               <Link href="/login" className="btn btn-secondary text-sm">
                 Login
               </Link>
-              <Link href="/login" className="btn btn-primary text-sm">
-                Get Started
+              <Link href="/dashboard/owner" className="btn btn-primary text-sm">
+                Go to Dashboard
               </Link>
             </div>
           </div>
@@ -203,31 +142,27 @@ export default function LandingPage() {
               Built for Nigerian Businesses
             </div>
             <h1 className="mx-auto max-w-4xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
-              Modern POS System for{" "}
+              SSV Shop{" "}
               <span className="bg-gradient-to-r from-[#d4a843] to-[#c49a38] bg-clip-text text-transparent">
-                Growing Businesses
+                Point of Sale System
               </span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[#9090a0]">
-              Glopresc gives you everything you need to run your retail or
-              service business — from sales and inventory to customer management
-              and financial reporting. All in one powerful, easy-to-use platform.
+              Manage sales, inventory, customers, and finances in one place.
+              Everything you need to run your retail business — from sales and
+              inventory to customer management and financial reporting.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
-                href="/login"
+                href="/dashboard/owner"
                 className="btn btn-primary btn-lg group"
               >
-                Get Started
+                Go to Dashboard
                 <ArrowRight
                   size={16}
                   className="transition-transform group-hover:translate-x-0.5"
                 />
               </Link>
-              <button className="btn btn-secondary btn-lg group">
-                <Play size={16} />
-                Watch Demo
-              </button>
             </div>
           </div>
         </div>
@@ -245,8 +180,8 @@ export default function LandingPage() {
               <span className="text-[#d4a843]">Run Your Business</span>
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-[#9090a0]">
-              A complete toolkit designed to streamline operations, boost
-              efficiency, and help you make smarter decisions.
+              Everything you need to run your retail business. Streamline
+              operations, boost efficiency, and make smarter decisions.
             </p>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -289,77 +224,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Pricing ────────────────────────────────────────── */}
-      <section id="pricing" className="py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-16 text-center">
-            <h2 className="text-3xl font-bold sm:text-4xl">
-              Simple, Transparent{" "}
-              <span className="text-[#d4a843]">Pricing</span>
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-[#9090a0]">
-              No hidden fees. No surprises. Pick the plan that fits your
-              business and scale as you grow.
-            </p>
-          </div>
-          <div className="grid gap-8 lg:grid-cols-3">
-            {plans.map((plan) => (
-              <div
-                key={plan.name}
-                className={`feature-card relative flex flex-col ${
-                  plan.highlighted
-                    ? "border-[#d4a843]/30 shadow-[0_0_40px_rgba(212,168,67,0.08)]"
-                    : ""
-                }`}
-              >
-                {plan.highlighted && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-[#d4a843] to-[#c49a38] px-4 py-1 text-xs font-semibold text-black">
-                    Most Popular
-                  </div>
-                )}
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-[#f0f0f5]">
-                    {plan.name}
-                  </h3>
-                  <div className="mt-3 flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-[#f0f0f5]">
-                      {plan.price}
-                    </span>
-                    {plan.period && (
-                      <span className="text-sm text-[#9090a0]">
-                        {plan.period}
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-2 text-sm text-[#9090a0]">
-                    {plan.description}
-                  </p>
-                </div>
-                <ul className="mb-8 flex-1 space-y-3">
-                  {plan.features.map((f) => (
-                    <li
-                      key={f}
-                      className="flex items-center gap-2 text-sm text-[#9090a0]"
-                    >
-                      <ChevronRight size={14} className="text-[#d4a843]" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/login"
-                  className={`btn w-full text-center ${
-                    plan.highlighted ? "btn-primary" : "btn-secondary"
-                  }`}
-                >
-                  {plan.cta}
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── Footer ─────────────────────────────────────────── */}
       <footer id="about" className="border-t border-[#2a2a3a] bg-[#0c0c14]">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -370,12 +234,12 @@ export default function LandingPage() {
                   <span className="text-sm font-bold text-black">G</span>
                 </div>
                 <span className="text-lg font-bold text-[#f0f0f5]">
-                  Glopresc
+                  SSV Shop
                 </span>
               </div>
               <p className="mt-4 text-sm leading-relaxed text-[#9090a0]">
-                The modern POS platform designed for Nigerian businesses.
-                Streamline your operations and grow with confidence.
+                The complete POS system for SSV Shop.
+                Manage sales, inventory, customers, and finances with confidence.
               </p>
             </div>
             <div>
@@ -389,8 +253,8 @@ export default function LandingPage() {
                   </a>
                 </li>
                 <li>
-                  <a href="#pricing" className="hover:text-[#f0f0f5]">
-                    Pricing
+                  <a href="#" className="hover:text-[#f0f0f5]">
+                    Reports
                   </a>
                 </li>
                 <li>
@@ -437,14 +301,14 @@ export default function LandingPage() {
                 Contact
               </h4>
               <ul className="space-y-2 text-sm text-[#9090a0]">
-                <li>support@glopresc.com</li>
-                <li>+234 800 GLOPRES</li>
+                <li>support@ssvshop.com</li>
+                <li>+234 800 SSVSHOP</li>
                 <li>Lagos, Nigeria</li>
               </ul>
             </div>
           </div>
           <div className="mt-12 border-t border-[#2a2a3a] pt-8 text-center text-xs text-[#606070]">
-            &copy; {new Date().getFullYear()} Glopresc. All rights reserved.
+            &copy; 2026 SSV Shop. All rights reserved.
           </div>
         </div>
       </footer>
