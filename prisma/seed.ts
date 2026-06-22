@@ -15,10 +15,12 @@ async function main() {
   const usersData = [
     { email: "owner@ssvshop.com", firstName: "Chukwuma", lastName: "Okafor", role: UserRole.OWNER },
     { email: "manager@ssvshop.com", firstName: "Amina", lastName: "Abdullahi", role: UserRole.MANAGER },
-    { email: "sales@ssvshop.com", firstName: "Emeka", lastName: "Nwosu", role: UserRole.SALES_MANAGER },
-    { email: "cashier@ssvshop.com", firstName: "Fatima", lastName: "Bello", role: UserRole.CASHIER },
-    { email: "inventory@ssvshop.com", firstName: "Tunde", lastName: "Adeyemi", role: UserRole.INVENTORY_MANAGER },
-    { email: "procurement@ssvshop.com", firstName: "Ngozi", lastName: "Okonkwo", role: UserRole.PROCUREMENT },
+    { email: "warehouse-manager@ssvshop.com", firstName: "Emeka", lastName: "Nwosu", role: UserRole.WAREHOUSE_MANAGER },
+    { email: "warehouse-rep@ssvshop.com", firstName: "Chinedu", lastName: "Okoro", role: UserRole.WAREHOUSE_REP },
+    { email: "procurement-manager@ssvshop.com", firstName: "Ngozi", lastName: "Okonkwo", role: UserRole.PROCUREMENT_MANAGER },
+    { email: "procurement-rep@ssvshop.com", firstName: "Damilola", lastName: "Oyewole", role: UserRole.PROCUREMENT_REP },
+    { email: "sales-manager@ssvshop.com", firstName: "Tunde", lastName: "Adeyemi", role: UserRole.SALES_MANAGER },
+    { email: "sales-rep@ssvshop.com", firstName: "Fatima", lastName: "Bello", role: UserRole.SALES_REP },
     { email: "accountant@ssvshop.com", firstName: "Yusuf", lastName: "Lawal", role: UserRole.ACCOUNTANT },
     { email: "auditor@ssvshop.com", firstName: "Aisha", lastName: "Mohammed", role: UserRole.AUDITOR },
     { email: "customer@ssvshop.com", firstName: "Chidera", lastName: "Eze", role: UserRole.CUSTOMER },
@@ -264,7 +266,7 @@ async function main() {
     const sale = await prisma.sale.create({
       data: {
         invoiceNumber: invoiceNum,
-        userId: users["cashier@ssvshop.com"],
+        userId: users["sales-rep@ssvshop.com"],
         customerId,
         subtotal,
         discount,
@@ -378,7 +380,7 @@ async function main() {
         status,
         expectedDate: new Date(orderDate.getTime() + 14 * 24 * 60 * 60 * 1000),
         notes: `Order from ${supplierName}`,
-        createdBy: users["procurement@ssvshop.com"],
+        createdBy: users["procurement-manager@ssvshop.com"],
         createdAt: orderDate,
         items: {
           create: poItems,
@@ -392,7 +394,7 @@ async function main() {
   console.log("\n🏧 Seeding cash drawers...");
   await prisma.cashDrawer.create({
     data: {
-        userId: users["cashier@ssvshop.com"],
+        userId: users["sales-rep@ssvshop.com"],
       openingBalance: 50000,
       closingBalance: 87500,
       actualBalance: 87500,
@@ -405,7 +407,7 @@ async function main() {
 
   await prisma.cashDrawer.create({
     data: {
-        userId: users["cashier@ssvshop.com"],
+        userId: users["sales-rep@ssvshop.com"],
       openingBalance: 50000,
       status: DrawerStatus.OPEN,
       openedAt: new Date(),
@@ -573,7 +575,7 @@ async function main() {
     await prisma.stockAdjustment.create({
       data: {
         productId: products[sku],
-        userId: users["inventory@ssvshop.com"],
+        userId: users["warehouse-manager@ssvshop.com"],
         type: adjTypes[Math.floor(Math.random() * adjTypes.length)],
         quantity: 1 + Math.floor(Math.random() * 20),
         reason: adjReasons[Math.floor(Math.random() * adjReasons.length)],
@@ -596,17 +598,33 @@ async function main() {
       { action: "manage", resource: "products" },
       { action: "manage", resource: "sales" },
     ],
-    CASHIER: [
-      { action: "create", resource: "sale" },
-      { action: "view", resource: "products" },
-    ],
-    INVENTORY_MANAGER: [
+    WAREHOUSE_MANAGER: [
       { action: "manage", resource: "products" },
       { action: "manage", resource: "stock" },
+      { action: "manage", resource: "categories" },
     ],
-    PROCUREMENT: [
+    WAREHOUSE_REP: [
+      { action: "view", resource: "products" },
+      { action: "manage", resource: "stock-adjustments" },
+    ],
+    PROCUREMENT_MANAGER: [
       { action: "manage", resource: "purchase-orders" },
       { action: "view", resource: "suppliers" },
+      { action: "manage", resource: "suppliers" },
+    ],
+    PROCUREMENT_REP: [
+      { action: "view", resource: "suppliers" },
+      { action: "create", resource: "stock-requests" },
+    ],
+    SALES_MANAGER: [
+      { action: "view", resource: "sales" },
+      { action: "manage", resource: "sales" },
+      { action: "view", resource: "customers" },
+    ],
+    SALES_REP: [
+      { action: "create", resource: "sale" },
+      { action: "view", resource: "products" },
+      { action: "view", resource: "customers" },
     ],
     ACCOUNTANT: [
       { action: "view", resource: "financial-reports" },
@@ -615,11 +633,6 @@ async function main() {
     AUDITOR: [
       { action: "view", resource: "audit-logs" },
       { action: "view", resource: "reports" },
-    ],
-    SALES_MANAGER: [
-      { action: "view", resource: "sales" },
-      { action: "manage", resource: "sales" },
-      { action: "view", resource: "customers" },
     ],
     CUSTOMER: [
       { action: "view", resource: "profile" },
@@ -651,7 +664,7 @@ async function main() {
     await prisma.supplyRequest.create({
       data: {
         supplierId: suppliers[supplierName],
-        requestedBy: users["procurement@ssvshop.com"],
+        requestedBy: users["procurement-manager@ssvshop.com"],
         description: `Urgent supply request for ${supplierName} - batch ${i + 1}`,
         status: supplyRequestStatuses[i % supplyRequestStatuses.length] as any,
         urgency: urgencyLevels[i % urgencyLevels.length] as any,

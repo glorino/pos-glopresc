@@ -9,10 +9,12 @@ import AIChatbot from "@/components/ui/AIChatbot";
 type UserRole =
   | "OWNER"
   | "MANAGER"
+  | "WAREHOUSE_MANAGER"
+  | "WAREHOUSE_REP"
+  | "PROCUREMENT_MANAGER"
+  | "PROCUREMENT_REP"
   | "SALES_MANAGER"
-  | "CASHIER"
-  | "INVENTORY_MANAGER"
-  | "PROCUREMENT"
+  | "SALES_REP"
   | "ACCOUNTANT"
   | "AUDITOR"
   | "CUSTOMER";

@@ -34,7 +34,7 @@ const BOT_RESPONSES: Record<string, string> = {
   "how do i view audit logs?":
     "To view audit logs:\n\n1. Go to Auditor > Audit Logs\n2. View all system activities\n3. Filter by user, action type, or date\n4. Click on any entry for full details\n5. Export logs for compliance reporting",
   "what roles are available?":
-    "Available roles in SSV Shop POS:\n\n1. Owner - Full system access\n2. Manager - Operations & management\n3. Sales Manager - Sales oversight\n4. Cashier - POS terminal operations\n5. Inventory Manager - Stock management\n6. Procurement - Supplier & ordering\n7. Accountant - Financial management\n8. Auditor - System audit & compliance\n9. Customer - Self-service portal",
+    "Available roles in SSV Shop POS:\n\n1. Owner - Full system access\n2. Manager - Operations & management\n3. Warehouse Manager - Warehouse stock management\n4. Warehouse Rep - Warehouse stock adjustments\n5. Procurement Manager - Supplier & purchase order management\n6. Procurement Rep - Supplier & stock request handling\n7. Sales Manager - Sales oversight\n8. Sales Rep - POS terminal operations\n9. Accountant - Financial management\n10. Auditor - System audit & compliance\n11. Customer - Self-service portal",
   "how do i close the register?":
     "To close the cash register:\n\n1. Go to POS Terminal\n2. Click 'Close Drawer' in the top bar\n3. Count the physical cash in the drawer\n4. Enter the actual balance\n5. The system calculates any difference\n6. Confirm to close\n\nA summary report is generated automatically.",
   "how do i run a stock take?":

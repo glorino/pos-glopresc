@@ -12,14 +12,17 @@ export default withAuth(
 
       if (roleSegment && role) {
         const allowedRoutes: Record<string, string[]> = {
-          OWNER: ["owner", "manager", "sales", "cashier", "inventory", "procurement", "accountant", "auditor"],
-          MANAGER: ["manager", "sales", "cashier", "inventory", "procurement"],
-          SALES_MANAGER: ["sales", "cashier"],
-          CASHIER: ["cashier"],
-          INVENTORY_MANAGER: ["inventory"],
-          PROCUREMENT: ["procurement"],
-          ACCOUNTANT: ["accountant"],
+          OWNER: ["owner", "manager", "warehouse-manager", "warehouse-rep", "procurement-manager", "procurement-rep", "sales-manager", "sales-rep", "accounting", "auditor", "customer"],
+          MANAGER: ["manager", "warehouse-manager", "procurement-manager", "sales-manager", "sales-rep", "accounting"],
+          WAREHOUSE_MANAGER: ["warehouse-manager", "warehouse-rep"],
+          WAREHOUSE_REP: ["warehouse-rep"],
+          PROCUREMENT_MANAGER: ["procurement-manager", "procurement-rep"],
+          PROCUREMENT_REP: ["procurement-rep"],
+          SALES_MANAGER: ["sales-manager", "sales-rep"],
+          SALES_REP: ["sales-rep"],
+          ACCOUNTANT: ["accounting"],
           AUDITOR: ["auditor"],
+          CUSTOMER: ["customer"],
         };
 
         const allowed = allowedRoutes[role] || [];
