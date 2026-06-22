@@ -1,0 +1,540 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Users & Auth ──────────────────────────────────────────
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  firstName     String
+  lastName      String
+  phone         String?
+  role          UserRole
+  avatar        String?
+  isActive      Boolean   @default(true)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  permissions       UserPermission[]
+  auditLogs         AuditLog[]
+  sales             Sale[]
+  cashDrawer        CashDrawer[]
+  expenses          Expense[]
+  expenseApprovals  ExpenseApproval[]
+  notifications     Notification[]
+  stockAdjustments  StockAdjustment[]
+
+  @@index([role])
+  @@index([email])
+}
+
+enum UserRole {
+  OWNER
+  MANAGER
+  SALES_MANAGER
+  CASHIER
+  INVENTORY_MANAGER
+  PROCUREMENT
+  ACCOUNTANT
+  AUDITOR
+  CUSTOMER
+}
+
+model UserPermission {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  resource  String
+  granted   Boolean  @default(true)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, action, resource])
+}
+
+// ── Categories ────────────────────────────────────────────
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  image       String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products Product[]
+
+  @@index([name])
+}
+
+// ── Suppliers ─────────────────────────────────────────────
+model Supplier {
+  id          String   @id @default(cuid())
+  name        String
+  contactName String?
+  email       String?
+  phone       String?
+  address     String?
+  city        String?
+  state       String?
+  country     String  @default("Nigeria")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products          Product[]
+  purchaseOrders    PurchaseOrder[]
+  supplyRequests    SupplyRequest[]
+
+  @@index([name])
+}
+
+// ── Products ──────────────────────────────────────────────
+model Product {
+  id              String   @id @default(cuid())
+  name            String
+  sku             String   @unique
+  barcode         String?
+  description     String?
+  price           Decimal  @db.Decimal(10, 2)
+  costPrice       Decimal  @db.Decimal(10, 2) @default(0)
+  stockQuantity   Int      @default(0)
+  minStockLevel   Int      @default(5)
+  maxStockLevel   Int      @default(1000)
+  unit            String   @default("piece")
+  image           String?
+  isActive        Boolean  @default(true)
+  isFeatured      Boolean  @default(false)
+  categoryId      String?
+  supplierId      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  category        Category?   @relation(fields: [categoryId], references: [id])
+  supplier        Supplier?   @relation(fields: [supplierId], references: [id])
+  saleItems       SaleItem[]
+  cartItems       CartItem[]
+  stockAdjustments StockAdjustment[]
+  purchaseOrderItems PurchaseOrderItem[]
+
+  @@index([sku])
+  @@index([name])
+  @@index([categoryId])
+}
+
+// ── Customers ─────────────────────────────────────────────
+model Customer {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String?  @unique
+  phone       String?
+  address     String?
+  city        String?
+  state       String?
+  notes       String?
+  loyaltyPoints Int    @default(0)
+  totalSpent  Decimal  @default(0) @db.Decimal(10, 2)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sales       Sale[]
+  bookings    Booking[]
+  invoices    Invoice[]
+  payments    Payment[]
+
+  @@index([email])
+  @@index([phone])
+}
+
+// ── Cart ──────────────────────────────────────────────────
+model CartItem {
+  id        String   @id @default(cuid())
+  sessionId String
+  productId String
+  quantity  Int      @default(1)
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([sessionId, productId])
+}
+
+// ── Sales ─────────────────────────────────────────────────
+model Sale {
+  id            String      @id @default(cuid())
+  invoiceNumber String      @unique
+  userId        String
+  customerId    String?
+  subtotal      Decimal     @db.Decimal(10, 2)
+  discount      Decimal     @default(0) @db.Decimal(10, 2)
+  tax           Decimal     @default(0) @db.Decimal(10, 2)
+  total         Decimal     @db.Decimal(10, 2)
+  amountPaid    Decimal     @default(0) @db.Decimal(10, 2)
+  changeDue     Decimal     @default(0) @db.Decimal(10, 2)
+  paymentMethod PaymentMethod
+  status        SaleStatus  @default(COMPLETED)
+  notes         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id])
+  customer     Customer?     @relation(fields: [customerId], references: [id])
+  items        SaleItem[]
+  invoiceId    String?   @unique
+  invoice     Invoice?     @relation(fields: [invoiceId], references: [id])
+
+  @@index([invoiceNumber])
+  @@index([createdAt])
+  @@index([userId])
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
+  USSD
+  MOBILE
+  ONLINE
+}
+
+enum SaleStatus {
+  PENDING
+  COMPLETED
+  RETURNED
+  REFUNDED
+  CANCELLED
+}
+
+model SaleItem {
+  id        String  @id @default(cuid())
+  saleId    String
+  productId String
+  quantity  Int
+  unitPrice Decimal @db.Decimal(10, 2)
+  total     Decimal @db.Decimal(10, 2)
+  sale      Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@index([saleId])
+}
+
+// ── Payments ──────────────────────────────────────────────
+model Payment {
+  id            String        @id @default(cuid())
+  customerId    String?
+  amount        Decimal       @db.Decimal(10, 2)
+  method        PaymentMethod
+  reference     String?       @unique
+  description   String?
+  status        PaymentStatus @default(COMPLETED)
+  createdAt     DateTime      @default(now())
+
+  customer      Customer?     @relation(fields: [customerId], references: [id])
+
+  @@index([reference])
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+// ── Cash Drawer ───────────────────────────────────────────
+model CashDrawer {
+  id              String       @id @default(cuid())
+  userId          String
+  openingBalance  Decimal      @db.Decimal(10, 2)
+  closingBalance  Decimal?     @db.Decimal(10, 2)
+  actualBalance   Decimal?     @db.Decimal(10, 2)
+  difference      Decimal?     @db.Decimal(10, 2)
+  status          DrawerStatus @default(OPEN)
+  openedAt        DateTime     @default(now())
+  closedAt        DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([openedAt])
+}
+
+enum DrawerStatus {
+  OPEN
+  CLOSED
+}
+
+// ── Expenses ──────────────────────────────────────────────
+model Expense {
+  id            String       @id @default(cuid())
+  userId        String
+  categoryId    String
+  description   String
+  amount        Decimal      @db.Decimal(10, 2)
+  date          DateTime     @default(now())
+  receipt       String?
+  status        ExpenseStatus @default(PENDING)
+  approvedBy    String?
+  notes         String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  user      User             @relation(fields: [userId], references: [id])
+  category  ExpenseCategory  @relation(fields: [categoryId], references: [id])
+  approvals ExpenseApproval[]
+  invoice   Invoice?
+
+  @@index([date])
+  @@index([status])
+}
+
+enum ExpenseStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PAID
+}
+
+model ExpenseCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  expenses Expense[]
+}
+
+model ExpenseApproval {
+  id         String       @id @default(cuid())
+  expenseId  String
+  userId     String
+  status     ApprovalStatus
+  notes      String?
+  createdAt  DateTime     @default(now())
+
+  expense Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ── Invoices ──────────────────────────────────────────────
+model Invoice {
+  id            String        @id @default(cuid())
+  invoiceNumber String        @unique
+  customerId    String?
+  expenseId     String?   @unique
+  amount        Decimal       @db.Decimal(10, 2)
+  tax           Decimal       @default(0) @db.Decimal(10, 2)
+  total         Decimal       @db.Decimal(10, 2)
+  status        InvoiceStatus @default(PENDING)
+  dueDate       DateTime
+  paidDate      DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  customer  Customer?  @relation(fields: [customerId], references: [id])
+  expense   Expense?   @relation(fields: [expenseId], references: [id])
+  sale      Sale?
+
+  @@index([invoiceNumber])
+  @@index([status])
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+// ── Bookings ──────────────────────────────────────────────
+model Booking {
+  id            String        @id @default(cuid())
+  bookingNumber String        @unique
+  customerId    String
+  serviceType   String
+  description   String?
+  date          DateTime
+  time          String
+  duration      Int           @default(60)
+  status        BookingStatus @default(PENDING)
+  notes         String?
+  totalAmount   Decimal?      @db.Decimal(10, 2)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  customer  Customer @relation(fields: [customerId], references: [id])
+
+  @@index([date])
+  @@index([status])
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+// ── Notifications ─────────────────────────────────────────
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      NotificationType @default(INFO)
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+// ── Audit Log ─────────────────────────────────────────────
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  resource  String
+  resourceId String?
+  details   Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// ── Settings ──────────────────────────────────────────────
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  group     String   @default("general")
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+}
+
+// ── Purchase Orders ───────────────────────────────────────
+model PurchaseOrder {
+  id            String            @id @default(cuid())
+  orderNumber   String            @unique
+  supplierId    String
+  total         Decimal           @db.Decimal(10, 2)
+  status        PurchaseStatus    @default(PENDING)
+  expectedDate  DateTime?
+  notes         String?
+  createdBy     String
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  supplier  Supplier            @relation(fields: [supplierId], references: [id])
+  items     PurchaseOrderItem[]
+
+  @@index([orderNumber])
+  @@index([status])
+}
+
+enum PurchaseStatus {
+  PENDING
+  APPROVED
+  ORDERED
+  RECEIVED
+  CANCELLED
+}
+
+model PurchaseOrderItem {
+  id              String        @id @default(cuid())
+  purchaseOrderId String
+  productId       String
+  quantity        Int
+  unitCost        Decimal       @db.Decimal(10, 2)
+  total           Decimal       @db.Decimal(10, 2)
+  receivedQty     Int           @default(0)
+
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  product       Product       @relation(fields: [productId], references: [id])
+}
+
+// ── Stock Adjustments ─────────────────────────────────────
+model StockAdjustment {
+  id          String           @id @default(cuid())
+  productId   String
+  userId      String
+  type        AdjustmentType
+  quantity    Int
+  reason      String
+  reference   String?
+  createdAt   DateTime         @default(now())
+
+  product Product @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@index([productId])
+}
+
+enum AdjustmentType {
+  ADDITION
+  SUBTRACTION
+  DAMAGE
+  EXPIRED
+  RETURN
+  TRANSFER
+}
+
+// ── Supply Requests ───────────────────────────────────────
+model SupplyRequest {
+  id            String              @id @default(cuid())
+  supplierId    String
+  requestedBy   String
+  description   String
+  status        SupplyRequestStatus @default(PENDING)
+  urgency       Urgency            @default(NORMAL)
+  expectedDate  DateTime?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+}
+
+enum SupplyRequestStatus {
+  PENDING
+  APPROVED
+  ORDERED
+  RECEIVED
+  CANCELLED
+}
+
+enum Urgency {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
