@@ -74,7 +74,7 @@ export default function CashierDashboard() {
 
   if (loading) {
     return (
-      <DashboardLayout role="CASHIER" title="Cashier Dashboard">
+      <DashboardLayout role="SALES_REP" title="Cashier Dashboard">
         <div className="flex h-[60vh] items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4a843] border-t-transparent" />
         </div>
@@ -152,7 +152,7 @@ export default function CashierDashboard() {
   ];
 
   return (
-    <DashboardLayout role="CASHIER" title="Cashier Dashboard">
+    <DashboardLayout role="SALES_REP" title="Cashier Dashboard">
       <div className="space-y-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {stats.map((stat) => {

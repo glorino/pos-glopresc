@@ -198,7 +198,7 @@ export default function ProcurementDashboard() {
   }
 
   return (
-    <DashboardLayout role="PROCUREMENT" title="Procurement Management">
+    <DashboardLayout role="PROCUREMENT_MANAGER" title="Procurement Management">
       <div className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">

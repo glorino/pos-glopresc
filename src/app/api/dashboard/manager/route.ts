@@ -43,7 +43,7 @@ export async function GET() {
         },
       }),
       db.user.count({
-        where: { isActive: true, role: { in: ["CASHIER", "SALES_MANAGER"] } },
+        where: { isActive: true, role: { in: ["SALES_REP", "SALES_MANAGER"] } },
       }),
       db.product.aggregate({
         _sum: { stockQuantity: true },
@@ -72,7 +72,7 @@ export async function GET() {
         },
       }),
       db.user.findMany({
-        where: { isActive: true, role: { in: ["CASHIER", "SALES_MANAGER"] } },
+        where: { isActive: true, role: { in: ["SALES_REP", "SALES_MANAGER"] } },
         select: {
           id: true,
           firstName: true,

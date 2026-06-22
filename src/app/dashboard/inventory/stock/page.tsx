@@ -148,7 +148,7 @@ export default function InventoryStockPage() {
   }
 
   return (
-    <DashboardLayout role="INVENTORY_MANAGER" title="Stock Management">
+    <DashboardLayout role="WAREHOUSE_MANAGER" title="Stock Management">
       <div className="space-y-6">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="glass-card p-6">

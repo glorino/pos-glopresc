@@ -98,7 +98,7 @@ export default function InventoryProductsPage() {
   const outOfStockCount = products.filter((p) => p.isOutOfStock).length;
 
   return (
-    <DashboardLayout role="INVENTORY_MANAGER" title="Products">
+    <DashboardLayout role="WAREHOUSE_MANAGER" title="Products">
       <div className="space-y-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="stat-card">

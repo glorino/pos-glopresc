@@ -40,9 +40,9 @@ const roleOptions = [
   "OWNER",
   "MANAGER",
   "SALES_MANAGER",
-  "CASHIER",
-  "INVENTORY_MANAGER",
-  "PROCUREMENT",
+  "SALES_REP",
+  "WAREHOUSE_MANAGER",
+  "PROCUREMENT_MANAGER",
   "ACCOUNTANT",
   "AUDITOR",
 ];
@@ -61,7 +61,7 @@ const emptyForm: UserFormData = {
   lastName: "",
   email: "",
   phone: "",
-  role: "CASHIER",
+  role: "SALES_REP",
   password: "",
 };
 

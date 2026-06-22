@@ -109,7 +109,7 @@ export default function InventoryCategoriesPage() {
   }
 
   return (
-    <DashboardLayout role="INVENTORY_MANAGER" title="Categories">
+    <DashboardLayout role="WAREHOUSE_MANAGER" title="Categories">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-[#9090a0]">
