@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import {
@@ -60,6 +60,7 @@ interface DashboardData {
 const COLORS = ["#d4a843", "#3b82f6", "#8b5cf6", "#10b981", "#f59e0b"];
 
 export default function OwnerDashboard() {
+  const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -154,12 +155,11 @@ export default function OwnerDashboard() {
   ];
 
   const quickActions = [
-    { label: "View Reports", href: "/dashboard/reports", icon: BarChart3, color: "text-[#3b82f6]" },
-    { label: "Manage Users", href: "/dashboard/users", icon: Shield, color: "text-[#8b5cf6]" },
-    { label: "Shop", href: "/shop", icon: Store, color: "text-[#d4a843]" },
-    { label: "Settings", href: "/dashboard/settings", icon: Settings, color: "text-[#10b981]" },
-    { label: "Audit Logs", href: "/dashboard/audit-logs", icon: FileText, color: "text-[#f59e0b]" },
-    { label: "Add User", href: "/dashboard/users", icon: UserPlus, color: "text-[#f43f5e]" },
+    { label: "View Reports", action: () => router.push('/dashboard/owner/reports'), icon: BarChart3, color: "text-[#3b82f6]" },
+    { label: "Manage Users", action: () => router.push('/dashboard/owner/users'), icon: Shield, color: "text-[#8b5cf6]" },
+    { label: "Shop", action: () => router.push('/shop'), icon: Store, color: "text-[#d4a843]" },
+    { label: "Settings", action: () => router.push('/dashboard/owner/settings'), icon: Settings, color: "text-[#10b981]" },
+    { label: "Add User", action: () => router.push('/dashboard/owner/users'), icon: UserPlus, color: "text-[#f43f5e]" },
   ];
 
   const recentActivity = [
@@ -323,16 +323,16 @@ export default function OwnerDashboard() {
               {quickActions.map((action) => {
                 const Icon = action.icon;
                 return (
-                  <Link
+                  <button
                     key={action.label}
-                    href={action.href}
+                    onClick={action.action}
                     className="group flex flex-col items-center gap-2 rounded-xl border border-[#2a2a3a] bg-[#1c1c28]/50 p-4 transition-all duration-200 hover:border-[#d4a843]/30 hover:bg-[#1c1c28] hover:shadow-lg hover:shadow-black/20"
                   >
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2a2a3a]/50 transition-all group-hover:bg-[#2a2a3a]">
                       <Icon size={20} className={action.color} />
                     </div>
                     <span className="text-xs font-medium text-[#f0f0f5]">{action.label}</span>
-                  </Link>
+                  </button>
                 );
               })}
             </div>

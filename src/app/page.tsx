@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   ShoppingCart,
@@ -53,6 +53,14 @@ const features = [
   },
 ];
 
+const phrases = [
+  "Manage Sales & Inventory",
+  "Track Finances & Expenses",
+  "Process Orders Faster",
+  "Grow Your Business",
+  "Real-time Analytics",
+];
+
 const stats = [
   { value: "10K+", label: "Transactions" },
   { value: "100%", label: "Secure" },
@@ -60,10 +68,16 @@ const stats = [
   { value: "24/7", label: "Support" },
 ];
 
-
-
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentPhrase, setCurrentPhrase] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentPhrase((prev) => (prev + 1) % phrases.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
@@ -152,6 +166,11 @@ export default function LandingPage() {
               Everything you need to run your retail business — from sales and
               inventory to customer management and financial reporting.
             </p>
+            <div className="h-8 overflow-hidden">
+              <p className="text-xl text-[#9090a0] transition-all duration-500 ease-in-out" key={currentPhrase}>
+                {phrases[currentPhrase]}
+              </p>
+            </div>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
                 href="/dashboard/owner"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency } from "@/lib/utils";
 import {
@@ -49,6 +49,7 @@ interface ManagerData {
 }
 
 export default function ManagerDashboard() {
+  const router = useRouter();
   const [data, setData] = useState<ManagerData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -125,9 +126,9 @@ export default function ManagerDashboard() {
   ];
 
   const quickActions = [
-    { label: "Approve Expenses", href: "/dashboard/expenses", icon: CheckCircle },
-    { label: "View Reports", href: "/dashboard/reports", icon: BarChart3 },
-    { label: "Staff Management", href: "/dashboard/users", icon: Users },
+    { label: "Approve Expenses", action: () => router.push('/dashboard/accounting/expenses'), icon: CheckCircle },
+    { label: "View Reports", action: () => router.push('/dashboard/owner/reports'), icon: BarChart3 },
+    { label: "Staff Management", action: () => router.push('/dashboard/owner/users'), icon: Users },
   ];
 
   return (
@@ -196,9 +197,9 @@ export default function ManagerDashboard() {
               {quickActions.map((action) => {
                 const Icon = action.icon;
                 return (
-                  <Link
+                  <button
                     key={action.label}
-                    href={action.href}
+                    onClick={action.action}
                     className="flex items-center justify-between rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-3 transition-all hover:border-[#d4a843]/30"
                   >
                     <div className="flex items-center gap-3">
@@ -208,7 +209,7 @@ export default function ManagerDashboard() {
                       </span>
                     </div>
                     <ArrowRight size={14} className="text-[#606070]" />
-                  </Link>
+                  </button>
                 );
               })}
             </div>

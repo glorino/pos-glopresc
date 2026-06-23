@@ -11,11 +11,14 @@ import {
   Minus,
   Trash2,
   Package,
-  Menu,
   ChevronRight,
   ArrowLeft,
-  Store,
+  CreditCard,
+  CheckCircle2,
+  MapPin,
 } from "lucide-react";
+import ShippingCalculator from "@/components/ui/ShippingCalculator";
+import FlutterwavePayment from "@/components/ui/FlutterwavePayment";
 
 interface Product {
   id: string;
@@ -43,6 +46,13 @@ export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [shippingFee, setShippingFee] = useState(0);
+  const [shippingEstimate, setShippingEstimate] = useState("");
+  const [shippingAddress, setShippingAddress] = useState("");
+  const [orderSuccess, setOrderSuccess] = useState(false);
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerName, setCustomerName] = useState("");
 
   useEffect(() => {
     fetchProducts();
@@ -100,7 +110,47 @@ export default function ShopPage() {
     setCart((prev) => prev.filter((item) => item.product.id !== productId));
   }
 
+  function handleCheckout() {
+    setCartOpen(false);
+    setCheckoutOpen(true);
+  }
+
+  async function createSale(txRef: string) {
+    try {
+      const items = cart.map((item) => ({
+        productId: item.product.id,
+        quantity: item.quantity,
+        unitPrice: item.product.price,
+      }));
+
+      const res = await fetch("/api/sales", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items,
+          paymentMethod: "online",
+          amountPaid: subtotal + shippingFee,
+          txRef,
+        }),
+      });
+
+      if (res.ok) {
+        setOrderSuccess(true);
+        setCart([]);
+        setCheckoutOpen(false);
+        setShippingFee(0);
+        setShippingEstimate("");
+        setShippingAddress("");
+      } else {
+        alert("Failed to record sale. Please contact support.");
+      }
+    } catch {
+      alert("Failed to record sale. Please contact support.");
+    }
+  }
+
   const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const total = subtotal + shippingFee;
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const filteredProducts = products.filter((product) => {
@@ -112,6 +162,32 @@ export default function ShopPage() {
       product.category?.name?.toLowerCase() === selectedCategory.toLowerCase();
     return matchesSearch && matchesCategory;
   });
+
+  if (orderSuccess) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0f]">
+        <div className="flex min-h-screen items-center justify-center px-4">
+          <div className="w-full max-w-md rounded-2xl border border-[#2a2a3a] bg-[#111118] p-8 text-center">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#10b981]/10">
+              <CheckCircle2 size={40} className="text-[#10b981]" />
+            </div>
+            <h2 className="text-2xl font-bold text-[#f0f0f5]">Order Confirmed!</h2>
+            <p className="mt-2 text-sm text-[#9090a0]">
+              Your order has been placed successfully. We will process it shortly.
+            </p>
+            <Link
+              href="/shop"
+              onClick={() => setOrderSuccess(false)}
+              className="btn btn-primary mt-8 inline-flex items-center gap-2"
+            >
+              <ArrowLeft size={16} />
+              Continue Shopping
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
@@ -356,20 +432,162 @@ export default function ShopPage() {
 
             {cart.length > 0 && (
               <div className="border-t border-[#2a2a3a] px-6 py-4">
-                <div className="mb-4 flex justify-between text-sm">
+                <div className="mb-2 flex justify-between text-sm">
                   <span className="text-[#9090a0]">Subtotal</span>
                   <span className="font-bold text-[#d4a843]">{formatCurrency(subtotal)}</span>
                 </div>
-                <Link
-                  href="/booking"
+                {shippingFee > 0 && (
+                  <div className="mb-2 flex justify-between text-sm">
+                    <span className="text-[#9090a0]">Shipping</span>
+                    <span className="font-bold text-[#d4a843]">{formatCurrency(shippingFee)}</span>
+                  </div>
+                )}
+                <div className="mb-4 flex justify-between border-t border-[#2a2a3a] pt-2 text-sm">
+                  <span className="font-semibold text-[#f0f0f5]">Total</span>
+                  <span className="font-bold text-[#d4a843]">{formatCurrency(total)}</span>
+                </div>
+                <button
+                  onClick={handleCheckout}
                   className="btn btn-primary flex w-full items-center justify-center gap-2"
-                  onClick={() => setCartOpen(false)}
                 >
-                  Proceed to Checkout
+                  Checkout
                   <ChevronRight size={16} />
-                </Link>
+                </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Checkout Modal */}
+      {checkoutOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setCheckoutOpen(false)}
+          />
+          <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[#2a2a3a] bg-[#111118] shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[#2a2a3a] px-6 py-4">
+              <div className="flex items-center gap-2">
+                <CreditCard size={18} className="text-[#d4a843]" />
+                <h2 className="text-lg font-bold text-[#f0f0f5]">Checkout</h2>
+              </div>
+              <button
+                onClick={() => setCheckoutOpen(false)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#606070] hover:bg-[#1c1c28] hover:text-[#f0f0f5]"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="space-y-4 px-6 py-4">
+              {/* Customer Info */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-[#f0f0f5]">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  placeholder="John Doe"
+                  className="input text-sm"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-[#f0f0f5]">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
+                  placeholder="john@example.com"
+                  className="input text-sm"
+                />
+              </div>
+
+              {/* Shipping Address */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-[#f0f0f5]">
+                  <MapPin size={14} className="mr-1 inline text-[#d4a843]" />
+                  Delivery Address
+                </label>
+                <input
+                  type="text"
+                  value={shippingAddress}
+                  onChange={(e) => setShippingAddress(e.target.value)}
+                  placeholder="e.g., 123 Allen Avenue, Ikeja, Lagos"
+                  className="input text-sm"
+                />
+              </div>
+
+              {/* Shipping Calculator */}
+              <ShippingCalculator
+                weight={cart.reduce((sum, item) => sum + item.quantity, 0)}
+                onCalculate={(fee, estimate) => {
+                  setShippingFee(fee);
+                  setShippingEstimate(estimate);
+                }}
+              />
+
+              {shippingEstimate && (
+                <p className="text-xs text-[#9090a0]">
+                  Estimated delivery: <span className="font-medium text-[#10b981]">{shippingEstimate}</span>
+                </p>
+              )}
+
+              {/* Order Summary */}
+              <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
+                <h4 className="mb-3 text-sm font-semibold text-[#f0f0f5]">Order Summary</h4>
+                <div className="space-y-2">
+                  {cart.map((item) => (
+                    <div key={item.product.id} className="flex justify-between text-sm">
+                      <span className="text-[#9090a0]">
+                        {item.product.name} x{item.quantity}
+                      </span>
+                      <span className="font-medium text-[#f0f0f5]">
+                        {formatCurrency(item.product.price * item.quantity)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <hr className="my-3 border-[#2a2a3a]" />
+                <div className="flex justify-between text-sm">
+                  <span className="text-[#9090a0]">Subtotal</span>
+                  <span className="font-bold text-[#d4a843]">{formatCurrency(subtotal)}</span>
+                </div>
+                <div className="mt-1 flex justify-between text-sm">
+                  <span className="text-[#9090a0]">Shipping</span>
+                  <span className="font-bold text-[#d4a843]">
+                    {shippingFee > 0 ? formatCurrency(shippingFee) : "Calculate below"}
+                  </span>
+                </div>
+                <hr className="my-3 border-[#2a2a3a]" />
+                <div className="flex justify-between">
+                  <span className="font-semibold text-[#f0f0f5]">Total</span>
+                  <span className="text-lg font-bold text-[#d4a843]">{formatCurrency(total)}</span>
+                </div>
+              </div>
+
+              {/* Payment */}
+              {!customerName || !customerEmail || !shippingAddress ? (
+                <p className="text-center text-xs text-[#f59e0b]">
+                  Please fill in your name, email, and delivery address to proceed.
+                </p>
+              ) : (
+                <FlutterwavePayment
+                  amount={total}
+                  email={customerEmail}
+                  name={customerName}
+                  description={`SSV Shop Order - ${cart.length} item(s)`}
+                  onSuccess={(response) => {
+                    createSale(response.tx_ref as string);
+                  }}
+                  onClose={() => {}}
+                />
+              )}
+            </div>
           </div>
         </div>
       )}

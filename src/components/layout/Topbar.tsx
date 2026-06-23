@@ -12,6 +12,7 @@ import {
   User,
   Settings,
 } from "lucide-react";
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 
 interface TopbarProps {
   title: string;
@@ -83,6 +84,8 @@ export default function Topbar({ title, user }: TopbarProps) {
             3
           </span>
         </button>
+
+        <LanguageSwitcher />
 
         <div ref={dropdownRef} className="relative">
           <button

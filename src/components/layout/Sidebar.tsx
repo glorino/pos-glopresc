@@ -54,9 +54,9 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
     {
       title: "Management",
       items: [
-        { icon: BarChart3, label: "Reports", href: "/dashboard/reports" },
-        { icon: Shield, label: "Users", href: "/dashboard/users" },
-        { icon: Settings, label: "Settings", href: "/dashboard/settings" },
+        { icon: BarChart3, label: "Reports", href: "/dashboard/owner/reports" },
+        { icon: Shield, label: "Users", href: "/dashboard/owner/users" },
+        { icon: Settings, label: "Settings", href: "/dashboard/owner/settings" },
       ],
     },
   ],
@@ -70,7 +70,7 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
     {
       title: "Operations",
       items: [
-        { icon: ShoppingCart, label: "Sales", href: "/dashboard/sales" },
+        { icon: ShoppingCart, label: "Sales", href: "/dashboard/sales-manager/sales" },
         { icon: Package, label: "Inventory", href: "/dashboard/inventory" },
         { icon: Truck, label: "Procurement", href: "/dashboard/procurement" },
       ],
@@ -78,70 +78,70 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
     {
       title: "Finance",
       items: [
-        { icon: BarChart3, label: "Reports", href: "/dashboard/reports" },
+        { icon: BarChart3, label: "Reports", href: "/dashboard/owner/reports" },
       ],
     },
   ],
   WAREHOUSE_MANAGER: [
     {
       items: [
-        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/warehouse-manager" },
+        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/inventory" },
       ],
     },
     {
       title: "Warehouse",
       items: [
-        { icon: Package, label: "Products", href: "/dashboard/products" },
-        { icon: ClipboardList, label: "Stock", href: "/dashboard/stock" },
-        { icon: FileText, label: "Categories", href: "/dashboard/categories" },
+        { icon: Package, label: "Products", href: "/dashboard/inventory/products" },
+        { icon: ClipboardList, label: "Stock", href: "/dashboard/inventory/stock" },
+        { icon: FileText, label: "Categories", href: "/dashboard/inventory/categories" },
       ],
     },
   ],
   WAREHOUSE_REP: [
     {
       items: [
-        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/warehouse-rep" },
+        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/inventory" },
       ],
     },
     {
       title: "Warehouse",
       items: [
-        { icon: Package, label: "Products", href: "/dashboard/products" },
-        { icon: ClipboardList, label: "Stock Adjustments", href: "/dashboard/stock-adjustments" },
+        { icon: Package, label: "Products", href: "/dashboard/inventory/products" },
+        { icon: ClipboardList, label: "Stock Adjustments", href: "/dashboard/inventory/stock" },
       ],
     },
   ],
   PROCUREMENT_MANAGER: [
     {
       items: [
-        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/procurement-manager" },
+        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/procurement" },
       ],
     },
     {
       title: "Procurement",
       items: [
-        { icon: Truck, label: "Suppliers", href: "/dashboard/suppliers" },
-        { icon: ClipboardList, label: "Purchase Orders", href: "/dashboard/purchase-orders" },
+        { icon: Truck, label: "Suppliers", href: "/dashboard/procurement" },
+        { icon: ClipboardList, label: "Purchase Orders", href: "/dashboard/procurement" },
       ],
     },
     {
       title: "Finance",
       items: [
-        { icon: BarChart3, label: "Reports", href: "/dashboard/reports" },
+        { icon: BarChart3, label: "Reports", href: "/dashboard/owner/reports" },
       ],
     },
   ],
   PROCUREMENT_REP: [
     {
       items: [
-        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/procurement-rep" },
+        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/procurement" },
       ],
     },
     {
       title: "Procurement",
       items: [
-        { icon: Truck, label: "Suppliers", href: "/dashboard/suppliers" },
-        { icon: ClipboardList, label: "Stock Requests", href: "/dashboard/stock-requests" },
+        { icon: Truck, label: "Suppliers", href: "/dashboard/procurement" },
+        { icon: ClipboardList, label: "Stock Requests", href: "/dashboard/procurement" },
       ],
     },
   ],
@@ -154,24 +154,24 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
     {
       title: "Sales",
       items: [
-        { icon: ShoppingCart, label: "Sales", href: "/dashboard/sales" },
-        { icon: Package, label: "Products", href: "/dashboard/products" },
-        { icon: Users, label: "Customers", href: "/dashboard/customers" },
+        { icon: ShoppingCart, label: "Sales", href: "/dashboard/sales-manager/sales" },
+        { icon: Package, label: "Products", href: "/dashboard/sales-manager/products" },
+        { icon: Users, label: "Customers", href: "/dashboard/sales-manager/customers" },
       ],
     },
   ],
   SALES_REP: [
     {
       items: [
-        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/sales-rep" },
+        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/cashier" },
       ],
     },
     {
       title: "Sales",
       items: [
-        { icon: ShoppingCart, label: "POS Terminal", href: "/dashboard/pos" },
-        { icon: ClipboardList, label: "My Sales", href: "/dashboard/my-sales" },
-        { icon: Users, label: "Customers", href: "/dashboard/customers" },
+        { icon: ShoppingCart, label: "POS Terminal", href: "/dashboard/cashier/pos" },
+        { icon: ClipboardList, label: "My Sales", href: "/dashboard/sales-manager/sales" },
+        { icon: Users, label: "Customers", href: "/dashboard/sales-manager/customers" },
       ],
     },
   ],
@@ -184,9 +184,8 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
     {
       title: "Finance",
       items: [
-        { icon: CreditCard, label: "Expenses", href: "/dashboard/expenses" },
-        { icon: FileText, label: "Invoices", href: "/dashboard/invoices" },
-        { icon: BarChart3, label: "Reports", href: "/dashboard/reports" },
+        { icon: CreditCard, label: "Expenses", href: "/dashboard/accounting/expenses" },
+        { icon: FileText, label: "Invoices", href: "/dashboard/accounting/invoices" },
       ],
     },
   ],
@@ -196,23 +195,11 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
         { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/auditor" },
       ],
     },
-    {
-      items: [
-        { icon: Shield, label: "Audit Logs", href: "/dashboard/audit-logs" },
-        { icon: BarChart3, label: "Reports", href: "/dashboard/reports" },
-      ],
-    },
   ],
   CUSTOMER: [
     {
       items: [
         { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/customer" },
-      ],
-    },
-    {
-      items: [
-        { icon: ClipboardList, label: "My Orders", href: "/dashboard/my-orders" },
-        { icon: ClipboardList, label: "My Bookings", href: "/dashboard/my-bookings" },
       ],
     },
   ],
