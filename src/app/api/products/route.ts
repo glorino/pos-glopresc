@@ -58,12 +58,12 @@ export async function GET(request: NextRequest) {
     ]);
 
     const categoryImageMap: Record<string, string> = {
-      "Food & Snacks": "https://placehold.co/400x300/2d1f0e/f59e0b?text=Food",
-      "Beverages": "https://placehold.co/400x300/0f1a2e/3b82f6?text=Beverage",
-      "Electronics": "https://placehold.co/400x300/1a0f2e/8b5cf6?text=Electronics",
-      "Fashion": "https://placehold.co/400x300/2e0f1a/ec4899?text=Fashion",
-      "Health & Beauty": "https://placehold.co/400x300/0f2e1a/10b981?text=Health",
-      "Home & Kitchen": "https://placehold.co/400x300/2e2a0f/f59e0b?text=Home",
+      "Food & Snacks": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop",
+      "Beverages": "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&h=300&fit=crop",
+      "Electronics": "https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=400&h=300&fit=crop",
+      "Fashion": "https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=300&fit=crop",
+      "Health & Beauty": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&h=300&fit=crop",
+      "Home & Kitchen": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop",
     };
 
     return NextResponse.json({
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
         ...p,
         price: Number(p.price),
         costPrice: Number(p.costPrice),
-        image: p.image || categoryImageMap[p.category?.name as string] || "https://placehold.co/400x300/1a1a2e/d4a843?text=Product",
+        image: p.image || categoryImageMap[p.category?.name as string] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop",
       })),
       total,
       page,
