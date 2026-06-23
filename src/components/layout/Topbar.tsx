@@ -118,7 +118,7 @@ export default function Topbar({ title, user }: TopbarProps) {
               <button
                 onClick={() => {
                   setDropdownOpen(false);
-                  router.push("/dashboard/settings");
+                  router.push("/dashboard/owner/settings");
                 }}
                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#9090a0] hover:bg-white/5 hover:text-[#f0f0f5]"
               >
@@ -128,7 +128,7 @@ export default function Topbar({ title, user }: TopbarProps) {
               <button
                 onClick={() => {
                   setDropdownOpen(false);
-                  router.push("/dashboard/settings");
+                  router.push("/dashboard/owner/settings");
                 }}
                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#9090a0] hover:bg-white/5 hover:text-[#f0f0f5]"
               >

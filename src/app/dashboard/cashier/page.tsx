@@ -196,7 +196,7 @@ export default function CashierDashboard() {
               </p>
             </div>
             <Link
-              href="/dashboard/pos"
+              href="/dashboard/cashier/pos"
               className="group flex items-center gap-4 rounded-2xl bg-gradient-to-r from-[#d4a843] to-[#b8942f] px-8 py-5 text-lg font-bold text-black shadow-lg shadow-[#d4a843]/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-[#d4a843]/30"
             >
               <ShoppingCart size={24} className="transition-transform group-hover:rotate-12" />
@@ -262,7 +262,7 @@ export default function CashierDashboard() {
                 Today&apos;s Transactions
               </h3>
               <Link
-                href="/dashboard/my-sales"
+                href="/dashboard/sales-manager/sales"
                 className="flex items-center gap-1 text-sm text-[#d4a843] transition-colors hover:text-[#b8942f]"
               >
                 View All <ArrowRight size={14} />
@@ -372,7 +372,7 @@ export default function CashierDashboard() {
         {/* Quick Actions Grid */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <Link
-            href="/dashboard/pos"
+            href="/dashboard/cashier/pos"
             className="group glass-card flex flex-col items-center gap-3 p-5 transition-all duration-300 hover:scale-[1.02]"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843] to-[#b8942f] shadow-lg">
@@ -381,7 +381,7 @@ export default function CashierDashboard() {
             <span className="text-sm font-medium text-[#f0f0f5]">POS Terminal</span>
           </Link>
           <Link
-            href="/dashboard/my-sales"
+            href="/dashboard/sales-manager/sales"
             className="group glass-card flex flex-col items-center gap-3 p-5 transition-all duration-300 hover:scale-[1.02]"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#3b82f6] to-[#2563eb] shadow-lg">
@@ -390,7 +390,7 @@ export default function CashierDashboard() {
             <span className="text-sm font-medium text-[#f0f0f5]">My Sales</span>
           </Link>
           <Link
-            href="/dashboard/products"
+            href="/dashboard/sales-manager/products"
             className="group glass-card flex flex-col items-center gap-3 p-5 transition-all duration-300 hover:scale-[1.02]"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#8b5cf6] to-[#7c3aed] shadow-lg">
@@ -399,7 +399,7 @@ export default function CashierDashboard() {
             <span className="text-sm font-medium text-[#f0f0f5]">Products</span>
           </Link>
           <Link
-            href="/dashboard/customers"
+            href="/dashboard/sales-manager/customers"
             className="group glass-card flex flex-col items-center gap-3 p-5 transition-all duration-300 hover:scale-[1.02]"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#10b981] to-[#059669] shadow-lg">

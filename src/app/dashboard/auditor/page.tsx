@@ -126,9 +126,9 @@ export default function AuditorDashboard() {
   ];
 
   const quickActions = [
-    { label: "Export Logs", href: "#", icon: Download, onClick: () => {} },
-    { label: "View Details", href: "#", icon: Eye, onClick: () => {} },
-    { label: "User Activity Report", href: "#", icon: FileText, onClick: () => {} },
+    { label: "Export Logs", href: "#", icon: Download, onClick: () => window.alert("Export feature coming soon") },
+    { label: "View Details", href: "#", icon: Eye, onClick: () => window.alert("Details feature coming soon") },
+    { label: "User Activity Report", href: "#", icon: FileText, onClick: () => window.alert("Report feature coming soon") },
   ];
 
   function getActionBadge(action: string) {

@@ -159,10 +159,10 @@ export default function ProcurementDashboard() {
   ];
 
   const quickActions = [
-    { label: "Add Supplier", href: "/dashboard/suppliers", icon: Plus },
-    { label: "Create Order", href: "/dashboard/purchase-orders", icon: ShoppingCart },
-    { label: "View Suppliers", href: "/dashboard/suppliers", icon: Eye },
-    { label: "Stock Requests", href: "/dashboard/supply-requests", icon: FileText },
+    { label: "Add Supplier", href: "/dashboard/procurement", icon: Plus },
+    { label: "Create Order", href: "/dashboard/procurement", icon: ShoppingCart },
+    { label: "View Suppliers", href: "/dashboard/procurement", icon: Eye },
+    { label: "Stock Requests", href: "/dashboard/procurement", icon: FileText },
   ];
 
   function getOrderStatusBadge(status: string) {
@@ -281,7 +281,7 @@ export default function ProcurementDashboard() {
             <div className="glass-card p-6">
               <div className="mb-4 flex items-center justify-between">
                 <h4 className="text-base font-semibold text-[#f0f0f5]">Suppliers</h4>
-                <Link href="/dashboard/suppliers" className="text-xs text-[#d4a843] hover:underline">
+                <Link href="/dashboard/procurement" className="text-xs text-[#d4a843] hover:underline">
                   View All
                 </Link>
               </div>
@@ -326,7 +326,7 @@ export default function ProcurementDashboard() {
             <div className="glass-card p-6">
               <div className="mb-4 flex items-center justify-between">
                 <h4 className="text-base font-semibold text-[#f0f0f5]">Purchase Orders</h4>
-                <Link href="/dashboard/purchase-orders" className="text-xs text-[#d4a843] hover:underline">
+                <Link href="/dashboard/procurement" className="text-xs text-[#d4a843] hover:underline">
                   View All
                 </Link>
               </div>
@@ -380,7 +380,7 @@ export default function ProcurementDashboard() {
           <div className="glass-card p-6">
             <div className="mb-4 flex items-center justify-between">
               <h4 className="text-base font-semibold text-[#f0f0f5]">Supply Requests</h4>
-              <Link href="/dashboard/supply-requests" className="text-xs text-[#d4a843] hover:underline">
+                <Link href="/dashboard/procurement" className="text-xs text-[#d4a843] hover:underline">
                 View All
               </Link>
             </div>

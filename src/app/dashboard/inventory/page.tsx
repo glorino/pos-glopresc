@@ -143,10 +143,10 @@ export default function InventoryDashboard() {
   ];
 
   const quickActions = [
-    { label: "Add Product", href: "/dashboard/products", icon: Plus },
-    { label: "Stock Adjustment", href: "/dashboard/stock-adjustments", icon: ArrowUpDown },
-    { label: "View Categories", href: "/dashboard/categories", icon: Eye },
-    { label: "Stock Report", href: "/dashboard/stock-reports", icon: BarChart3 },
+    { label: "Add Product", href: "/dashboard/inventory/products", icon: Plus },
+    { label: "Stock Adjustment", href: "/dashboard/inventory/stock", icon: ArrowUpDown },
+    { label: "View Categories", href: "/dashboard/inventory/categories", icon: Eye },
+    { label: "Stock Report", href: "/dashboard/owner/reports", icon: BarChart3 },
   ];
 
   function getStockStatus(product: Product) {
@@ -296,7 +296,7 @@ export default function InventoryDashboard() {
                         </td>
                         <td>
                           <Link
-                            href={`/dashboard/products?id=${product.id}`}
+                            href={`/dashboard/inventory/products?id=${product.id}`}
                             className="btn btn-secondary btn-sm"
                           >
                             View

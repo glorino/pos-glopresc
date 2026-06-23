@@ -138,10 +138,10 @@ export default function AccountingDashboard() {
   ];
 
   const quickActions = [
-    { label: "Add Expense", href: "/dashboard/expenses", icon: Plus },
-    { label: "View Invoices", href: "/dashboard/invoices", icon: Eye },
-    { label: "Generate Report", href: "/dashboard/reports", icon: BarChart3 },
-    { label: "Expense Report", href: "/dashboard/expense-reports", icon: FileText },
+    { label: "Add Expense", href: "/dashboard/accounting/expenses", icon: Plus },
+    { label: "View Invoices", href: "/dashboard/accounting/invoices", icon: Eye },
+    { label: "Generate Report", href: "/dashboard/owner/reports", icon: BarChart3 },
+    { label: "Expense Report", href: "/dashboard/accounting/expenses", icon: FileText },
   ];
 
   const transactions = data?.recentTransactions ?? [];
@@ -285,7 +285,7 @@ export default function AccountingDashboard() {
               <div className="glass-card p-6">
                 <div className="mb-4 flex items-center justify-between">
                   <h4 className="text-base font-semibold text-[#f0f0f5]">Recent Transactions</h4>
-                  <Link href="/dashboard/expenses" className="text-xs text-[#d4a843] hover:underline">
+                  <Link href="/dashboard/accounting/expenses" className="text-xs text-[#d4a843] hover:underline">
                     View All
                   </Link>
                 </div>
@@ -344,7 +344,7 @@ export default function AccountingDashboard() {
                   <h4 className="text-base font-semibold text-[#f0f0f5]">
                     Pending Expense Approvals
                   </h4>
-                  <Link href="/dashboard/expenses" className="text-xs text-[#d4a843] hover:underline">
+                  <Link href="/dashboard/accounting/expenses" className="text-xs text-[#d4a843] hover:underline">
                     View All
                   </Link>
                 </div>

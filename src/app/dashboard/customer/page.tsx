@@ -154,9 +154,9 @@ export default function CustomerDashboard() {
   ];
 
   const quickActions = [
-    { label: "Browse Shop", href: "/dashboard/shop", icon: Store },
-    { label: "Make Booking", href: "/dashboard/bookings", icon: Calendar },
-    { label: "View History", href: "/dashboard/order-history", icon: History },
+    { label: "Browse Shop", href: "/shop", icon: Store },
+    { label: "Make Booking", href: "/booking", icon: Calendar },
+    { label: "View History", href: "/dashboard/customer", icon: History },
     { label: "Edit Profile", href: "#", icon: Edit3, onClick: () => setEditing(true) },
   ];
 
@@ -225,7 +225,7 @@ export default function CustomerDashboard() {
             <div className="glass-card p-6">
               <div className="mb-4 flex items-center justify-between">
                 <h4 className="text-base font-semibold text-[#f0f0f5]">My Recent Orders</h4>
-                <Link href="/dashboard/order-history" className="text-xs text-[#d4a843] hover:underline">
+                <Link href="/dashboard/customer" className="text-xs text-[#d4a843] hover:underline">
                   View All
                 </Link>
               </div>
@@ -268,7 +268,7 @@ export default function CustomerDashboard() {
             <div className="glass-card p-6">
               <div className="mb-4 flex items-center justify-between">
                 <h4 className="text-base font-semibold text-[#f0f0f5]">My Bookings</h4>
-                <Link href="/dashboard/bookings" className="text-xs text-[#d4a843] hover:underline">
+                <Link href="/booking" className="text-xs text-[#d4a843] hover:underline">
                   View All
                 </Link>
               </div>

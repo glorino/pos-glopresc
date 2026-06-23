@@ -65,7 +65,18 @@ export default function SalesManagementPage() {
       const res = await fetch(`/api/sales?${params}`);
       if (res.ok) {
         const data = await res.json();
-        setSales(data.sales);
+        const mapped = (data.sales ?? []).map((s: any) => ({
+          ...s,
+          customer: s.customer ? `${s.customer.firstName ?? ""} ${s.customer.lastName ?? ""}`.trim() : "Walk-in",
+          cashier: s.user ? `${s.user.firstName ?? ""} ${s.user.lastName ?? ""}`.trim() : "—",
+          items: (s.items ?? []).map((i: any) => ({
+            name: i.product?.name ?? i.name ?? "Item",
+            quantity: i.quantity,
+            unitPrice: Number(i.unitPrice),
+            total: Number(i.total),
+          })),
+        }));
+        setSales(mapped);
       }
     } catch (error) {
       console.error("Failed to fetch sales:", error);

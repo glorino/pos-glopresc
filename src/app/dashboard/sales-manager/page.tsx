@@ -146,17 +146,17 @@ export default function SalesManagerDashboard() {
   const quickActions = [
     {
       label: "View Sales Report",
-      href: "/dashboard/reports",
+      href: "/dashboard/owner/reports",
       icon: BarChart3,
     },
     {
       label: "Process Returns",
-      href: "/dashboard/pos",
+      href: "/dashboard/cashier/pos",
       icon: RotateCcw,
     },
     {
       label: "View Products",
-      href: "/dashboard/products",
+      href: "/dashboard/sales-manager/products",
       icon: Package,
     },
   ];
