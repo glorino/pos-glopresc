@@ -88,9 +88,21 @@ export default function POSTerminal() {
   const [lastReceipt, setLastReceipt] = useState<SaleReceipt | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
+  const [taxRate, setTaxRate] = useState(7.5);
 
   useEffect(() => {
     fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settings?.currency?.taxRate) {
+          setTaxRate(Number(data.settings.currency.taxRate));
+        }
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -215,7 +227,7 @@ export default function POSTerminal() {
   const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const discountAmount = parseFloat(discount) || 0;
   const taxableAmount = subtotal - discountAmount;
-  const tax = taxableAmount * 0.075;
+  const tax = taxableAmount * (taxRate / 100);
   const total = taxableAmount + tax;
   const cashAmount = parseFloat(cashReceived) || 0;
   const change = cashAmount - total;
@@ -528,7 +540,7 @@ export default function POSTerminal() {
                 />
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-[#9090a0]">VAT (7.5%)</span>
+                <span className="text-[#9090a0]">VAT ({taxRate}%)</span>
                 <span className="text-[#f0f0f5]">{formatCurrency(tax)}</span>
               </div>
               <div className="border-t border-[#2a2a3a] pt-2">
@@ -663,7 +675,7 @@ export default function POSTerminal() {
                   </div>
                 )}
                 <div className="flex justify-between text-xs">
-                  <span className="text-[#606070]">VAT (7.5%)</span>
+                  <span className="text-[#606070]">VAT ({taxRate}%)</span>
                   <span className="text-[#9090a0]">{formatCurrency(lastReceipt.tax)}</span>
                 </div>
                 <div className="flex justify-between border-t border-[#2a2a3a] pt-1 text-sm font-bold">
@@ -686,12 +698,68 @@ export default function POSTerminal() {
               </div>
             </div>
 
-            <button
-              onClick={() => setShowReceipt(false)}
-              className="btn btn-primary mt-4 w-full"
-            >
-              Close
-            </button>
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={() => {
+                  const printWindow = window.open("", "_blank", "width=400,height=600");
+                  if (printWindow) {
+                    printWindow.document.write(`
+                      <html>
+                      <head>
+                        <title>Receipt ${lastReceipt.invoiceNumber}</title>
+                        <style>
+                          body { font-family: 'Courier New', monospace; font-size: 12px; padding: 20px; max-width: 300px; margin: 0 auto; }
+                          .center { text-align: center; }
+                          .bold { font-weight: bold; }
+                          .divider { border-top: 1px dashed #000; margin: 8px 0; }
+                          .row { display: flex; justify-content: space-between; }
+                          .footer { text-align: center; margin-top: 12px; font-size: 10px; }
+                        </style>
+                      </head>
+                      <body>
+                        <div class="center bold" style="font-size: 16px;">SSV SHOP</div>
+                        <div class="center" style="font-size: 10px; color: #666;">POS Receipt</div>
+                        <div class="divider"></div>
+                        <div style="font-size: 10px; color: #666;">
+                          <div>Invoice: ${lastReceipt.invoiceNumber}</div>
+                          <div>${new Date(lastReceipt.date).toLocaleString()}</div>
+                        </div>
+                        <div class="divider"></div>
+                        ${lastReceipt.items.map((item: any) => `
+                          <div class="row">
+                            <span>${item.name} x${item.quantity}</span>
+                            <span>₦${item.total.toLocaleString()}</span>
+                          </div>
+                        `).join("")}
+                        <div class="divider"></div>
+                        <div class="row"><span>Subtotal</span><span>₦${lastReceipt.subtotal.toLocaleString()}</span></div>
+                        ${lastReceipt.discount > 0 ? `<div class="row"><span>Discount</span><span>-₦${lastReceipt.discount.toLocaleString()}</span></div>` : ""}
+                        <div class="row"><span>VAT (${taxRate}%)</span><span>₦${lastReceipt.tax.toLocaleString()}</span></div>
+                        <div class="divider"></div>
+                        <div class="row bold" style="font-size: 14px;"><span>TOTAL</span><span>₦${lastReceipt.total.toLocaleString()}</span></div>
+                        <div class="row"><span>Paid (${lastReceipt.paymentMethod})</span><span style="color: green;">₦${lastReceipt.amountPaid.toLocaleString()}</span></div>
+                        ${lastReceipt.changeDue > 0 ? `<div class="row"><span>Change</span><span>₦${lastReceipt.changeDue.toLocaleString()}</span></div>` : ""}
+                        <div class="divider"></div>
+                        <div class="footer">Thank you for shopping with SSV Shop!</div>
+                      </body>
+                      </html>
+                    `);
+                    printWindow.document.close();
+                    printWindow.print();
+                  }
+                }}
+                className="btn btn-secondary flex-1"
+              >
+                <Receipt size={14} />
+                Print Receipt
+              </button>
+              <button
+                onClick={() => setShowReceipt(false)}
+                className="btn btn-primary flex-1"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

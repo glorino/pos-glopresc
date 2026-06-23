@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import AIChatbot from "@/components/ui/AIChatbot";
@@ -21,28 +22,30 @@ type UserRole =
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  role: UserRole;
   title: string;
-  user?: {
-    name: string;
-    role: string;
-    email: string;
-  };
+  role?: UserRole;
 }
 
 export default function DashboardLayout({
   children,
-  role,
   title,
-  user,
+  role: roleProp,
 }: DashboardLayoutProps) {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const displayUser = user || {
-    name: "User",
-    role: role.replace("_", " "),
-    email: "user@ssvshop.com",
+  const sessionRole = (session?.user as any)?.role as UserRole | undefined;
+  const role: UserRole = sessionRole || roleProp || "OWNER";
+
+  const userName = session?.user?.name || "User";
+  const userRole = role.replace(/_/g, " ");
+  const userEmail = session?.user?.email || "user@ssvshop.com";
+
+  const displayUser = {
+    name: userName,
+    role: userRole,
+    email: userEmail,
   };
 
   useEffect(() => {

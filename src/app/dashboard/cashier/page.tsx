@@ -65,29 +65,33 @@ export default function CashierDashboard() {
     transactions: 0,
     averageSale: 0,
   });
+  const [paymentMethods, setPaymentMethods] = useState<{ name: string; count: number; color: string }[]>([]);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch("/api/dashboard/manager");
+        const res = await fetch("/api/dashboard/cashier");
         if (res.ok) {
           const json = await res.json();
-          const todaySales = json.todayRevenue ?? 0;
-          const transactions = json.todaySales ?? 0;
-          const averageSale = transactions > 0 ? Math.round(todaySales / transactions) : 0;
           setData({
-            todaySales,
-            transactions,
-            averageSale,
-            openDrawer: true,
-            pendingOrders: 0,
-            recentSales: [],
+            todaySales: json.todaySales ?? 0,
+            transactions: json.transactions ?? 0,
+            averageSale: json.averageSale ?? 0,
+            openDrawer: json.drawerStatus?.isOpen ?? false,
+            pendingOrders: json.pendingOrders ?? 0,
+            recentSales: json.recentSales ?? [],
             drawerStatus: {
-              isOpen: true,
-              openingBalance: 50000,
-              openedAt: new Date().toISOString(),
+              isOpen: json.drawerStatus?.isOpen ?? false,
+              openingBalance: json.drawerStatus?.openingBalance ?? 0,
+              openedAt: json.drawerStatus?.openedAt ?? null,
             },
           });
+          const paymentMethodsData = (json.paymentMethods ?? []).map((pm: any) => ({
+            name: pm.name,
+            count: pm.count,
+            color: pm.name === "CASH" ? "#10b981" : pm.name === "CARD" ? "#3b82f6" : pm.name === "TRANSFER" ? "#8b5cf6" : pm.name === "USSD" ? "#f59e0b" : "#ec4899",
+          }));
+          setPaymentMethods(paymentMethodsData);
         }
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
@@ -129,13 +133,6 @@ export default function CashierDashboard() {
       </DashboardLayout>
     );
   }
-
-  const paymentMethods = [
-    { name: "Cash", count: 45, color: "#10b981" },
-    { name: "Card", count: 28, color: "#3b82f6" },
-    { name: "Transfer", count: 18, color: "#8b5cf6" },
-    { name: "Mobile", count: 12, color: "#f59e0b" },
-  ];
 
   const stats = [
     {
