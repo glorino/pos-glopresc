@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
+import { useTranslation } from "@/contexts/LanguageContext";
 import {
   DollarSign,
   ShoppingCart,
@@ -68,6 +69,7 @@ const COLORS = ["#d4a843", "#3b82f6", "#8b5cf6", "#10b981", "#f59e0b"];
 
 export default function OwnerDashboard() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -90,7 +92,7 @@ export default function OwnerDashboard() {
 
   if (loading) {
     return (
-      <DashboardLayout role="OWNER" title="Owner Dashboard">
+      <DashboardLayout role="OWNER" title={t("ownerDashboard")}>
         <div className="flex h-[60vh] items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4a843] border-t-transparent" />
         </div>
@@ -100,7 +102,7 @@ export default function OwnerDashboard() {
 
   const stats = [
     {
-      label: "Total Revenue",
+      label: t("totalRevenue"),
       value: formatCurrency(data?.totalRevenue ?? 0),
       icon: DollarSign,
       gradient: "from-[#d4a843] to-[#b8942f]",
@@ -110,7 +112,7 @@ export default function OwnerDashboard() {
       trendUp: true,
     },
     {
-      label: "Total Sales",
+      label: t("totalSales"),
       value: (data?.totalSales ?? 0).toLocaleString(),
       icon: ShoppingCart,
       gradient: "from-[#3b82f6] to-[#2563eb]",
@@ -120,7 +122,7 @@ export default function OwnerDashboard() {
       trendUp: true,
     },
     {
-      label: "Active Products",
+      label: t("activeProducts"),
       value: (data?.activeProducts ?? 0).toLocaleString(),
       icon: Package,
       gradient: "from-[#8b5cf6] to-[#7c3aed]",
@@ -130,7 +132,7 @@ export default function OwnerDashboard() {
       trendUp: true,
     },
     {
-      label: "Total Customers",
+      label: t("totalCustomers"),
       value: (data?.totalCustomers ?? 0).toLocaleString(),
       icon: Users,
       gradient: "from-[#10b981] to-[#059669]",
@@ -140,7 +142,7 @@ export default function OwnerDashboard() {
       trendUp: true,
     },
     {
-      label: "Pending Expenses",
+      label: t("pendingExpenses"),
       value: (data?.pendingExpenses ?? 0).toLocaleString(),
       icon: AlertTriangle,
       gradient: "from-[#f43f5e] to-[#e11d48]",
@@ -150,7 +152,7 @@ export default function OwnerDashboard() {
       trendUp: false,
     },
     {
-      label: "Low Stock Items",
+      label: t("lowStockItems"),
       value: (data?.lowStockItems ?? 0).toLocaleString(),
       icon: AlertTriangle,
       gradient: "from-[#f59e0b] to-[#d97706]",
@@ -184,7 +186,7 @@ export default function OwnerDashboard() {
   ];
 
   return (
-    <DashboardLayout role="OWNER" title="Owner Dashboard">
+    <DashboardLayout role="OWNER" title={t("ownerDashboard")}>
       <div className="space-y-6">
         {(data?.lowStockItems ?? 0) > 0 && (
           <button
@@ -245,7 +247,7 @@ export default function OwnerDashboard() {
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-[#f0f0f5]">
-                  Revenue Overview
+                  {t("revenueOverview")}
                 </h3>
                 <p className="text-sm text-[#9090a0]">Monthly revenue for {new Date().getFullYear()}</p>
               </div>
@@ -295,7 +297,7 @@ export default function OwnerDashboard() {
           {/* Sales Breakdown Donut */}
           <div className="glass-card p-6">
             <h3 className="mb-2 text-lg font-semibold text-[#f0f0f5]">
-              Sales Breakdown
+              {t("salesBreakdown")}
             </h3>
             <p className="mb-4 text-sm text-[#9090a0]">By category</p>
             <div className="flex h-[200px] items-center justify-center">
@@ -344,7 +346,7 @@ export default function OwnerDashboard() {
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <div className="glass-card p-6">
             <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-              Quick Actions
+              {t("quickActions")}
             </h3>
             <div className="grid grid-cols-3 gap-3">
               {quickActions.map((action) => {
@@ -368,7 +370,7 @@ export default function OwnerDashboard() {
           <div className="glass-card p-6">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-[#f0f0f5]">
-                Recent Activity
+                {t("recentActivity")}
               </h3>
               <Clock size={16} className="text-[#606070]" />
             </div>
@@ -396,7 +398,7 @@ export default function OwnerDashboard() {
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <div className="glass-card p-6">
             <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-              Recent Sales
+              {t("recentSales")}
             </h3>
             <div className="table-container">
               <table className="table">
@@ -453,7 +455,7 @@ export default function OwnerDashboard() {
 
           <div className="glass-card p-6">
             <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-              Top Selling Products
+              {t("topSellingProducts")}
             </h3>
             <div className="space-y-3">
               {data?.topProducts?.map((product, index) => (

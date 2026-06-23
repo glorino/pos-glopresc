@@ -10,6 +10,7 @@ import {
   Shield,
   Save,
   Upload,
+  Truck,
 } from "lucide-react";
 
 interface Settings {
@@ -44,6 +45,12 @@ const defaultSettings: Settings = {
     sessionTimeout: "30",
     passwordPolicy: "medium",
     twoFactorAuth: "false",
+  },
+  shipping: {
+    originAddress: "",
+    ratePerKm: "100",
+    minFee: "500",
+    freeShippingThreshold: "0",
   },
 };
 
@@ -188,6 +195,17 @@ export default function BusinessSettingsPage() {
         },
       ],
       toggles: [{ key: "twoFactorAuth", label: "Two-Factor Authentication" }],
+    },
+    {
+      key: "shipping",
+      title: "Shipping Settings",
+      icon: Truck,
+      fields: [
+        { key: "originAddress", label: "Business Address (for shipping origin)", type: "text" },
+        { key: "ratePerKm", label: "Shipping Fee Per Km (₦)", type: "number" },
+        { key: "minFee", label: "Minimum Shipping Fee (₦)", type: "number" },
+        { key: "freeShippingThreshold", label: "Free Shipping Above Order Amount (₦, 0 = disabled)", type: "number" },
+      ],
     },
   ];
 

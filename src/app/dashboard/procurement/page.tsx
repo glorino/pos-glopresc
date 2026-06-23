@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
+import { useTranslation } from "@/contexts/LanguageContext";
 import {
   Truck,
   ClipboardList,
@@ -64,6 +65,7 @@ interface OrderData {
 }
 
 export default function ProcurementDashboard() {
+  const { t } = useTranslation();
   const [suppliersData, setSuppliersData] = useState<SupplierData | null>(null);
   const [ordersData, setOrdersData] = useState<OrderData | null>(null);
   const [supplyRequests, setSupplyRequests] = useState<SupplyRequest[]>([]);
@@ -122,35 +124,35 @@ export default function ProcurementDashboard() {
 
   const stats = [
     {
-      label: "Active Suppliers",
+      label: t("activeSuppliers"),
       value: activeSuppliers,
       icon: Truck,
       color: "from-[#d4a843]/20 to-[#d4a843]/5",
       iconColor: "text-[#d4a843]",
     },
     {
-      label: "Pending Orders",
+      label: t("pendingOrders"),
       value: pendingOrders,
       icon: ClipboardList,
       color: "from-[#f59e0b]/20 to-[#f59e0b]/5",
       iconColor: "text-[#f59e0b]",
     },
     {
-      label: "Total Orders",
+      label: t("totalOrders"),
       value: totalOrders,
       icon: ShoppingCart,
       color: "from-[#3b82f6]/20 to-[#3b82f6]/5",
       iconColor: "text-[#3b82f6]",
     },
     {
-      label: "Pending Requests",
+      label: t("pendingApprovals"),
       value: supplyRequests.filter((r) => r.status === "PENDING").length,
       icon: FileText,
       color: "from-[#8b5cf6]/20 to-[#8b5cf6]/5",
       iconColor: "text-[#8b5cf6]",
     },
     {
-      label: "Monthly Spend",
+      label: t("monthlySpend"),
       value: formatCurrency(monthlySpend),
       icon: DollarSign,
       color: "from-[#10b981]/20 to-[#10b981]/5",
@@ -198,7 +200,7 @@ export default function ProcurementDashboard() {
   }
 
   return (
-    <DashboardLayout role="PROCUREMENT_MANAGER" title="Procurement Management">
+    <DashboardLayout role="PROCUREMENT_MANAGER" title={t("procurementDashboard")}>
       <div className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
@@ -242,7 +244,7 @@ export default function ProcurementDashboard() {
 
         {/* Filters */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h3 className="text-lg font-semibold text-[#f0f0f5]">Suppliers & Orders</h3>
+          <h3 className="text-lg font-semibold text-[#f0f0f5]">{t("suppliers")}</h3>
           <div className="flex flex-col gap-3 sm:flex-row">
             <div className="relative">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />

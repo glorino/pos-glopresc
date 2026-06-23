@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { useTranslation } from "@/contexts/LanguageContext";
 import { formatCurrency } from "@/lib/utils";
 import {
   Search,
@@ -69,6 +70,7 @@ const emptyForm: ProductFormData = {
 };
 
 export default function SalesProductsPage() {
+  const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -195,7 +197,7 @@ export default function SalesProductsPage() {
   }
 
   return (
-    <DashboardLayout role="SALES_MANAGER" title="Product Management">
+    <DashboardLayout role="SALES_MANAGER" title={t("products")}>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3">

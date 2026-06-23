@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "inventory management",
     "sales tracking",
     "business management",
-    "Nigeria POS",
+    "global POS",
     "SSV Shop",
   ],
   openGraph: {

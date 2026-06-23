@@ -1,8 +1,11 @@
-const TERMII_API_KEY =
-  "TLLmKgKKlrAXpCIRIEjrzKfUoJpfiOhEsCDxNxpgcvdxmUJDweLbdRIiTGUNUK";
+const TERMII_API_KEY = process.env.TERMII_API_KEY;
 const TERMII_BASE_URL = "https://api.termii.com/api";
 
 export async function sendSMS(phoneNumber: string, message: string) {
+  if (!TERMII_API_KEY) {
+    console.error("TERMII_API_KEY is not configured");
+    return null;
+  }
   try {
     const res = await fetch(`${TERMII_BASE_URL}/sms/send`, {
       method: "POST",

@@ -17,6 +17,8 @@ import {
   CheckCircle2,
   MapPin,
 } from "lucide-react";
+import PublicHeader from "@/components/layout/PublicHeader";
+import PublicFooter from "@/components/layout/PublicFooter";
 import ShippingCalculator from "@/components/ui/ShippingCalculator";
 import FlutterwavePayment from "@/components/ui/FlutterwavePayment";
 
@@ -50,12 +52,19 @@ export default function ShopPage() {
   const [shippingFee, setShippingFee] = useState(0);
   const [shippingEstimate, setShippingEstimate] = useState("");
   const [shippingAddress, setShippingAddress] = useState("");
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState(0);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerName, setCustomerName] = useState("");
 
   useEffect(() => {
     fetchProducts();
+    fetch("/api/settings/shipping")
+      .then((res) => res.json())
+      .then((data) => {
+        setFreeShippingThreshold(data.freeShippingThreshold || 0);
+      })
+      .catch(() => {});
   }, []);
 
   async function fetchProducts() {
@@ -129,7 +138,7 @@ export default function ShopPage() {
         body: JSON.stringify({
           items,
           paymentMethod: "online",
-          amountPaid: subtotal + shippingFee,
+          amountPaid: subtotal + effectiveShipping,
           txRef,
         }),
       });
@@ -150,7 +159,8 @@ export default function ShopPage() {
   }
 
   const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  const total = subtotal + shippingFee;
+  const effectiveShipping = freeShippingThreshold > 0 && subtotal >= freeShippingThreshold ? 0 : shippingFee;
+  const total = subtotal + effectiveShipping;
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const filteredProducts = products.filter((product) => {
@@ -191,52 +201,12 @@ export default function ShopPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
-      {/* Navbar */}
-      <nav className="sticky top-0 z-40 border-b border-[#2a2a3a] bg-[#0a0a0f]/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#d4a843] to-[#c49a38]">
-              <span className="text-sm font-bold text-black">G</span>
-            </div>
-            <span className="text-lg font-bold text-[#f0f0f5]">SSV Shop</span>
-          </Link>
+      <PublicHeader />
 
-          <div className="hidden max-w-md flex-1 px-8 md:block">
-            <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="input pl-10 text-sm"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/booking"
-              className="hidden text-sm font-medium text-[#9090a0] transition-colors hover:text-[#d4a843] md:block"
-            >
-              Book a Service
-            </Link>
-            <button
-              onClick={() => setCartOpen(true)}
-              className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-[#2a2a3a] bg-[#1c1c28] text-[#9090a0] transition-colors hover:border-[#d4a843]/50 hover:text-[#d4a843]"
-            >
-              <ShoppingCart size={20} />
-              {itemCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#d4a843] text-[10px] font-bold text-black">
-                  {itemCount}
-                </span>
-              )}
-            </button>
-          </div>
-        </div>
-
-        <div className="mx-auto max-w-7xl px-4 pb-3 md:hidden">
-          <div className="relative">
+      {/* Shop Toolbar */}
+      <div className="sticky top-16 z-40 border-b border-[#2a2a3a] bg-[#0a0a0f]/80 backdrop-blur-xl">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+          <div className="relative max-w-md flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
             <input
               type="text"
@@ -246,8 +216,19 @@ export default function ShopPage() {
               className="input pl-10 text-sm"
             />
           </div>
+          <button
+            onClick={() => setCartOpen(true)}
+            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#2a2a3a] bg-[#1c1c28] text-[#9090a0] transition-colors hover:border-[#d4a843]/50 hover:text-[#d4a843]"
+          >
+            <ShoppingCart size={20} />
+            {itemCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#d4a843] text-[10px] font-bold text-black">
+                {itemCount}
+              </span>
+            )}
+          </button>
         </div>
-      </nav>
+      </div>
 
       {/* Hero */}
       <div className="hero-gradient relative overflow-hidden">
@@ -436,12 +417,12 @@ export default function ShopPage() {
                   <span className="text-[#9090a0]">Subtotal</span>
                   <span className="font-bold text-[#d4a843]">{formatCurrency(subtotal)}</span>
                 </div>
-                {shippingFee > 0 && (
-                  <div className="mb-2 flex justify-between text-sm">
-                    <span className="text-[#9090a0]">Shipping</span>
-                    <span className="font-bold text-[#d4a843]">{formatCurrency(shippingFee)}</span>
-                  </div>
-                )}
+                <div className="mb-2 flex justify-between text-sm">
+                  <span className="text-[#9090a0]">Shipping</span>
+                  <span className="font-bold text-[#d4a843]">
+                    {effectiveShipping > 0 ? formatCurrency(effectiveShipping) : "₦0.00 (Free)"}
+                  </span>
+                </div>
                 <div className="mb-4 flex justify-between border-t border-[#2a2a3a] pt-2 text-sm">
                   <span className="font-semibold text-[#f0f0f5]">Total</span>
                   <span className="font-bold text-[#d4a843]">{formatCurrency(total)}</span>
@@ -517,7 +498,7 @@ export default function ShopPage() {
                   type="text"
                   value={shippingAddress}
                   onChange={(e) => setShippingAddress(e.target.value)}
-                  placeholder="e.g., 123 Allen Avenue, Ikeja, Lagos"
+                  placeholder="e.g., 123 Main Street, City, Country"
                   className="input text-sm"
                 />
               </div>
@@ -560,7 +541,7 @@ export default function ShopPage() {
                 <div className="mt-1 flex justify-between text-sm">
                   <span className="text-[#9090a0]">Shipping</span>
                   <span className="font-bold text-[#d4a843]">
-                    {shippingFee > 0 ? formatCurrency(shippingFee) : "Calculate below"}
+                    {effectiveShipping > 0 ? formatCurrency(effectiveShipping) : "₦0.00 (Free)"}
                   </span>
                 </div>
                 <hr className="my-3 border-[#2a2a3a]" />
@@ -581,8 +562,20 @@ export default function ShopPage() {
                   email={customerEmail}
                   name={customerName}
                   description={`SSV Shop Order - ${cart.length} item(s)`}
-                  onSuccess={(response) => {
-                    createSale(response.tx_ref as string);
+                  onSuccess={async (response) => {
+                    try {
+                      const verifyRes = await fetch(
+                        `/api/payments/verify?transaction_id=${response.transaction_id}`
+                      );
+                      const verifyData = await verifyRes.json();
+                      if (verifyData.status === "success") {
+                        createSale(response.tx_ref as string);
+                      } else {
+                        alert("Payment verification failed. Please contact support.");
+                      }
+                    } catch {
+                      alert("Could not verify payment. Please contact support.");
+                    }
                   }}
                   onClose={() => {}}
                 />
@@ -592,27 +585,7 @@ export default function ShopPage() {
         </div>
       )}
 
-      {/* Footer */}
-      <footer className="border-t border-[#2a2a3a] bg-[#111118] py-12">
-        <div className="mx-auto max-w-7xl px-4">
-          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#d4a843] to-[#c49a38]">
-                <span className="text-sm font-bold text-black">G</span>
-              </div>
-              <span className="text-lg font-bold text-[#f0f0f5]">SSV Shop</span>
-            </div>
-            <div className="flex gap-6 text-sm text-[#606070]">
-              <Link href="/" className="hover:text-[#d4a843]">Home</Link>
-              <Link href="/shop" className="hover:text-[#d4a843]">Shop</Link>
-              <Link href="/booking" className="hover:text-[#d4a843]">Book a Service</Link>
-            </div>
-            <p className="text-xs text-[#606070]">
-              &copy; {new Date().getFullYear()} SSV Shop. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }

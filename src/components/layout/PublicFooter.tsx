@@ -64,8 +64,7 @@ export default function PublicFooter() {
             </h4>
             <ul className="space-y-2 text-sm text-[#9090a0]">
               <li>support@ssvshop.com</li>
-              <li>+234 800 SSVSHOP</li>
-              <li>Lagos, Nigeria</li>
+              <li>Worldwide</li>
             </ul>
           </div>
         </div>

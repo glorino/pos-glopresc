@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
+import { useTranslation } from "@/contexts/LanguageContext";
 import {
   ShoppingCart,
   TrendingUp,
@@ -55,6 +56,7 @@ interface CashierData {
 }
 
 export default function CashierDashboard() {
+  const { t } = useTranslation();
   const [data, setData] = useState<CashierData | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -120,7 +122,7 @@ export default function CashierDashboard() {
 
   if (loading) {
     return (
-      <DashboardLayout role="SALES_REP" title="Sales Rep Dashboard">
+      <DashboardLayout role="SALES_REP" title={t("salesRepDashboard")}>
         <div className="flex h-[60vh] items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4a843] border-t-transparent" />
         </div>
@@ -137,7 +139,7 @@ export default function CashierDashboard() {
 
   const stats = [
     {
-      label: "Today's Sales",
+      label: t("todaySales"),
       value: formatCurrency(animatedValues.todaySales),
       icon: DollarSign,
       gradient: "from-[#d4a843] to-[#b8942f]",
@@ -145,7 +147,7 @@ export default function CashierDashboard() {
       iconColor: "text-white",
     },
     {
-      label: "Transactions",
+      label: t("transactions"),
       value: animatedValues.transactions.toLocaleString(),
       icon: ShoppingCart,
       gradient: "from-[#3b82f6] to-[#2563eb]",
@@ -153,7 +155,7 @@ export default function CashierDashboard() {
       iconColor: "text-white",
     },
     {
-      label: "Average Sale",
+      label: t("averageSale"),
       value: formatCurrency(animatedValues.averageSale),
       icon: TrendingUp,
       gradient: "from-[#8b5cf6] to-[#7c3aed]",
@@ -161,7 +163,7 @@ export default function CashierDashboard() {
       iconColor: "text-white",
     },
     {
-      label: "Cash Drawer",
+      label: t("cashDrawer"),
       value: data?.drawerStatus.isOpen ? "Open" : "Closed",
       icon: data?.drawerStatus.isOpen ? Unlock : Lock,
       gradient: data?.drawerStatus.isOpen ? "from-[#10b981] to-[#059669]" : "from-[#f43f5e] to-[#e11d48]",
@@ -169,7 +171,7 @@ export default function CashierDashboard() {
       iconColor: "text-white",
     },
     {
-      label: "Pending Orders",
+      label: t("pendingOrders"),
       value: (data?.pendingOrders ?? 0).toLocaleString(),
       icon: Receipt,
       gradient: "from-[#f59e0b] to-[#d97706]",
@@ -259,7 +261,7 @@ export default function CashierDashboard() {
           <div className="glass-card p-6 xl:col-span-2">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-[#f0f0f5]">
-                Today&apos;s Transactions
+                {t("recentTransactions")}
               </h3>
               <Link
                 href="/dashboard/sales-manager/sales"
@@ -330,7 +332,7 @@ export default function CashierDashboard() {
           {/* Payment Method Breakdown */}
           <div className="glass-card p-6">
             <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-              Payment Methods
+              {t("paymentMethods")}
             </h3>
             <p className="mb-4 text-sm text-[#9090a0]">Today&apos;s breakdown</p>
             <div className="h-[200px]">

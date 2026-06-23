@@ -1,34 +1,66 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MapPin, Truck, Loader2 } from "lucide-react";
+
+interface ShippingSettings {
+  originAddress: string;
+  ratePerKm: number;
+  minFee: number;
+  freeShippingThreshold: number;
+}
 
 interface ShippingCalculatorProps {
   weight: number;
   onCalculate: (fee: number, estimate: string) => void;
 }
 
-function getShippingFee(distanceKm: number): { fee: number; label: string; estimate: string } {
-  if (distanceKm <= 30) {
-    return { fee: 1000, label: "Within Lagos", estimate: "1-2 business days" };
-  } else if (distanceKm <= 60) {
-    return { fee: 2000, label: "Lagos Metro", estimate: "2-3 business days" };
-  } else if (distanceKm <= 200) {
-    return { fee: 3500, label: "Southwest Nigeria", estimate: "3-5 business days" };
-  } else {
-    return { fee: 5000, label: "Other parts of Nigeria", estimate: "5-7 business days" };
-  }
+function getDeliveryEstimate(distanceKm: number): string {
+  if (distanceKm <= 30) return "1-2 business days";
+  if (distanceKm <= 100) return "2-3 business days";
+  if (distanceKm <= 300) return "3-5 business days";
+  if (distanceKm <= 600) return "5-7 business days";
+  return "7-10 business days";
 }
 
 export default function ShippingCalculator({ weight, onCalculate }: ShippingCalculatorProps) {
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<{ fee: number; label: string; estimate: string; distance: number } | null>(null);
+  const [result, setResult] = useState<{
+    fee: number;
+    estimate: string;
+    distance: number;
+    ratePerKm: number;
+  } | null>(null);
   const [error, setError] = useState("");
+  const [settings, setSettings] = useState<ShippingSettings>({
+    originAddress: "",
+    ratePerKm: 100,
+    minFee: 500,
+    freeShippingThreshold: 0,
+  });
+
+  useEffect(() => {
+    fetch("/api/settings/shipping")
+      .then((res) => res.json())
+      .then((data) => {
+        setSettings({
+          originAddress: data.originAddress || "",
+          ratePerKm: data.ratePerKm || 100,
+          minFee: data.minFee || 500,
+          freeShippingThreshold: data.freeShippingThreshold || 0,
+        });
+      })
+      .catch(() => {});
+  }, []);
 
   async function handleCalculate() {
     if (!address.trim()) {
       setError("Please enter a delivery address");
+      return;
+    }
+    if (!settings.originAddress) {
+      setError("Business address not configured. Please contact support.");
       return;
     }
     setLoading(true);
@@ -36,9 +68,15 @@ export default function ShippingCalculator({ weight, onCalculate }: ShippingCalc
     setResult(null);
 
     try {
-      const apiKey = "AIzaSyBbMpcjjTTuZRL---5TbBeepWN9_Nt-7PQ";
-      const origin = "Lagos, Nigeria";
-      const destination = `${address}, Nigeria`;
+      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+      if (!apiKey) {
+        setError("Google Maps API key is not configured.");
+        setLoading(false);
+        return;
+      }
+
+      const origin = settings.originAddress;
+      const destination = address;
       const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(origin)}&destinations=${encodeURIComponent(destination)}&key=${apiKey}`;
 
       const res = await fetch(url);
@@ -59,11 +97,17 @@ export default function ShippingCalculator({ weight, onCalculate }: ShippingCalc
 
       const distanceMeters = element.distance?.value || 0;
       const distanceKm = Math.round(distanceMeters / 1000);
-      const shipping = getShippingFee(distanceKm);
+      const fee = Math.max(Math.ceil(distanceKm * settings.ratePerKm), settings.minFee);
+      const estimate = getDeliveryEstimate(distanceKm);
 
-      const shippingResult = { ...shipping, distance: distanceKm };
+      const shippingResult = {
+        fee,
+        estimate,
+        distance: distanceKm,
+        ratePerKm: settings.ratePerKm,
+      };
       setResult(shippingResult);
-      onCalculate(shipping.fee, shipping.estimate);
+      onCalculate(fee, estimate);
     } catch {
       setError("Failed to calculate shipping. Please try again.");
     } finally {
@@ -83,7 +127,7 @@ export default function ShippingCalculator({ weight, onCalculate }: ShippingCalc
           <MapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
           <input
             type="text"
-            placeholder="Enter delivery address (e.g., Ikeja, Abuja)"
+            placeholder="Enter delivery address"
             value={address}
             onChange={(e) => {
               setAddress(e.target.value);
@@ -110,7 +154,7 @@ export default function ShippingCalculator({ weight, onCalculate }: ShippingCalc
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-[#9090a0]">Distance: {result.distance} km</p>
-              <p className="text-xs text-[#9090a0]">Zone: {result.label}</p>
+              <p className="text-xs text-[#9090a0]">Rate: ₦{result.ratePerKm.toLocaleString()}/km</p>
             </div>
             <div className="text-right">
               <p className="text-sm font-bold text-[#d4a843]">

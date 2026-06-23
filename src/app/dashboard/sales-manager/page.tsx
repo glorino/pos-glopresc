@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
+import { useTranslation } from "@/contexts/LanguageContext";
 import {
   DollarSign,
   ShoppingCart,
@@ -56,6 +57,7 @@ interface SalesData {
 const PIE_COLORS = ["#d4a843", "#3b82f6", "#8b5cf6", "#10b981", "#f43f5e", "#06b6d4"];
 
 export default function SalesManagerDashboard() {
+  const { t } = useTranslation();
   const [data, setData] = useState<SalesData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -97,7 +99,7 @@ export default function SalesManagerDashboard() {
 
   if (loading) {
     return (
-      <DashboardLayout role="SALES_MANAGER" title="Sales Manager Dashboard">
+      <DashboardLayout role="SALES_MANAGER" title={t("salesManagerDashboard")}>
         <div className="flex h-[60vh] items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4a843] border-t-transparent" />
         </div>
@@ -107,35 +109,35 @@ export default function SalesManagerDashboard() {
 
   const stats = [
     {
-      label: "Today's Revenue",
+      label: t("todayRevenue"),
       value: formatCurrency(data?.todayRevenue ?? 0),
       icon: DollarSign,
       color: "from-[#d4a843]/20 to-[#d4a843]/5",
       iconColor: "text-[#d4a843]",
     },
     {
-      label: "Today's Transactions",
+      label: t("todayTransactions"),
       value: (data?.todayTransactions ?? 0).toLocaleString(),
       icon: ShoppingCart,
       color: "from-[#3b82f6]/20 to-[#3b82f6]/5",
       iconColor: "text-[#3b82f6]",
     },
     {
-      label: "Average Sale Value",
+      label: t("averageSaleValue"),
       value: formatCurrency(data?.averageSaleValue ?? 0),
       icon: TrendingUp,
       color: "from-[#8b5cf6]/20 to-[#8b5cf6]/5",
       iconColor: "text-[#8b5cf6]",
     },
     {
-      label: "Top Cashier",
+      label: t("topCashier"),
       value: data?.topCashier ?? "N/A",
       icon: User,
       color: "from-[#10b981]/20 to-[#10b981]/5",
       iconColor: "text-[#10b981]",
     },
     {
-      label: "Return Rate",
+      label: t("returnRate"),
       value: `${data?.returnRate ?? 0}%`,
       icon: RotateCcw,
       color: "from-[#f43f5e]/20 to-[#f43f5e]/5",
@@ -184,7 +186,7 @@ export default function SalesManagerDashboard() {
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
           <div className="glass-card xl:col-span-2 p-6">
             <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-              Sales Trend
+              {t("salesTrend")}
             </h3>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -228,7 +230,7 @@ export default function SalesManagerDashboard() {
 
           <div className="glass-card p-6">
             <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-              Sales by Category
+              {t("salesByCategory")}
             </h3>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -268,7 +270,7 @@ export default function SalesManagerDashboard() {
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
           <div className="glass-card xl:col-span-2 p-6">
             <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-              Top Performing Products
+              {t("topPerformingProducts")}
             </h3>
             <div className="table-container">
               <table className="table">
@@ -331,9 +333,9 @@ export default function SalesManagerDashboard() {
         </div>
 
         <div className="glass-card p-6">
-          <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-            Recent Transactions
-          </h3>
+            <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
+              {t("recentTransactions")}
+            </h3>
           <div className="table-container">
             <table className="table">
               <thead>

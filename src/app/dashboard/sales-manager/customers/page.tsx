@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { useTranslation } from "@/contexts/LanguageContext";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import {
   Search,
@@ -59,6 +60,7 @@ const emptyForm: CustomerFormData = {
 };
 
 export default function SalesCustomersPage() {
+  const { t } = useTranslation();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -153,7 +155,7 @@ export default function SalesCustomersPage() {
   }
 
   return (
-    <DashboardLayout role="SALES_MANAGER" title="Customer Management">
+    <DashboardLayout role="SALES_MANAGER" title={t("customers")}>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">

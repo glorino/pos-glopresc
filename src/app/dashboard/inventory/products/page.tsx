@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { useTranslation } from "@/contexts/LanguageContext";
 import { formatCurrency } from "@/lib/utils";
 import {
   Search,
@@ -31,6 +32,7 @@ interface Product {
 }
 
 export default function InventoryProductsPage() {
+  const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -98,19 +100,19 @@ export default function InventoryProductsPage() {
   const outOfStockCount = products.filter((p) => p.isOutOfStock).length;
 
   return (
-    <DashboardLayout role="WAREHOUSE_MANAGER" title="Products">
+    <DashboardLayout role="WAREHOUSE_MANAGER" title={t("products")}>
       <div className="space-y-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="stat-card">
-            <p className="text-sm text-[#9090a0]">Total Stock Value</p>
+            <p className="text-sm text-[#9090a0]">{t("stockValue")}</p>
             <p className="text-2xl font-bold text-[#d4a843]">{formatCurrency(totalValue)}</p>
           </div>
           <div className="stat-card">
-            <p className="text-sm text-[#9090a0]">Low Stock Items</p>
+            <p className="text-sm text-[#9090a0]">{t("lowStockItems")}</p>
             <p className="text-2xl font-bold text-[#f59e0b]">{lowStockCount}</p>
           </div>
           <div className="stat-card">
-            <p className="text-sm text-[#9090a0]">Out of Stock</p>
+            <p className="text-sm text-[#9090a0]">{t("outOfStock")}</p>
             <p className="text-2xl font-bold text-[#f43f5e]">{outOfStockCount}</p>
           </div>
         </div>

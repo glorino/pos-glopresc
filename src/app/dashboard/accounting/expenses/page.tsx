@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { useTranslation } from "@/contexts/LanguageContext";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import {
   Search,
@@ -51,6 +52,7 @@ const emptyForm: ExpenseFormData = {
 };
 
 export default function ExpenseManagementPage() {
+  const { t } = useTranslation();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -175,7 +177,7 @@ export default function ExpenseManagementPage() {
   }
 
   return (
-    <DashboardLayout role="ACCOUNTANT" title="Expense Management">
+    <DashboardLayout role="ACCOUNTANT" title={t("expenses")}>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3">

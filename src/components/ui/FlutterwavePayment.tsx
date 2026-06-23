@@ -27,6 +27,7 @@ export default function FlutterwavePayment({
   onClose,
 }: FlutterwavePaymentProps) {
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (document.getElementById("flutterwave-script")) {
@@ -40,47 +41,77 @@ export default function FlutterwavePayment({
     document.head.appendChild(script);
   }, []);
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     if (!window.FlutterwaveCheckout) {
       alert("Payment gateway is still loading. Please try again.");
       return;
     }
 
-    const txRef = `TX-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+    setLoading(true);
+    try {
+      const initiateRes = await fetch("/api/payments/initiate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount, email, name, description }),
+      });
 
-    window.FlutterwaveCheckout({
-      public_key: process.env.NEXT_PUBLIC_FLW_PUBLIC_KEY || "FLWPUBK_TEST-d6487d955432e2041f36d5496f8cb98a-X",
-      tx_ref: txRef,
-      amount: amount,
-      currency: "NGN",
-      customer: {
-        email: email,
-        name: name,
-      },
-      customizations: {
-        title: "SSV Shop",
-        description: description,
-        logo: "",
-      },
-      callback: (response: Record<string, unknown>) => {
-        if (response.status === "successful" && onSuccess) {
-          onSuccess(response);
-        }
-      },
-      onclose: () => {
-        if (onClose) onClose();
-      },
-    });
+      if (!initiateRes.ok) {
+        const data = await initiateRes.json();
+        alert(data.error || data.message || "Failed to initiate payment");
+        setLoading(false);
+        return;
+      }
+
+      const { tx_ref, public_key } = await initiateRes.json();
+
+      window.FlutterwaveCheckout({
+        public_key,
+        tx_ref,
+        amount,
+        currency: "NGN",
+        customer: { email, name },
+        customizations: {
+          title: "SSV Shop",
+          description,
+          logo: "",
+        },
+        callback: async (response: Record<string, unknown>) => {
+          if (response.status === "successful") {
+            try {
+              const verifyRes = await fetch(
+                `/api/payments/verify?transaction_id=${response.transaction_id}`
+              );
+              const verifyData = await verifyRes.json();
+              if (verifyData.status === "success" && onSuccess) {
+                onSuccess(response);
+              } else {
+                alert("Payment verification failed. Please contact support.");
+              }
+            } catch {
+              alert("Could not verify payment. Please contact support.");
+            }
+          }
+          setLoading(false);
+        },
+        onclose: () => {
+          setLoading(false);
+          if (onClose) onClose();
+        },
+      });
+    } catch {
+      alert("Failed to initiate payment. Please try again.");
+      setLoading(false);
+    }
   };
 
   return (
     <button
       onClick={handlePayment}
-      disabled={!scriptLoaded || amount <= 0}
+      disabled={!scriptLoaded || amount <= 0 || loading}
       className="btn-primary flex w-full items-center justify-center gap-3 rounded-xl px-6 py-4 text-lg font-bold transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
     >
       <CreditCard size={22} />
-      Pay ₦{(amount / 100).toLocaleString("en-NG", { minimumFractionDigits: 2 })} with Flutterwave
+      {loading ? "Processing..." : `Pay ₦${(amount / 100).toLocaleString("en-NG", { minimumFractionDigits: 2 })} with Flutterwave`}
     </button>
   );
 }

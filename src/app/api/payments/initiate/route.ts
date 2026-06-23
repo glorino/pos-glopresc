@@ -12,12 +12,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const publicKey = process.env.NEXT_PUBLIC_FLW_PUBLIC_KEY;
+    if (!publicKey) {
+      return NextResponse.json(
+        { error: "Flutterwave public key not configured" },
+        { status: 500 }
+      );
+    }
+
     const txRef = `TX-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 
     return NextResponse.json({
       status: "success",
       tx_ref: txRef,
-      public_key: process.env.NEXT_PUBLIC_FLW_PUBLIC_KEY || "FLWPUBK_TEST-d6487d955432e2041f36d5496f8cb98a-X",
+      public_key: publicKey,
       amount,
       currency: "NGN",
       customer: { email, name },

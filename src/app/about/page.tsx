@@ -15,7 +15,7 @@ import PublicFooter from "@/components/layout/PublicFooter";
 export const metadata: Metadata = {
   title: "About — SSV Shop POS",
   description:
-    "Learn about SSV Shop — our mission to empower Nigerian businesses with modern point-of-sale technology.",
+    "Learn about SSV Shop — our mission to empower businesses worldwide with modern point-of-sale technology.",
 };
 
 const values = [
@@ -23,7 +23,7 @@ const values = [
     icon: Target,
     title: "Our Mission",
     description:
-      "To provide affordable, reliable, and easy-to-use point-of-sale technology that empowers Nigerian businesses to compete and grow in the modern economy.",
+      "To provide affordable, reliable, and easy-to-use point-of-sale technology that empowers businesses to compete and grow in the modern economy.",
   },
   {
     icon: Heart,
@@ -47,7 +47,7 @@ const team = [
 ];
 
 const contactInfo = [
-  { icon: MapPin, label: "Address", value: "12 Victoria Island, Lagos, Nigeria" },
+  { icon: MapPin, label: "Address", value: "Worldwide" },
   { icon: Phone, label: "Phone", value: "+234 800 SSVSHOP" },
   { icon: Mail, label: "Email", value: "support@ssvshop.com" },
   { icon: Clock, label: "Hours", value: "Mon – Fri, 8 AM – 6 PM WAT" },
@@ -69,13 +69,12 @@ export default function AboutPage() {
             <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
               Empowering{" "}
               <span className="bg-gradient-to-r from-[#d4a843] to-[#c49a38] bg-clip-text text-transparent">
-                Nigerian Businesses
+                Modern Retail
               </span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-[#9090a0]">
-              We believe every business — from a corner shop in Surulere to a
-              chain in Victoria Island — deserves access to modern, affordable
-              point-of-sale technology.
+              We believe every business — from a small shop to a growing chain
+              — deserves access to modern, affordable point-of-sale technology.
             </p>
           </div>
         </div>
@@ -88,21 +87,21 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold sm:text-3xl">Our Story</h2>
           <div className="mt-6 space-y-4 text-[#9090a0] leading-relaxed">
             <p>
-              SSV Shop was born from a simple observation: Nigerian businesses
+              SSV Shop was born from a simple observation: businesses
               deserve better tools. Too many shops still rely on paper ledgers
-              or outdated software that doesn&apos;t understand local payment
+              or outdated software that doesn&apos;t understand modern payment
               methods, currencies, or business practices.
             </p>
             <p>
-              Founded in Lagos in 2024, we set out to build a point-of-sale
-              system designed from the ground up for the Nigerian market. We
-              support Naira transactions, local payment providers like OPay and
-              PalmPay, and multi-branch operations — all wrapped in a modern,
+              Founded in 2024, we set out to build a point-of-sale
+              system designed from the ground up for modern retail. We
+              support multiple currencies, local payment providers, and
+              multi-branch operations — all wrapped in a modern,
               easy-to-use interface.
             </p>
             <p>
-              Today, SSV Shop powers thousands of daily transactions across
-              Nigeria. From single-store retailers to multi-location chains, our
+              Today, SSV Shop powers thousands of daily transactions worldwide.
+              From single-store retailers to multi-location chains, our
               platform scales to meet the needs of businesses at every stage of
               growth.
             </p>

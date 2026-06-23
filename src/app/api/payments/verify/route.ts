@@ -11,7 +11,13 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const secretKey = process.env.FLW_SECRET_KEY || "FLWSECK_TEST-secret_key_here";
+  const secretKey = process.env.FLW_SECRET_KEY;
+  if (!secretKey) {
+    return NextResponse.json(
+      { error: "Payment gateway not configured" },
+      { status: 500 }
+    );
+  }
 
   try {
     const response = await fetch(

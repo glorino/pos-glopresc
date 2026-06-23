@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { useTranslation } from "@/contexts/LanguageContext";
 import { formatCurrency, formatDate, generateInvoiceNumber } from "@/lib/utils";
 import {
   Search,
@@ -47,6 +48,7 @@ const emptyForm: InvoiceFormData = {
 };
 
 export default function InvoicesPage() {
+  const { t } = useTranslation();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -155,7 +157,7 @@ export default function InvoicesPage() {
   }
 
   return (
-    <DashboardLayout role="ACCOUNTANT" title="Invoices">
+    <DashboardLayout role="ACCOUNTANT" title={t("invoices")}>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3">

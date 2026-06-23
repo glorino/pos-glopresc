@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { useTranslation } from "@/contexts/LanguageContext";
 import { formatDateTime } from "@/lib/utils";
 import {
   Plus,
@@ -44,6 +45,7 @@ const adjustmentTypes = [
 ];
 
 export default function InventoryStockPage() {
+  const { t } = useTranslation();
   const [adjustments, setAdjustments] = useState<StockAdjustment[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -165,13 +167,13 @@ export default function InventoryStockPage() {
   }
 
   return (
-    <DashboardLayout role="WAREHOUSE_MANAGER" title="Stock Management">
+    <DashboardLayout role="WAREHOUSE_MANAGER" title={t("stock")}>
       <div className="space-y-6">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="glass-card p-6">
             <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-[#f0f0f5]">
               <Plus size={18} className="text-[#d4a843]" />
-              Stock Adjustment
+              {t("stockAdjustment")}
             </h3>
 
             {error && (
@@ -272,7 +274,7 @@ export default function InventoryStockPage() {
           <div className="glass-card p-6">
             <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-[#f0f0f5]">
               <AlertTriangle size={18} className="text-[#f59e0b]" />
-              Low Stock Alerts
+              {t("lowStockAlerts")}
             </h3>
             {lowStockAlerts.length === 0 ? (
               <p className="text-center text-sm text-[#606070]">No low stock alerts</p>

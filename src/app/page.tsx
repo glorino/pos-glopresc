@@ -77,7 +77,7 @@ export default function LandingPage() {
           <div className="text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#d4a843]/20 bg-[#d4a843]/10 px-4 py-1.5 text-sm font-medium text-[#d4a843]">
               <Activity size={14} />
-              Built for Nigerian Businesses
+              Built for Modern Retail
             </div>
             <h1 className="mx-auto max-w-4xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
               SSV Shop{" "}

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -44,6 +45,7 @@ export default function PublicHeader() {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
+          <LanguageSwitcher />
           <Link
             href="/login"
             className="btn btn-secondary !py-2 !px-4 text-sm"
@@ -84,6 +86,9 @@ export default function PublicHeader() {
               </Link>
             ))}
             <hr className="border-[#2a2a3a]" />
+            <div className="flex items-center justify-center">
+              <LanguageSwitcher />
+            </div>
             <Link href="/login" className="btn btn-secondary text-sm">
               Login
             </Link>

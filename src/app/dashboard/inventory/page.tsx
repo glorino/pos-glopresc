@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { useTranslation } from "@/contexts/LanguageContext";
 import { formatCurrency } from "@/lib/utils";
 import {
   Package,
@@ -51,6 +52,7 @@ interface ProductData {
 }
 
 export default function InventoryDashboard() {
+  const { t } = useTranslation();
   const [data, setData] = useState<ProductData | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,35 +108,35 @@ export default function InventoryDashboard() {
 
   const stats = [
     {
-      label: "Total Products",
+      label: t("totalProducts"),
       value: totalProducts,
       icon: Package,
       color: "from-[#d4a843]/20 to-[#d4a843]/5",
       iconColor: "text-[#d4a843]",
     },
     {
-      label: "Low Stock Items",
+      label: t("lowStockItems"),
       value: lowStockItems,
       icon: AlertTriangle,
       color: "from-[#f59e0b]/20 to-[#f59e0b]/5",
       iconColor: "text-[#f59e0b]",
     },
     {
-      label: "Out of Stock",
+      label: t("outOfStock"),
       value: outOfStock,
       icon: XCircle,
       color: "from-[#f43f5e]/20 to-[#f43f5e]/5",
       iconColor: "text-[#f43f5e]",
     },
     {
-      label: "Categories",
+      label: t("categories"),
       value: categoriesCount,
       icon: FolderOpen,
       color: "from-[#8b5cf6]/20 to-[#8b5cf6]/5",
       iconColor: "text-[#8b5cf6]",
     },
     {
-      label: "Stock Value",
+      label: t("stockValue"),
       value: formatCurrency(stockValue),
       icon: DollarSign,
       color: "from-[#10b981]/20 to-[#10b981]/5",
@@ -143,10 +145,10 @@ export default function InventoryDashboard() {
   ];
 
   const quickActions = [
-    { label: "Add Product", href: "/dashboard/inventory/products", icon: Plus },
-    { label: "Stock Adjustment", href: "/dashboard/inventory/stock", icon: ArrowUpDown },
-    { label: "View Categories", href: "/dashboard/inventory/categories", icon: Eye },
-    { label: "Stock Report", href: "/dashboard/owner/reports", icon: BarChart3 },
+    { label: t("addProduct"), href: "/dashboard/inventory/products", icon: Plus },
+    { label: t("stockAdjustment"), href: "/dashboard/inventory/stock", icon: ArrowUpDown },
+    { label: t("categories"), href: "/dashboard/inventory/categories", icon: Eye },
+    { label: t("reports"), href: "/dashboard/owner/reports", icon: BarChart3 },
   ];
 
   function getStockStatus(product: Product) {
@@ -156,7 +158,7 @@ export default function InventoryDashboard() {
   }
 
   return (
-    <DashboardLayout role="WAREHOUSE_MANAGER" title="Inventory Management">
+    <DashboardLayout role="WAREHOUSE_MANAGER" title={t("inventoryDashboard")}>
       <div className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
@@ -180,7 +182,7 @@ export default function InventoryDashboard() {
 
         {/* Quick Actions */}
         <div className="glass-card p-6">
-          <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">Quick Actions</h3>
+          <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">{t("quickActions")}</h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {quickActions.map((action) => {
               const Icon = action.icon;
@@ -200,7 +202,7 @@ export default function InventoryDashboard() {
 
         {/* Filters */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h3 className="text-lg font-semibold text-[#f0f0f5]">Products</h3>
+          <h3 className="text-lg font-semibold text-[#f0f0f5]">{t("products")}</h3>
           <div className="flex flex-col gap-3 sm:flex-row">
             <div className="relative">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
