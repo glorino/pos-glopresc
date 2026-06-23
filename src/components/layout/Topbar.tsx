@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import {
@@ -21,9 +22,10 @@ interface TopbarProps {
     role: string;
     email: string;
   };
+  onMenuToggle?: () => void;
 }
 
-export default function Topbar({ title, user }: TopbarProps) {
+export default function Topbar({ title, user, onMenuToggle }: TopbarProps) {
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -54,10 +56,7 @@ export default function Topbar({ title, user }: TopbarProps) {
     <header className="topbar flex items-center justify-between px-4 sm:px-6">
       <div className="flex items-center gap-4">
         <button
-          onClick={() => {
-            const sidebar = document.getElementById("sidebar");
-            sidebar?.classList.toggle("open");
-          }}
+          onClick={onMenuToggle}
           className="rounded-lg p-2 text-[#9090a0] hover:bg-white/5 lg:hidden"
         >
           <Menu size={20} />

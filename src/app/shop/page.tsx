@@ -40,7 +40,8 @@ interface CartItem {
   quantity: number;
 }
 
-const CATEGORIES = ["All", "Food", "Beverages", "Electronics", "Clothing", "Health", "Home", "Other"];
+const CATEGORY_KEYS = ["catFood", "catBeverages", "catElectronics", "catFashion", "catHealth", "catHome"] as const;
+const CATEGORY_DB_NAMES = ["Food & Snacks", "Beverages", "Electronics", "Fashion", "Health & Beauty", "Home & Kitchen"] as const;
 
 export default function ShopPage() {
   const { t } = useTranslation();
@@ -48,6 +49,7 @@ export default function ShopPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedDbCategory, setSelectedDbCategory] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -170,8 +172,8 @@ export default function ShopPage() {
       !searchQuery ||
       product.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory =
-      selectedCategory === "All" ||
-      product.category?.name?.toLowerCase() === selectedCategory.toLowerCase();
+      !selectedDbCategory ||
+      product.category?.name === selectedDbCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -250,17 +252,27 @@ export default function ShopPage() {
       {/* Categories */}
       <div className="mx-auto max-w-7xl px-4 py-6">
         <div className="flex gap-2 overflow-x-auto pb-2">
-          {CATEGORIES.map((cat) => (
+          <button
+            onClick={() => { setSelectedCategory("All"); setSelectedDbCategory(""); }}
+            className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+              selectedCategory === "All"
+                ? "bg-gradient-to-r from-[#d4a843] to-[#c49a38] text-black"
+                : "border border-[#2a2a3a] bg-[#1c1c28] text-[#9090a0] hover:border-[#3a3a4a] hover:text-[#f0f0f5]"
+            }`}
+          >
+            {t("all")}
+          </button>
+          {CATEGORY_KEYS.map((key, idx) => (
             <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
+              key={key}
+              onClick={() => { setSelectedCategory(t(key)); setSelectedDbCategory(CATEGORY_DB_NAMES[idx]); }}
               className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                selectedCategory === cat
+                selectedDbCategory === CATEGORY_DB_NAMES[idx]
                   ? "bg-gradient-to-r from-[#d4a843] to-[#c49a38] text-black"
                   : "border border-[#2a2a3a] bg-[#1c1c28] text-[#9090a0] hover:border-[#3a3a4a] hover:text-[#f0f0f5]"
               }`}
             >
-              {cat}
+              {t(key)}
             </button>
           ))}
         </div>

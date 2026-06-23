@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
@@ -20,10 +21,8 @@ export default function PublicHeader() {
   return (
     <nav className="sticky top-0 z-50 border-b border-[#2a2a3a] bg-[#0a0a0f]/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843] to-[#c49a38] shadow-lg shadow-[#d4a843]/20">
-            <span className="text-lg font-black text-black">S</span>
-          </div>
+        <Link href="/" className="flex items-center gap-2.5">
+          <Image src="/favicon.svg" alt="SSV Shop" width={36} height={36} className="h-9 w-9" />
           <span className="text-xl font-black tracking-tight text-[#f0f0f5]">SSV <span className="text-[#d4a843]">Shop</span></span>
         </Link>
 
@@ -61,39 +60,56 @@ export default function PublicHeader() {
 
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="rounded-lg p-2 text-[#9090a0] hover:bg-white/5 md:hidden"
+          className="relative z-50 rounded-lg p-2 text-[#9090a0] hover:bg-white/5 md:hidden"
         >
-          {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
+      {/* Mobile menu overlay */}
       {mobileMenuOpen && (
-        <div className="border-t border-[#2a2a3a] px-4 pb-4 pt-2 md:hidden">
-          <div className="flex flex-col gap-3">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`text-sm hover:text-[#f0f0f5] ${
-                  pathname === link.href
-                    ? "text-[#d4a843]"
-                    : "text-[#9090a0]"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <hr className="border-[#2a2a3a]" />
-            <div className="flex items-center justify-center">
-              <LanguageSwitcher />
+        <div className="fixed inset-0 top-16 z-40 md:hidden">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <div className="relative mx-4 mt-2 overflow-hidden rounded-2xl border border-[#2a2a3a] bg-[#111118] p-4 shadow-2xl">
+            <div className="flex flex-col gap-1">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+                    pathname === link.href
+                      ? "bg-[#d4a843]/10 text-[#d4a843]"
+                      : "text-[#9090a0] hover:bg-white/5 hover:text-[#f0f0f5]"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
             </div>
-            <Link href="/login" className="btn btn-secondary text-sm">
-              Login
-            </Link>
-            <Link href="/dashboard/owner" className="btn btn-primary text-sm">
-              Go to Dashboard
-            </Link>
+            <hr className="my-3 border-[#2a2a3a]" />
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-center">
+                <LanguageSwitcher />
+              </div>
+              <Link
+                href="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="btn btn-secondary w-full text-sm"
+              >
+                Login
+              </Link>
+              <Link
+                href="/dashboard/owner"
+                onClick={() => setMobileMenuOpen(false)}
+                className="btn btn-primary w-full text-sm"
+              >
+                Go to Dashboard
+              </Link>
+            </div>
           </div>
         </div>
       )}

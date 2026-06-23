@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   Home,
   LayoutDashboard,
@@ -232,10 +233,8 @@ export default function Sidebar({ role, currentPath }: SidebarProps) {
 
   return (
     <aside className="sidebar flex flex-col" id="sidebar">
-      <div className="flex h-16 items-center gap-2 border-b border-[#2a2a3a] px-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843] to-[#c49a38] shadow-lg shadow-[#d4a843]/20">
-          <span className="text-lg font-black text-black">S</span>
-        </div>
+      <div className="flex h-16 items-center gap-2.5 border-b border-[#2a2a3a] px-5">
+        <Image src="/favicon.svg" alt="SSV Shop" width={36} height={36} className="h-9 w-9" />
         <span className="text-xl font-black tracking-tight text-[#f0f0f5]">SSV <span className="text-[#d4a843]">Shop</span></span>
       </div>
 

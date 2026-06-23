@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function PublicFooter() {
   return (
@@ -6,14 +7,12 @@ export default function PublicFooter() {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#d4a843] to-[#c49a38]">
-                <span className="text-sm font-bold text-black">G</span>
-              </div>
+            <Link href="/" className="flex items-center gap-2.5">
+              <Image src="/favicon.svg" alt="SSV Shop" width={32} height={32} className="h-8 w-8" />
               <span className="text-lg font-bold text-[#f0f0f5]">
                 SSV Shop
               </span>
-            </div>
+            </Link>
             <p className="mt-4 text-sm leading-relaxed text-[#9090a0]">
               The complete POS system for SSV Shop. Manage sales, inventory,
               customers, and finances with confidence.

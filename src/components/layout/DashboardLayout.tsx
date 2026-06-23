@@ -70,7 +70,7 @@ export default function DashboardLayout({
       </div>
 
       <div className="flex flex-1 flex-col lg:pl-[260px]">
-        <Topbar title={title} user={displayUser} />
+        <Topbar title={title} user={displayUser} onMenuToggle={() => setSidebarOpen((p) => !p)} />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
       </div>
 
