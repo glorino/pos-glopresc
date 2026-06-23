@@ -1,6 +1,20 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
+const roleDefaultRoutes: Record<string, string> = {
+  OWNER: "/dashboard/owner",
+  MANAGER: "/dashboard/manager",
+  WAREHOUSE_MANAGER: "/dashboard/inventory",
+  WAREHOUSE_REP: "/dashboard/inventory",
+  PROCUREMENT_MANAGER: "/dashboard/procurement",
+  PROCUREMENT_REP: "/dashboard/procurement",
+  SALES_MANAGER: "/dashboard/sales-manager",
+  SALES_REP: "/dashboard/cashier",
+  ACCOUNTANT: "/dashboard/accounting",
+  AUDITOR: "/dashboard/auditor",
+  CUSTOMER: "/dashboard/customer",
+};
+
 export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token;
@@ -27,7 +41,8 @@ export default withAuth(
 
         const allowed = allowedRoutes[role] || [];
         if (!allowed.includes(roleSegment)) {
-          return NextResponse.redirect(new URL(`/dashboard/${role.toLowerCase()}`, req.url));
+          const defaultRoute = roleDefaultRoutes[role] || "/dashboard/owner";
+          return NextResponse.redirect(new URL(defaultRoute, req.url));
         }
       }
     }

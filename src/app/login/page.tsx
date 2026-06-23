@@ -30,7 +30,23 @@ export default function LoginPage() {
       if (result?.error) {
         setError("Invalid email or password. Please try again.");
       } else {
-        router.push("/dashboard/owner");
+        const sessionRes = await fetch("/api/auth/session");
+        const session = await sessionRes.json();
+        const role = session?.user?.role;
+        const roleRoutes: Record<string, string> = {
+          OWNER: "/dashboard/owner",
+          MANAGER: "/dashboard/manager",
+          WAREHOUSE_MANAGER: "/dashboard/inventory",
+          WAREHOUSE_REP: "/dashboard/inventory",
+          PROCUREMENT_MANAGER: "/dashboard/procurement",
+          PROCUREMENT_REP: "/dashboard/procurement",
+          SALES_MANAGER: "/dashboard/sales-manager",
+          SALES_REP: "/dashboard/cashier",
+          ACCOUNTANT: "/dashboard/accounting",
+          AUDITOR: "/dashboard/auditor",
+          CUSTOMER: "/dashboard/customer",
+        };
+        router.push(roleRoutes[role] || "/dashboard/owner");
         router.refresh();
       }
     } catch {
