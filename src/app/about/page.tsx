@@ -57,17 +57,17 @@ export default function AboutPage() {
       <section className="hero-gradient relative overflow-hidden">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
           <div className="text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#d4a843]/20 bg-[#d4a843]/10 px-4 py-1.5 text-sm font-medium text-[#d4a843]">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#d4a843]/20 bg-[#d4a843]/10 px-4 py-1.5 text-sm font-medium text-[#d4a843] animate-fade-in-down">
               <Building size={14} />
               {t("aboutSsvShop")}
             </div>
-            <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+            <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl animate-fade-in-up">
               {t("empoweringModernRetail")}{" "}
               <span className="bg-gradient-to-r from-[#d4a843] to-[#c49a38] bg-clip-text text-transparent">
                 {t("modernRetail")}
               </span>
             </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-[#9090a0]">
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-[#9090a0] animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
               {t("aboutHeroDesc")}
             </p>
           </div>
@@ -79,7 +79,7 @@ export default function AboutPage() {
       <section className="relative py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold sm:text-3xl">{t("ourStory")}</h2>
-          <div className="mt-6 space-y-4 text-[#9090a0] leading-relaxed">
+          <div className="mt-6 space-y-4 text-[#9090a0] leading-relaxed animate-fade-in-left">
             <p>{t("storyP1")}</p>
             <p>{t("storyP2")}</p>
             <p>{t("storyP3")}</p>
@@ -93,11 +93,11 @@ export default function AboutPage() {
           <h2 className="mb-12 text-center text-2xl font-bold sm:text-3xl">
             {t("whatWeStandFor")}
           </h2>
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
             {valueKeys.map((v) => {
               const Icon = v.icon;
               return (
-                <div key={v.titleKey} className="feature-card text-center">
+                <div key={v.titleKey} className="feature-card text-center opacity-0 animate-fade-in-up">
                   <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843]/15 to-[#3b82f6]/10 text-[#d4a843]">
                     <Icon size={24} />
                   </div>
@@ -120,9 +120,9 @@ export default function AboutPage() {
           <h2 className="mb-12 text-center text-2xl font-bold sm:text-3xl">
             {t("meetTheTeam")}
           </h2>
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
             {team.map((member) => (
-              <div key={member.name} className="feature-card text-center overflow-hidden">
+              <div key={member.name} className="feature-card text-center overflow-hidden opacity-0 animate-scale-in">
                 <div className="h-20 w-full rounded-t-xl bg-gradient-to-r from-[#d4a843]/10 via-[#3b82f6]/10 to-[#8b5cf6]/10" />
                 <div className="mx-auto -mt-8 mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#d4a843]/20 to-[#3b82f6]/10 text-lg font-bold text-[#d4a843] ring-4 ring-[#111118]">
                   {member.initials}
@@ -168,7 +168,7 @@ export default function AboutPage() {
                 })}
               </div>
             </div>
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center animate-fade-in-right">
               <div className="glass-card flex h-64 w-full items-center justify-center rounded-2xl border border-[#2a2a3a] bg-[#16161f]/50 overflow-hidden relative">
                 <svg viewBox="0 0 400 200" className="absolute inset-0 h-full w-full opacity-10">
                   <circle cx="100" cy="80" r="30" fill="#d4a843" />

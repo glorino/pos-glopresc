@@ -74,11 +74,11 @@ export default function LandingPage() {
       <section className="hero-gradient relative overflow-hidden">
         <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
           <div className="text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#d4a843]/20 bg-[#d4a843]/10 px-4 py-1.5 text-sm font-medium text-[#d4a843]">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#d4a843]/20 bg-[#d4a843]/10 px-4 py-1.5 text-sm font-medium text-[#d4a843] animate-fade-in-down">
               <Activity size={14} />
               {t("builtForModernRetail")}
             </div>
-            <h1 className="mx-auto max-w-4xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+            <h1 className="mx-auto max-w-4xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl animate-fade-in-up">
               SSV Shop{" "}
               <span
                 key={currentPhrase}
@@ -87,11 +87,11 @@ export default function LandingPage() {
                 {t(phraseKeys[currentPhrase] as any)}
               </span>
             </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[#9090a0]">
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[#9090a0] animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
               {t("heroDescription")}
             </p>
             {/* Hero Visual */}
-            <div className="mx-auto mt-12 max-w-3xl">
+            <div className="mx-auto mt-12 max-w-3xl animate-float">
               <div className="relative rounded-2xl border border-[#2a2a3a] bg-[#111118]/80 p-1 shadow-2xl shadow-[#d4a843]/5">
                 <div className="rounded-xl bg-[#16161f] p-6">
                   <div className="flex items-center gap-3 mb-4">
@@ -115,7 +115,7 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
               <Link
                 href="/dashboard/owner"
                 className="btn btn-primary btn-lg group"
@@ -147,13 +147,13 @@ export default function LandingPage() {
               {t("streamlineOperations")}
             </p>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
             {topFeatureKeys.map((feature) => {
               const Icon = feature.icon;
               return (
                 <div
                   key={feature.titleKey}
-                  className="feature-card group cursor-default"
+                  className="feature-card group cursor-default opacity-0 animate-fade-in-up"
                 >
                   <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843]/15 to-[#3b82f6]/10 text-[#d4a843] transition-colors group-hover:from-[#d4a843]/25 group-hover:to-[#3b82f6]/15">
                     <Icon size={22} />
@@ -186,9 +186,9 @@ export default function LandingPage() {
       {/* ── Stats ──────────────────────────────────────────── */}
       <section className="border-y border-[#2a2a3a] bg-[#111118]/50 py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4 stagger-children">
             {statKeys.map((stat) => (
-              <div key={stat.labelKey} className="text-center">
+              <div key={stat.labelKey} className="text-center opacity-0 animate-scale-in">
                 <div className="text-3xl font-bold text-[#d4a843] sm:text-4xl">
                   {stat.value}
                 </div>
@@ -202,7 +202,7 @@ export default function LandingPage() {
       {/* ── CTA ────────────────────────────────────────────── */}
       <section className="relative py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="glass-card relative overflow-hidden px-8 py-16 text-center sm:px-16">
+          <div className="glass-card relative overflow-hidden px-8 py-16 text-center sm:px-16 animate-fade-in-up">
             <div className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full bg-[#d4a843]/10 blur-[80px]" />
             <div className="pointer-events-none absolute -bottom-20 -left-20 h-60 w-60 rounded-full bg-[#3b82f6]/10 blur-[80px]" />
             <h2 className="relative text-3xl font-bold sm:text-4xl">
@@ -230,8 +230,8 @@ export default function LandingPage() {
                   className="transition-transform group-hover:translate-x-0.5"
                 />
               </Link>
-              <Link href="/pricing" className="btn btn-secondary btn-lg">
-                {t("requestQuote")}
+              <Link href="/features" className="btn btn-secondary btn-lg">
+                {t("exploreFeatures")}
               </Link>
             </div>
           </div>

@@ -233,10 +233,10 @@ export default function Sidebar({ role, currentPath }: SidebarProps) {
   return (
     <aside className="sidebar flex flex-col" id="sidebar">
       <div className="flex h-16 items-center gap-2 border-b border-[#2a2a3a] px-5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#d4a843] to-[#c49a38]">
-          <span className="text-sm font-bold text-black">G</span>
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843] to-[#c49a38] shadow-lg shadow-[#d4a843]/20">
+          <span className="text-lg font-black text-black">S</span>
         </div>
-        <span className="text-lg font-bold text-[#f0f0f5]">SSV Shop</span>
+        <span className="text-xl font-black tracking-tight text-[#f0f0f5]">SSV <span className="text-[#d4a843]">Shop</span></span>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4">

@@ -209,13 +209,13 @@ export default function OwnerDashboard() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 stagger-children">
           {stats.map((stat) => {
             const Icon = stat.icon;
             return (
               <div
                 key={stat.label}
-                className="glass-card group relative overflow-hidden p-5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-black/20"
+                className="glass-card group relative overflow-hidden p-5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-black/20 opacity-0 animate-scale-in"
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${stat.bgGradient} opacity-0 transition-opacity duration-300 group-hover:opacity-100`} />
                 <div className="relative">

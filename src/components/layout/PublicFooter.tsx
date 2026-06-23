@@ -30,11 +30,6 @@ export default function PublicFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/pricing" className="hover:text-[#f0f0f5]">
-                  Pricing
-                </Link>
-              </li>
-              <li>
                 <Link href="/shop" className="hover:text-[#f0f0f5]">
                   Shop
                 </Link>

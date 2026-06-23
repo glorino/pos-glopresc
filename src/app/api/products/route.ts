@@ -57,11 +57,21 @@ export async function GET(request: NextRequest) {
       db.product.count({ where }),
     ]);
 
+    const categoryImageMap: Record<string, string> = {
+      "Food & Snacks": "https://placehold.co/400x300/2d1f0e/f59e0b?text=Food",
+      "Beverages": "https://placehold.co/400x300/0f1a2e/3b82f6?text=Beverage",
+      "Electronics": "https://placehold.co/400x300/1a0f2e/8b5cf6?text=Electronics",
+      "Fashion": "https://placehold.co/400x300/2e0f1a/ec4899?text=Fashion",
+      "Health & Beauty": "https://placehold.co/400x300/0f2e1a/10b981?text=Health",
+      "Home & Kitchen": "https://placehold.co/400x300/2e2a0f/f59e0b?text=Home",
+    };
+
     return NextResponse.json({
       products: products.map((p) => ({
         ...p,
         price: Number(p.price),
         costPrice: Number(p.costPrice),
+        image: p.image || categoryImageMap[p.category?.name as string] || "https://placehold.co/400x300/1a1a2e/d4a843?text=Product",
       })),
       total,
       page,

@@ -277,11 +277,11 @@ export default function ShopPage() {
             <p className="text-lg font-medium">No products found</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 stagger-children">
             {filteredProducts.map((product) => (
               <div
                 key={product.id}
-                className="group rounded-2xl border border-[#2a2a3a] bg-[#111118] p-4 transition-all hover:border-[#d4a843]/30 hover:shadow-lg hover:shadow-[#d4a843]/5"
+                className="group rounded-2xl border border-[#2a2a3a] bg-[#111118] p-4 transition-all hover:border-[#d4a843]/30 hover:shadow-lg hover:shadow-[#d4a843]/5 opacity-0 animate-fade-in-up"
               >
                 <Link href={`/shop/${product.id}`}>
                   <div className="mb-3 flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-[#1c1c28]">

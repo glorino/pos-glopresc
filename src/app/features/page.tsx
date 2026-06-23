@@ -141,23 +141,23 @@ export default function FeaturesPage() {
       <section className="hero-gradient relative overflow-hidden">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
           <div className="text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#d4a843]/20 bg-[#d4a843]/10 px-4 py-1.5 text-sm font-medium text-[#d4a843]">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#d4a843]/20 bg-[#d4a843]/10 px-4 py-1.5 text-sm font-medium text-[#d4a843] animate-fade-in-down">
               <Activity size={14} />
               {t("powerfulFeatures")}
             </div>
-            <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+            <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl animate-fade-in-up">
               {t("everythingYouNeed")}{" "}
               <span className="bg-gradient-to-r from-[#d4a843] to-[#c49a38] bg-clip-text text-transparent">
                 {t("runYourBusiness")}
               </span>
             </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-[#9090a0]">
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-[#9090a0] animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
               {t("featuresHeroDesc")}
             </p>
             {/* Features Hero Visual */}
             <div className="mx-auto mt-10 flex justify-center gap-4">
               {[ShoppingCart, Package, BarChart3, Shield, Users].map((Icon, i) => (
-                <div key={i} className={`flex h-14 w-14 items-center justify-center rounded-2xl border border-[#2a2a3a] bg-[#16161f] text-[#d4a843] shadow-lg transition-all hover:scale-110 hover:border-[#d4a843]/30`}
+                <div key={i} className={`flex h-14 w-14 items-center justify-center rounded-2xl border border-[#2a2a3a] bg-[#16161f] text-[#d4a843] shadow-lg transition-all hover:scale-110 hover:border-[#d4a843]/30 animate-float`}
                   style={{ animationDelay: `${i * 0.1}s` }}>
                   <Icon size={24} />
                 </div>
@@ -184,13 +184,13 @@ export default function FeaturesPage() {
                 {t(section.descKey as any)}
               </p>
             </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
               {section.features.map((feature) => {
                 const Icon = feature.icon;
                 return (
                   <div
                     key={feature.titleKey}
-                    className="feature-card group cursor-default"
+                    className="feature-card group cursor-default opacity-0 animate-fade-in-up"
                   >
                     <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843]/15 to-[#3b82f6]/10 text-[#d4a843] transition-colors group-hover:from-[#d4a843]/25 group-hover:to-[#3b82f6]/15">
                       <Icon size={22} />
