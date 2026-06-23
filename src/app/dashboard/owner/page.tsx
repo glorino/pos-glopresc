@@ -164,19 +164,19 @@ export default function OwnerDashboard() {
   ];
 
   const quickActions = [
-    { label: "View Reports", action: () => router.push('/dashboard/owner/reports'), icon: BarChart3, color: "text-[#3b82f6]" },
-    { label: "Manage Users", action: () => router.push('/dashboard/owner/users'), icon: Shield, color: "text-[#8b5cf6]" },
-    { label: "Shop", action: () => router.push('/shop'), icon: Store, color: "text-[#d4a843]" },
-    { label: "Settings", action: () => router.push('/dashboard/owner/settings'), icon: Settings, color: "text-[#10b981]" },
-    { label: "Add User", action: () => router.push('/dashboard/owner/users'), icon: UserPlus, color: "text-[#f43f5e]" },
+    { label: t("viewReports"), action: () => router.push('/dashboard/owner/reports'), icon: BarChart3, color: "text-[#3b82f6]" },
+    { label: t("manageUsers"), action: () => router.push('/dashboard/owner/users'), icon: Shield, color: "text-[#8b5cf6]" },
+    { label: t("shopLabel"), action: () => router.push('/shop'), icon: Store, color: "text-[#d4a843]" },
+    { label: t("settingsLabel"), action: () => router.push('/dashboard/owner/settings'), icon: Settings, color: "text-[#10b981]" },
+    { label: t("addUser"), action: () => router.push('/dashboard/owner/users'), icon: UserPlus, color: "text-[#f43f5e]" },
   ];
 
   const recentActivity = [
-    { icon: ShoppingCart, label: "New sale recorded", detail: "Invoice #INV-2024-042", time: "2 min ago", color: "text-[#10b981]" },
-    { icon: CreditCard, label: "Payment received", detail: "₦45,000 via Flutterwave", time: "5 min ago", color: "text-[#3b82f6]" },
-    { icon: AlertTriangle, label: "Low stock alert", detail: "3 products below threshold", time: "12 min ago", color: "text-[#f59e0b]" },
-    { icon: Package, label: "Stock updated", detail: "25 items added to inventory", time: "1 hr ago", color: "text-[#8b5cf6]" },
-    { icon: Users, label: "New customer", detail: "Oluwaseun Adebayo registered", time: "2 hr ago", color: "text-[#d4a843]" },
+    { icon: ShoppingCart, label: t("newSaleRecorded"), detail: "Invoice #INV-2024-042", time: "2 min ago", color: "text-[#10b981]" },
+    { icon: CreditCard, label: t("paymentReceived"), detail: "₦45,000 via Flutterwave", time: "5 min ago", color: "text-[#3b82f6]" },
+    { icon: AlertTriangle, label: t("lowStockAlert"), detail: "3 products below threshold", time: "12 min ago", color: "text-[#f59e0b]" },
+    { icon: Package, label: t("stockUpdated"), detail: "25 items added to inventory", time: "1 hr ago", color: "text-[#8b5cf6]" },
+    { icon: Users, label: t("newCustomer"), detail: "Oluwaseun Adebayo registered", time: "2 hr ago", color: "text-[#d4a843]" },
   ];
 
   const salesBreakdown = [
@@ -199,9 +199,9 @@ export default function OwnerDashboard() {
               </div>
               <div className="text-left">
                 <p className="text-sm font-semibold text-[#f0f0f5]">
-                  Stock Alert — {data?.lowStockItems ?? 0} product{(data?.lowStockItems ?? 0) !== 1 ? "s" : ""} below minimum level
+                  {t("stockAlert")} — {data?.lowStockItems ?? 0} product{(data?.lowStockItems ?? 0) !== 1 ? "s" : ""} {t("productsBelowMin")}
                 </p>
-                <p className="text-xs text-[#9090a0]">Click to view and manage inventory</p>
+                <p className="text-xs text-[#9090a0]">{t("clickToViewInventory")}</p>
               </div>
             </div>
             <ArrowRight size={16} className="text-[#f59e0b]" />
@@ -249,11 +249,11 @@ export default function OwnerDashboard() {
                 <h3 className="text-lg font-semibold text-[#f0f0f5]">
                   {t("revenueOverview")}
                 </h3>
-                <p className="text-sm text-[#9090a0]">Monthly revenue for {new Date().getFullYear()}</p>
+                <p className="text-sm text-[#9090a0]">{t("monthlyRevenueFor")} {new Date().getFullYear()}</p>
               </div>
               <div className="flex items-center gap-2 text-sm text-[#10b981]">
                 <TrendingUp size={16} />
-                <span className="font-medium">+12.5% vs last year</span>
+                <span className="font-medium">+12.5% {t("vsLastYear")}</span>
               </div>
             </div>
             <div className="h-[320px]">
@@ -299,7 +299,7 @@ export default function OwnerDashboard() {
             <h3 className="mb-2 text-lg font-semibold text-[#f0f0f5]">
               {t("salesBreakdown")}
             </h3>
-            <p className="mb-4 text-sm text-[#9090a0]">By category</p>
+            <p className="mb-4 text-sm text-[#9090a0]">{t("byCategory")}</p>
             <div className="flex h-[200px] items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -404,11 +404,11 @@ export default function OwnerDashboard() {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Invoice</th>
-                    <th>Customer</th>
-                    <th>Amount</th>
-                    <th>Date</th>
-                    <th>Status</th>
+                    <th>{t("invoice")}</th>
+                    <th>{t("customer")}</th>
+                    <th>{t("amount")}</th>
+                    <th>{t("date")}</th>
+                    <th>{t("status")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -444,7 +444,7 @@ export default function OwnerDashboard() {
                   {(!data?.recentSales || data.recentSales.length === 0) && (
                     <tr>
                       <td colSpan={5} className="text-center text-[#606070]">
-                        No recent sales
+                        {t("noRecentSales")}
                       </td>
                     </tr>
                   )}
@@ -472,7 +472,7 @@ export default function OwnerDashboard() {
                         {product.name}
                       </p>
                       <p className="text-xs text-[#606070]">
-                        {product.totalSold} sold
+                        {product.totalSold} {t("sold")}
                       </p>
                     </div>
                   </div>
@@ -483,7 +483,7 @@ export default function OwnerDashboard() {
               ))}
               {(!data?.topProducts || data.topProducts.length === 0) && (
                 <p className="text-center text-sm text-[#606070]">
-                  No product data available
+                  {t("noProductData")}
                 </p>
               )}
             </div>
@@ -496,7 +496,7 @@ export default function OwnerDashboard() {
             <div className="mb-4 flex items-center gap-2">
               <AlertTriangle size={18} className="text-[#f43f5e]" />
               <h3 className="text-lg font-semibold text-[#f0f0f5]">
-                Low Stock Alerts
+                {t("lowStockAlerts")}
               </h3>
               <span className="ml-2 rounded-full bg-[#f43f5e]/15 px-2 py-0.5 text-xs font-medium text-[#f43f5e]">
                 {data.lowStockProducts.length}
@@ -529,7 +529,7 @@ export default function OwnerDashboard() {
                       </p>
                     </div>
                     <span className="rounded-full bg-[#f43f5e]/15 px-2 py-0.5 text-xs font-medium text-[#f43f5e]">
-                      Low Stock
+                      {t("lowStock")}
                     </span>
                   </div>
                 </div>

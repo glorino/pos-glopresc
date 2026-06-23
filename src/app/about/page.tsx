@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+"use client";
+
 import {
   MapPin,
   Phone,
@@ -11,31 +12,23 @@ import {
 } from "lucide-react";
 import PublicHeader from "@/components/layout/PublicHeader";
 import PublicFooter from "@/components/layout/PublicFooter";
+import { useTranslation } from "@/contexts/LanguageContext";
 
-export const metadata: Metadata = {
-  title: "About — SSV Shop POS",
-  description:
-    "Learn about SSV Shop — our mission to empower businesses worldwide with modern point-of-sale technology.",
-};
-
-const values = [
+const valueKeys = [
   {
     icon: Target,
-    title: "Our Mission",
-    description:
-      "To provide affordable, reliable, and easy-to-use point-of-sale technology that empowers businesses to compete and grow in the modern economy.",
+    titleKey: "ourMission",
+    descKey: "missionDesc",
   },
   {
     icon: Heart,
-    title: "Our Vision",
-    description:
-      "To become the leading POS platform in West Africa, powering millions of daily transactions and helping small businesses thrive.",
+    titleKey: "ourVision",
+    descKey: "visionDesc",
   },
   {
     icon: Users,
-    title: "Our Team",
-    description:
-      "A passionate team of developers, designers, and business experts dedicated to building tools that make running a retail business effortless.",
+    titleKey: "ourTeam",
+    descKey: "teamDesc",
   },
 ];
 
@@ -54,6 +47,8 @@ const contactInfo = [
 ];
 
 export default function AboutPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
       <PublicHeader />
@@ -64,17 +59,16 @@ export default function AboutPage() {
           <div className="text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#d4a843]/20 bg-[#d4a843]/10 px-4 py-1.5 text-sm font-medium text-[#d4a843]">
               <Building size={14} />
-              About SSV Shop
+              {t("aboutSsvShop")}
             </div>
             <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
-              Empowering{" "}
+              {t("empoweringModernRetail")}{" "}
               <span className="bg-gradient-to-r from-[#d4a843] to-[#c49a38] bg-clip-text text-transparent">
-                Modern Retail
+                {t("modernRetail")}
               </span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-[#9090a0]">
-              We believe every business — from a small shop to a growing chain
-              — deserves access to modern, affordable point-of-sale technology.
+              {t("aboutHeroDesc")}
             </p>
           </div>
         </div>
@@ -84,27 +78,11 @@ export default function AboutPage() {
       {/* ── Story ──────────────────────────────────────────── */}
       <section className="relative py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold sm:text-3xl">Our Story</h2>
+          <h2 className="text-2xl font-bold sm:text-3xl">{t("ourStory")}</h2>
           <div className="mt-6 space-y-4 text-[#9090a0] leading-relaxed">
-            <p>
-              SSV Shop was born from a simple observation: businesses
-              deserve better tools. Too many shops still rely on paper ledgers
-              or outdated software that doesn&apos;t understand modern payment
-              methods, currencies, or business practices.
-            </p>
-            <p>
-              Founded in 2024, we set out to build a point-of-sale
-              system designed from the ground up for modern retail. We
-              support multiple currencies, local payment providers, and
-              multi-branch operations — all wrapped in a modern,
-              easy-to-use interface.
-            </p>
-            <p>
-              Today, SSV Shop powers thousands of daily transactions worldwide.
-              From single-store retailers to multi-location chains, our
-              platform scales to meet the needs of businesses at every stage of
-              growth.
-            </p>
+            <p>{t("storyP1")}</p>
+            <p>{t("storyP2")}</p>
+            <p>{t("storyP3")}</p>
           </div>
         </div>
       </section>
@@ -113,21 +91,21 @@ export default function AboutPage() {
       <section className="relative border-y border-[#2a2a3a] bg-[#111118]/30 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="mb-12 text-center text-2xl font-bold sm:text-3xl">
-            What We Stand For
+            {t("whatWeStandFor")}
           </h2>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {values.map((v) => {
+            {valueKeys.map((v) => {
               const Icon = v.icon;
               return (
-                <div key={v.title} className="feature-card text-center">
+                <div key={v.titleKey} className="feature-card text-center">
                   <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843]/15 to-[#3b82f6]/10 text-[#d4a843]">
                     <Icon size={24} />
                   </div>
                   <h3 className="mb-2 text-lg font-semibold text-[#f0f0f5]">
-                    {v.title}
+                    {t(v.titleKey as any)}
                   </h3>
                   <p className="text-sm leading-relaxed text-[#9090a0]">
-                    {v.description}
+                    {t(v.descKey as any)}
                   </p>
                 </div>
               );
@@ -140,12 +118,13 @@ export default function AboutPage() {
       <section className="relative py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="mb-12 text-center text-2xl font-bold sm:text-3xl">
-            Meet the Team
+            {t("meetTheTeam")}
           </h2>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {team.map((member) => (
-              <div key={member.name} className="feature-card text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#d4a843]/20 to-[#3b82f6]/10 text-lg font-bold text-[#d4a843]">
+              <div key={member.name} className="feature-card text-center overflow-hidden">
+                <div className="h-20 w-full rounded-t-xl bg-gradient-to-r from-[#d4a843]/10 via-[#3b82f6]/10 to-[#8b5cf6]/10" />
+                <div className="mx-auto -mt-8 mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#d4a843]/20 to-[#3b82f6]/10 text-lg font-bold text-[#d4a843] ring-4 ring-[#111118]">
                   {member.initials}
                 </div>
                 <h3 className="text-base font-semibold text-[#f0f0f5]">
@@ -166,10 +145,9 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-2">
             <div>
-              <h2 className="text-2xl font-bold sm:text-3xl">Get in Touch</h2>
+              <h2 className="text-2xl font-bold sm:text-3xl">{t("getInTouch")}</h2>
               <p className="mt-4 text-[#9090a0]">
-                Have a question or want to learn more? We&apos;d love to hear
-                from you.
+                {t("getInTouchDesc")}
               </p>
               <div className="mt-8 space-y-5">
                 {contactInfo.map((item) => {
@@ -191,10 +169,21 @@ export default function AboutPage() {
               </div>
             </div>
             <div className="flex items-center justify-center">
-              <div className="glass-card flex h-64 w-full items-center justify-center rounded-2xl border border-[#2a2a3a] bg-[#16161f]/50">
-                <p className="text-sm text-[#606070]">
-                  Map integration coming soon
-                </p>
+              <div className="glass-card flex h-64 w-full items-center justify-center rounded-2xl border border-[#2a2a3a] bg-[#16161f]/50 overflow-hidden relative">
+                <svg viewBox="0 0 400 200" className="absolute inset-0 h-full w-full opacity-10">
+                  <circle cx="100" cy="80" r="30" fill="#d4a843" />
+                  <circle cx="250" cy="120" r="20" fill="#3b82f6" />
+                  <circle cx="320" cy="60" r="15" fill="#8b5cf6" />
+                  <line x1="100" y1="80" x2="250" y2="120" stroke="#d4a843" strokeWidth="1" strokeDasharray="4" />
+                  <line x1="250" y1="120" x2="320" y2="60" stroke="#3b82f6" strokeWidth="1" strokeDasharray="4" />
+                  <circle cx="100" cy="80" r="5" fill="#d4a843" />
+                  <circle cx="250" cy="120" r="5" fill="#3b82f6" />
+                  <circle cx="320" cy="60" r="5" fill="#8b5cf6" />
+                </svg>
+                <div className="relative z-10 text-center">
+                  <MapPin size={32} className="mx-auto mb-2 text-[#d4a843]" />
+                  <p className="text-sm text-[#9090a0]">{t("mapComingSoon")}</p>
+                </div>
               </div>
             </div>
           </div>

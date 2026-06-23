@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+"use client";
+
 import React from "react";
 import {
   ShoppingCart,
@@ -32,109 +33,106 @@ import {
 } from "lucide-react";
 import PublicHeader from "@/components/layout/PublicHeader";
 import PublicFooter from "@/components/layout/PublicFooter";
-
-export const metadata: Metadata = {
-  title: "Features — SSV Shop POS",
-  description:
-    "Explore all features of SSV Shop POS: sales management, inventory control, customer tracking, procurement, accounting, reporting, and multi-branch support.",
-};
+import { useTranslation } from "@/contexts/LanguageContext";
 
 interface FeatureItem {
   icon: React.ElementType;
-  title: string;
-  description: string;
+  titleKey: string;
+  descKey: string;
 }
 
-const sections: { id: string; title: string; description: string; features: FeatureItem[] }[] = [
+const sections: { id: string; titleKey: string; descKey: string; features: FeatureItem[] }[] = [
   {
     id: "pos",
-    title: "Point of Sale",
-    description: "Fast, reliable transaction processing for every checkout.",
+    titleKey: "featuresPosTitle",
+    descKey: "featuresPosDesc",
     features: [
-      { icon: ShoppingCart, title: "Quick Checkout", description: "Process sales in seconds with an intuitive terminal designed for speed and accuracy." },
-      { icon: CreditCard, title: "Multiple Payment Methods", description: "Accept cash, cards, bank transfers, USSD, mobile wallets, and QR payments." },
-      { icon: Receipt, title: "Receipt Generation", description: "Auto-generate and print digital or paper receipts for every transaction." },
-      { icon: Tag, title: "Discounts & Promotions", description: "Apply percentage or fixed discounts, run promotions, and manage coupon codes." },
-      { icon: RefreshCw, title: "Returns & Refunds", description: "Handle returns and partial refunds with a clear audit trail." },
-      { icon: Smartphone, title: "Mobile POS", description: "Sell from anywhere using a tablet or phone with our responsive terminal." },
+      { icon: ShoppingCart, titleKey: "featuresPosQuickCheckout", descKey: "featuresPosQuickCheckoutDesc" },
+      { icon: CreditCard, titleKey: "featuresPosMultiplePayment", descKey: "featuresPosMultiplePaymentDesc" },
+      { icon: Receipt, titleKey: "featuresPosReceipt", descKey: "featuresPosReceiptDesc" },
+      { icon: Tag, titleKey: "featuresPosDiscounts", descKey: "featuresPosDiscountsDesc" },
+      { icon: RefreshCw, titleKey: "featuresPosReturns", descKey: "featuresPosReturnsDesc" },
+      { icon: Smartphone, titleKey: "featuresPosMobile", descKey: "featuresPosMobileDesc" },
     ],
   },
   {
     id: "inventory",
-    title: "Inventory Management",
-    description: "Keep track of every item across your stockroom and shelves.",
+    titleKey: "featuresInvTitle",
+    descKey: "featuresInvDesc",
     features: [
-      { icon: Package, title: "Product Catalog", description: "Organize products with variants, categories, images, barcodes, and custom attributes." },
-      { icon: Warehouse, title: "Stock Tracking", description: "Monitor stock levels in real-time across all locations with automatic adjustments." },
-      { icon: AlertTriangle, title: "Low Stock Alerts", description: "Get notified when inventory drops below your configured thresholds." },
-      { icon: Truck, title: "Supplier Management", description: "Maintain a supplier directory and streamline your procurement workflow." },
-      { icon: ClipboardList, title: "Purchase Orders", description: "Create, track, and receive purchase orders to keep shelves stocked." },
-      { icon: Layers, title: "Stock Transfers", description: "Move inventory between branches with full tracking and approval workflows." },
+      { icon: Package, titleKey: "featuresInvCatalog", descKey: "featuresInvCatalogDesc" },
+      { icon: Warehouse, titleKey: "featuresInvStockTracking", descKey: "featuresInvStockTrackingDesc" },
+      { icon: AlertTriangle, titleKey: "featuresInvLowStock", descKey: "featuresInvLowStockDesc" },
+      { icon: Truck, titleKey: "featuresInvSupplier", descKey: "featuresInvSupplierDesc" },
+      { icon: ClipboardList, titleKey: "featuresInvPurchase", descKey: "featuresInvPurchaseDesc" },
+      { icon: Layers, titleKey: "featuresInvTransfers", descKey: "featuresInvTransfersDesc" },
     ],
   },
   {
     id: "sales",
-    title: "Sales & Customers",
-    description: "Build relationships and drive repeat business.",
+    titleKey: "featuresSalesTitle",
+    descKey: "featuresSalesDesc",
     features: [
-      { icon: Users, title: "Customer Profiles", description: "Store contact details, purchase history, and preferences for each customer." },
-      { icon: TrendingUp, title: "Sales Tracking", description: "Monitor daily, weekly, and monthly sales with real-time dashboards." },
-      { icon: UserCheck, title: "Loyalty Program", description: "Reward repeat customers with points, tiers, and special offers." },
-      { icon: Bell, title: "Customer Notifications", description: "Send SMS or email notifications for orders, promotions, and account updates." },
-      { icon: BarChart3, title: "Sales Analytics", description: "Identify top-selling products, peak hours, and revenue trends." },
-      { icon: Clock, title: "Transaction History", description: "Access a complete, searchable log of every transaction with filters." },
+      { icon: Users, titleKey: "featuresSalesProfiles", descKey: "featuresSalesProfilesDesc" },
+      { icon: TrendingUp, titleKey: "featuresSalesTracking", descKey: "featuresSalesTrackingDesc" },
+      { icon: UserCheck, titleKey: "featuresSalesLoyalty", descKey: "featuresSalesLoyaltyDesc" },
+      { icon: Bell, titleKey: "featuresSalesNotifications", descKey: "featuresSalesNotificationsDesc" },
+      { icon: BarChart3, titleKey: "featuresSalesAnalytics", descKey: "featuresSalesAnalyticsDesc" },
+      { icon: Clock, titleKey: "featuresSalesHistory", descKey: "featuresSalesHistoryDesc" },
     ],
   },
   {
     id: "procurement",
-    title: "Procurement",
-    description: "Streamline your purchasing from request to delivery.",
+    titleKey: "featuresProcTitle",
+    descKey: "featuresProcDesc",
     features: [
-      { icon: Truck, title: "Vendor Management", description: "Track vendor performance, pricing, and lead times in one place." },
-      { icon: ClipboardList, title: "Requisition Workflows", description: "Route purchase requests through approval chains before orders are placed." },
-      { icon: FileText, title: "Invoice Matching", description: "Automatically match incoming invoices against purchase orders and receipts." },
-      { icon: RefreshCw, title: "Automated Reordering", description: "Trigger reorder points based on sales velocity and stock thresholds." },
+      { icon: Truck, titleKey: "featuresProcVendor", descKey: "featuresProcVendorDesc" },
+      { icon: ClipboardList, titleKey: "featuresProcRequisition", descKey: "featuresProcRequisitionDesc" },
+      { icon: FileText, titleKey: "featuresProcInvoice", descKey: "featuresProcInvoiceDesc" },
+      { icon: RefreshCw, titleKey: "featuresProcReorder", descKey: "featuresProcReorderDesc" },
     ],
   },
   {
     id: "accounting",
-    title: "Accounting & Finance",
-    description: "Keep your books balanced without the complexity.",
+    titleKey: "featuresAccTitle",
+    descKey: "featuresAccDesc",
     features: [
-      { icon: Receipt, title: "Expense Tracking", description: "Log and categorize business expenses with receipt attachments." },
-      { icon: BarChart3, title: "Profit & Loss", description: "Generate P&L statements filtered by date range, branch, or category." },
-      { icon: Database, title: "Cash Flow Management", description: "Track money in and out with projected cash flow forecasts." },
-      { icon: FileText, title: "Tax Reporting", description: "Automate VAT calculations and generate tax-ready reports." },
-      { icon: CreditCard, title: "Payment Reconciliation", description: "Match payments received against invoices to identify discrepancies." },
+      { icon: Receipt, titleKey: "featuresAccExpense", descKey: "featuresAccExpenseDesc" },
+      { icon: BarChart3, titleKey: "featuresAccProfit", descKey: "featuresAccProfitDesc" },
+      { icon: Database, titleKey: "featuresAccCashFlow", descKey: "featuresAccCashFlowDesc" },
+      { icon: FileText, titleKey: "featuresAccTax", descKey: "featuresAccTaxDesc" },
+      { icon: CreditCard, titleKey: "featuresAccReconciliation", descKey: "featuresAccReconciliationDesc" },
     ],
   },
   {
     id: "reporting",
-    title: "Reporting & Analytics",
-    description: "Turn data into actionable insights.",
+    titleKey: "featuresReportTitle",
+    descKey: "featuresReportDesc",
     features: [
-      { icon: BarChart3, title: "Sales Reports", description: "Detailed breakdowns by product, category, cashier, payment method, and time period." },
-      { icon: TrendingUp, title: "Inventory Reports", description: "Stock valuation, movement history, shrinkage, and turnover analysis." },
-      { icon: FileText, title: "Financial Reports", description: "Balance sheets, cash flow statements, and expense summaries on demand." },
-      { icon: Globe, title: "Multi-Branch Reports", description: "Compare performance across locations with consolidated and per-branch views." },
-      { icon: Zap, title: "Custom Dashboards", description: "Build personalized dashboards with the KPIs that matter to your role." },
+      { icon: BarChart3, titleKey: "featuresReportSales", descKey: "featuresReportSalesDesc" },
+      { icon: TrendingUp, titleKey: "featuresReportInventory", descKey: "featuresReportInventoryDesc" },
+      { icon: FileText, titleKey: "featuresReportFinancial", descKey: "featuresReportFinancialDesc" },
+      { icon: Globe, titleKey: "featuresReportMultiBranch", descKey: "featuresReportMultiBranchDesc" },
+      { icon: Zap, titleKey: "featuresReportDashboards", descKey: "featuresReportDashboardsDesc" },
     ],
   },
   {
     id: "multi-branch",
-    title: "Multi-Branch & Access",
-    description: "Scale your business while maintaining control.",
+    titleKey: "featuresMultiTitle",
+    descKey: "featuresMultiDesc",
     features: [
-      { icon: GitBranch, title: "Multi-Branch Support", description: "Manage multiple locations from a single account with centralized reporting." },
-      { icon: Shield, title: "Role-Based Access", description: "Granular permissions for owners, managers, cashiers, accountants, and more." },
-      { icon: Lock, title: "Audit Logs", description: "Track every action taken in the system with timestamped, user-attributed logs." },
-      { icon: Settings, title: "Branch Settings", description: "Configure tax rates, receipt templates, and payment options per location." },
-      { icon: Headphones, title: "24/7 Support", description: "Reach our support team anytime via chat, email, or phone." },
+      { icon: GitBranch, titleKey: "featuresMultiSupport", descKey: "featuresMultiSupportDesc" },
+      { icon: Shield, titleKey: "featuresMultiAccess", descKey: "featuresMultiAccessDesc" },
+      { icon: Lock, titleKey: "featuresMultiAudit", descKey: "featuresMultiAuditDesc" },
+      { icon: Settings, titleKey: "featuresMultiBranchSettings", descKey: "featuresMultiBranchSettingsDesc" },
+      { icon: Headphones, titleKey: "featuresMultiSupport247", descKey: "featuresMultiSupport247Desc" },
     ],
   },
 ];
 
 export default function FeaturesPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
       <PublicHeader />
@@ -145,18 +143,26 @@ export default function FeaturesPage() {
           <div className="text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#d4a843]/20 bg-[#d4a843]/10 px-4 py-1.5 text-sm font-medium text-[#d4a843]">
               <Activity size={14} />
-              Powerful Features
+              {t("powerfulFeatures")}
             </div>
             <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
-              Everything You Need to{" "}
+              {t("everythingYouNeed")}{" "}
               <span className="bg-gradient-to-r from-[#d4a843] to-[#c49a38] bg-clip-text text-transparent">
-                Run Your Business
+                {t("runYourBusiness")}
               </span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-[#9090a0]">
-              From point of sale to financial reporting, SSV Shop gives you the
-              tools to manage every aspect of your retail operations.
+              {t("featuresHeroDesc")}
             </p>
+            {/* Features Hero Visual */}
+            <div className="mx-auto mt-10 flex justify-center gap-4">
+              {[ShoppingCart, Package, BarChart3, Shield, Users].map((Icon, i) => (
+                <div key={i} className={`flex h-14 w-14 items-center justify-center rounded-2xl border border-[#2a2a3a] bg-[#16161f] text-[#d4a843] shadow-lg transition-all hover:scale-110 hover:border-[#d4a843]/30`}
+                  style={{ animationDelay: `${i * 0.1}s` }}>
+                  <Icon size={24} />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         <div className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-[#d4a843]/5 blur-[120px]" />
@@ -172,10 +178,10 @@ export default function FeaturesPage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-12">
               <h2 className="text-2xl font-bold sm:text-3xl">
-                {section.title}
+                {t(section.titleKey as any)}
               </h2>
               <p className="mt-2 max-w-xl text-[#9090a0]">
-                {section.description}
+                {t(section.descKey as any)}
               </p>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -183,17 +189,17 @@ export default function FeaturesPage() {
                 const Icon = feature.icon;
                 return (
                   <div
-                    key={feature.title}
+                    key={feature.titleKey}
                     className="feature-card group cursor-default"
                   >
                     <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843]/15 to-[#3b82f6]/10 text-[#d4a843] transition-colors group-hover:from-[#d4a843]/25 group-hover:to-[#3b82f6]/15">
                       <Icon size={22} />
                     </div>
                     <h3 className="mb-2 text-lg font-semibold text-[#f0f0f5]">
-                      {feature.title}
+                      {t(feature.titleKey as any)}
                     </h3>
                     <p className="text-sm leading-relaxed text-[#9090a0]">
-                      {feature.description}
+                      {t(feature.descKey as any)}
                     </p>
                   </div>
                 );

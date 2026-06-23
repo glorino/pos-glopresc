@@ -292,7 +292,16 @@ export default function ShopPage() {
                         className="h-full w-full object-cover transition-transform group-hover:scale-105"
                       />
                     ) : (
-                      <Package size={40} className="text-[#3a3a4a]" />
+                      <div className={`h-full w-full flex items-center justify-center bg-gradient-to-br ${
+                        product.category?.name === "Food" ? "from-[#f59e0b]/20 to-[#f59e0b]/5" :
+                        product.category?.name === "Beverages" ? "from-[#3b82f6]/20 to-[#3b82f6]/5" :
+                        product.category?.name === "Electronics" ? "from-[#8b5cf6]/20 to-[#8b5cf6]/5" :
+                        product.category?.name === "Clothing" ? "from-[#ec4899]/20 to-[#ec4899]/5" :
+                        product.category?.name === "Health" ? "from-[#10b981]/20 to-[#10b981]/5" :
+                        "from-[#d4a843]/20 to-[#d4a843]/5"
+                      }`}>
+                        <Package size={32} className="text-[#606070]" />
+                      </div>
                     )}
                   </div>
                 </Link>
