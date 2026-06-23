@@ -2,9 +2,11 @@
   <defs>
     <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#d4a843"/>
-      <stop offset="100%" style="stop-color:#c49a38"/>
+      <stop offset="100%" style="stop-color:#b8942f"/>
     </linearGradient>
   </defs>
   <rect width="64" height="64" rx="14" fill="url(#g)"/>
-  <text x="32" y="44" font-family="Arial,sans-serif" font-size="36" font-weight="bold" fill="#000" text-anchor="middle">S</text>
+  <path d="M16 24 L22 24 L28 40 L48 40 L52 26 L24 26" stroke="#000" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="30" cy="46" r="3" fill="#000"/>
+  <circle cx="46" cy="46" r="3" fill="#000"/>
 </svg>

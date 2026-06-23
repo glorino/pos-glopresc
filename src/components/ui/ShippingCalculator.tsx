@@ -68,18 +68,13 @@ export default function ShippingCalculator({ weight, onCalculate }: ShippingCalc
     setResult(null);
 
     try {
-      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-      if (!apiKey) {
-        setError("Google Maps API key is not configured.");
-        setLoading(false);
-        return;
-      }
-
       const origin = settings.originAddress;
       const destination = address;
-      const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(origin)}&destinations=${encodeURIComponent(destination)}&key=${apiKey}`;
-
-      const res = await fetch(url);
+      const res = await fetch("/api/shipping/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ origin, destination }),
+      });
       const data = await res.json();
 
       if (data.status !== "OK" || !data.rows?.[0]?.elements?.[0]) {

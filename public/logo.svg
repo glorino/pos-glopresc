@@ -2,10 +2,13 @@
   <defs>
     <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#d4a843"/>
-      <stop offset="100%" style="stop-color:#c49a38"/>
+      <stop offset="100%" style="stop-color:#b8942f"/>
     </linearGradient>
   </defs>
   <rect x="2" y="5" width="40" height="40" rx="10" fill="url(#gold)"/>
-  <text x="22" y="33" font-family="Arial,sans-serif" font-size="22" font-weight="bold" fill="#000" text-anchor="middle">S</text>
-  <text x="55" y="35" font-family="Arial,sans-serif" font-size="28" font-weight="bold" fill="#f0f0f5">SSV Shop</text>
+  <path d="M12 18 L16 18 L20 30 L32 30 L34 20 L18 20" stroke="#000" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="21" cy="34" r="2" fill="#000"/>
+  <circle cx="30" cy="34" r="2" fill="#000"/>
+  <text x="55" y="35" font-family="Arial,sans-serif" font-size="28" font-weight="bold" fill="#f0f0f5">SSV </text>
+  <text x="115" y="35" font-family="Arial,sans-serif" font-size="28" font-weight="bold" fill="#d4a843">Shop</text>
 </svg>

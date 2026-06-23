@@ -58,6 +58,7 @@ interface SaleReceipt {
   amountPaid: number;
   changeDue: number;
   date: string;
+  cashierName: string;
 }
 
 const CATEGORIES = ["All", "Food", "Beverages", "Electronics", "Clothing", "Health", "Home", "Other"];
@@ -285,6 +286,7 @@ export default function POSTerminal() {
         amountPaid: Number(sale.amountPaid),
         changeDue: Number(sale.changeDue),
         date: new Date().toISOString(),
+        cashierName: (session?.user as any)?.name || "Cashier",
       };
 
       setLastReceipt(receipt);
@@ -644,14 +646,18 @@ export default function POSTerminal() {
 
             <div className="rounded-xl border border-[#2a2a3a] bg-[#0a0a0f] p-4">
               <div className="mb-3 text-center">
+                <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843] to-[#c49a38]">
+                  <span className="text-xl font-black text-black">S</span>
+                </div>
                 <p className="text-lg font-bold text-[#d4a843]">SSV SHOP</p>
                 <p className="text-xs text-[#606070]">POS Receipt</p>
+                <p className="text-[10px] text-[#606070]">123 Commerce Street, Lagos, Nigeria</p>
+                <p className="text-[10px] text-[#606070]">Tel: +234 800 SSVSHOP</p>
               </div>
               <div className="mb-3 border-t border-dashed border-[#2a2a3a] pt-3">
                 <p className="text-xs text-[#606070]">Invoice: {lastReceipt.invoiceNumber}</p>
-                <p className="text-xs text-[#606070]">
-                  {new Date(lastReceipt.date).toLocaleString()}
-                </p>
+                <p className="text-xs text-[#606070]">{new Date(lastReceipt.date).toLocaleString()}</p>
+                <p className="text-xs text-[#9090a0]">Served by: {lastReceipt.cashierName}</p>
               </div>
               <div className="mb-3 space-y-1 border-t border-dashed border-[#2a2a3a] pt-3">
                 {lastReceipt.items.map((item, i) => (
@@ -714,15 +720,22 @@ export default function POSTerminal() {
                           .divider { border-top: 1px dashed #000; margin: 8px 0; }
                           .row { display: flex; justify-content: space-between; }
                           .footer { text-align: center; margin-top: 12px; font-size: 10px; }
+                          .logo { display: inline-block; background: #d4a843; color: #000; font-weight: 900; font-size: 18px; width: 32px; height: 32px; line-height: 32px; border-radius: 8px; text-align: center; }
                         </style>
                       </head>
                       <body>
-                        <div class="center bold" style="font-size: 16px;">SSV SHOP</div>
+                        <div class="center">
+                          <span class="logo">S</span>
+                        </div>
+                        <div class="center bold" style="font-size: 16px; margin-top: 4px;">SSV SHOP</div>
                         <div class="center" style="font-size: 10px; color: #666;">POS Receipt</div>
+                        <div class="center" style="font-size: 9px; color: #999;">123 Commerce Street, Lagos, Nigeria</div>
+                        <div class="center" style="font-size: 9px; color: #999;">Tel: +234 800 SSVSHOP</div>
                         <div class="divider"></div>
                         <div style="font-size: 10px; color: #666;">
                           <div>Invoice: ${lastReceipt.invoiceNumber}</div>
                           <div>${new Date(lastReceipt.date).toLocaleString()}</div>
+                          <div>Served by: ${lastReceipt.cashierName}</div>
                         </div>
                         <div class="divider"></div>
                         ${lastReceipt.items.map((item: any) => `
