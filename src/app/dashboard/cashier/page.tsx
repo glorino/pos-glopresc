@@ -66,6 +66,8 @@ export default function CashierDashboard() {
     averageSale: 0,
   });
   const [paymentMethods, setPaymentMethods] = useState<{ name: string; count: number; color: string }[]>([]);
+  const [registerDate, setRegisterDate] = useState(new Date().toISOString().split("T")[0]);
+  const [dailySummary, setDailySummary] = useState<any>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -123,6 +125,13 @@ export default function CashierDashboard() {
 
     return () => clearInterval(timer);
   }, [data]);
+
+  useEffect(() => {
+    fetch(`/api/cashier/daily-summary?date=${registerDate}`)
+      .then((res) => res.json())
+      .then((data) => setDailySummary(data))
+      .catch(() => {});
+  }, [registerDate]);
 
   if (loading) {
     return (
@@ -227,6 +236,47 @@ export default function CashierDashboard() {
               </div>
             );
           })}
+        </div>
+
+        {/* Daily Cash Register Summary */}
+        <div className="glass-card p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#10b981] to-[#059669]">
+                <Clock size={18} className="text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-[#f0f0f5]">Daily Cash Register</h3>
+                <p className="text-sm text-[#9090a0]">View register summary by date</p>
+              </div>
+            </div>
+            <input
+              type="date"
+              value={registerDate}
+              onChange={(e) => setRegisterDate(e.target.value)}
+              className="input text-sm"
+            />
+          </div>
+          {dailySummary && (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
+                <p className="text-xs text-[#9090a0]">Opening Balance</p>
+                <p className="mt-1 text-lg font-bold text-[#f0f0f5]">{formatCurrency(dailySummary.drawer?.openingBalance ?? 0)}</p>
+              </div>
+              <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
+                <p className="text-xs text-[#9090a0]">Total Sales</p>
+                <p className="mt-1 text-lg font-bold text-[#10b981]">{formatCurrency(dailySummary.totalSales)}</p>
+              </div>
+              <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
+                <p className="text-xs text-[#9090a0]">Cash Sales</p>
+                <p className="mt-1 text-lg font-bold text-[#d4a843]">{formatCurrency(dailySummary.cashSales)}</p>
+              </div>
+              <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
+                <p className="text-xs text-[#9090a0]">Transactions</p>
+                <p className="mt-1 text-lg font-bold text-[#3b82f6]">{dailySummary.totalTransactions}</p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Quick Product Search */}

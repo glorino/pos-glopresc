@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
+import { useTranslation } from "@/contexts/LanguageContext";
 import {
   Search,
   ShoppingCart,
@@ -42,6 +43,7 @@ interface CartItem {
 const CATEGORIES = ["All", "Food", "Beverages", "Electronics", "Clothing", "Health", "Home", "Other"];
 
 export default function ShopPage() {
+  const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -181,9 +183,9 @@ export default function ShopPage() {
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#10b981]/10">
               <CheckCircle2 size={40} className="text-[#10b981]" />
             </div>
-            <h2 className="text-2xl font-bold text-[#f0f0f5]">Order Confirmed!</h2>
+            <h2 className="text-2xl font-bold text-[#f0f0f5]">{t("orderConfirmed")}</h2>
             <p className="mt-2 text-sm text-[#9090a0]">
-              Your order has been placed successfully. We will process it shortly.
+              {t("orderConfirmedDesc")}
             </p>
             <Link
               href="/shop"
@@ -191,7 +193,7 @@ export default function ShopPage() {
               className="btn btn-primary mt-8 inline-flex items-center gap-2"
             >
               <ArrowLeft size={16} />
-              Continue Shopping
+              {t("continueShopping")}
             </Link>
           </div>
         </div>
@@ -210,7 +212,7 @@ export default function ShopPage() {
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder={t("searchProducts")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="input pl-10 text-sm"
@@ -234,14 +236,13 @@ export default function ShopPage() {
       <div className="hero-gradient relative overflow-hidden">
         <div className="mx-auto max-w-7xl px-4 py-16 text-center sm:py-20">
           <h1 className="text-3xl font-bold text-[#f0f0f5] sm:text-5xl">
-            Welcome to{" "}
+            {t("welcomeTo")}{" "}
             <span className="bg-gradient-to-r from-[#d4a843] to-[#c49a38] bg-clip-text text-transparent">
               SSV Shop
             </span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-[#9090a0]">
-            Discover our wide range of quality products at competitive prices.
-            Fast checkout, secure payments, and nationwide delivery.
+            {t("shopHeroDesc")}
           </p>
         </div>
       </div>
@@ -274,7 +275,7 @@ export default function ShopPage() {
         ) : filteredProducts.length === 0 ? (
           <div className="flex h-64 flex-col items-center justify-center text-[#606070]">
             <Package size={48} className="mb-4 opacity-30" />
-            <p className="text-lg font-medium">No products found</p>
+            <p className="text-lg font-medium">{t("noProductsFound")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 stagger-children">
@@ -324,7 +325,7 @@ export default function ShopPage() {
                           : "bg-[#f43f5e]/15 text-[#f43f5e]"
                       }`}
                     >
-                      {product.stockQuantity > 0 ? "In Stock" : "Out of Stock"}
+                      {product.stockQuantity > 0 ? t("inStock") : t("outOfStock")}
                     </span>
                   </div>
                   <button
@@ -333,7 +334,7 @@ export default function ShopPage() {
                     className="btn btn-primary mt-3 w-full text-xs"
                   >
                     <ShoppingCart size={14} />
-                    Add to Cart
+                    {t("addToCart")}
                   </button>
                 </div>
               </div>
@@ -353,7 +354,7 @@ export default function ShopPage() {
             <div className="flex items-center justify-between border-b border-[#2a2a3a] px-6 py-4">
               <div className="flex items-center gap-2">
                 <ShoppingCart size={18} className="text-[#d4a843]" />
-                <h2 className="text-lg font-bold text-[#f0f0f5]">Your Cart ({itemCount})</h2>
+                <h2 className="text-lg font-bold text-[#f0f0f5]">{t("cart")} ({itemCount})</h2>
               </div>
               <button
                 onClick={() => setCartOpen(false)}
@@ -423,24 +424,24 @@ export default function ShopPage() {
             {cart.length > 0 && (
               <div className="border-t border-[#2a2a3a] px-6 py-4">
                 <div className="mb-2 flex justify-between text-sm">
-                  <span className="text-[#9090a0]">Subtotal</span>
+                  <span className="text-[#9090a0]">{t("subtotal")}</span>
                   <span className="font-bold text-[#d4a843]">{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="mb-2 flex justify-between text-sm">
-                  <span className="text-[#9090a0]">Shipping</span>
+                  <span className="text-[#9090a0]">{t("shipping")}</span>
                   <span className="font-bold text-[#d4a843]">
-                    {effectiveShipping > 0 ? formatCurrency(effectiveShipping) : "₦0.00 (Free)"}
+                    {effectiveShipping > 0 ? formatCurrency(effectiveShipping) : `₦0.00 (${t("free")})`}
                   </span>
                 </div>
                 <div className="mb-4 flex justify-between border-t border-[#2a2a3a] pt-2 text-sm">
-                  <span className="font-semibold text-[#f0f0f5]">Total</span>
+                  <span className="font-semibold text-[#f0f0f5]">{t("total")}</span>
                   <span className="font-bold text-[#d4a843]">{formatCurrency(total)}</span>
                 </div>
                 <button
                   onClick={handleCheckout}
                   className="btn btn-primary flex w-full items-center justify-center gap-2"
                 >
-                  Checkout
+                  {t("checkout")}
                   <ChevronRight size={16} />
                 </button>
               </div>
@@ -460,7 +461,7 @@ export default function ShopPage() {
             <div className="flex items-center justify-between border-b border-[#2a2a3a] px-6 py-4">
               <div className="flex items-center gap-2">
                 <CreditCard size={18} className="text-[#d4a843]" />
-                <h2 className="text-lg font-bold text-[#f0f0f5]">Checkout</h2>
+                <h2 className="text-lg font-bold text-[#f0f0f5]">{t("checkout")}</h2>
               </div>
               <button
                 onClick={() => setCheckoutOpen(false)}
@@ -501,7 +502,7 @@ export default function ShopPage() {
               <div>
                 <label className="mb-1 block text-sm font-medium text-[#f0f0f5]">
                   <MapPin size={14} className="mr-1 inline text-[#d4a843]" />
-                  Delivery Address
+                  {t("deliveryAddress")}
                 </label>
                 <input
                   type="text"
@@ -529,7 +530,7 @@ export default function ShopPage() {
 
               {/* Order Summary */}
               <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
-                <h4 className="mb-3 text-sm font-semibold text-[#f0f0f5]">Order Summary</h4>
+                <h4 className="mb-3 text-sm font-semibold text-[#f0f0f5]">{t("orderSummary")}</h4>
                 <div className="space-y-2">
                   {cart.map((item) => (
                     <div key={item.product.id} className="flex justify-between text-sm">
@@ -544,18 +545,18 @@ export default function ShopPage() {
                 </div>
                 <hr className="my-3 border-[#2a2a3a]" />
                 <div className="flex justify-between text-sm">
-                  <span className="text-[#9090a0]">Subtotal</span>
+                  <span className="text-[#9090a0]">{t("subtotal")}</span>
                   <span className="font-bold text-[#d4a843]">{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="mt-1 flex justify-between text-sm">
-                  <span className="text-[#9090a0]">Shipping</span>
+                  <span className="text-[#9090a0]">{t("shipping")}</span>
                   <span className="font-bold text-[#d4a843]">
-                    {effectiveShipping > 0 ? formatCurrency(effectiveShipping) : "₦0.00 (Free)"}
+                    {effectiveShipping > 0 ? formatCurrency(effectiveShipping) : `₦0.00 (${t("free")})`}
                   </span>
                 </div>
                 <hr className="my-3 border-[#2a2a3a]" />
                 <div className="flex justify-between">
-                  <span className="font-semibold text-[#f0f0f5]">Total</span>
+                  <span className="font-semibold text-[#f0f0f5]">{t("total")}</span>
                   <span className="text-lg font-bold text-[#d4a843]">{formatCurrency(total)}</span>
                 </div>
               </div>
