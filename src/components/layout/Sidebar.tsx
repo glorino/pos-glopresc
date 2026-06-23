@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import {
+  Home,
   LayoutDashboard,
   ShoppingCart,
   Package,
@@ -17,7 +18,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Store,
+  Building2,
 } from "lucide-react";
+import { useTranslation } from "@/contexts/LanguageContext";
+import type { TranslationKey } from "@/lib/translations";
 
 type UserRole =
   | "OWNER"
@@ -34,12 +38,12 @@ type UserRole =
 
 interface NavItem {
   icon: React.ElementType;
-  label: string;
+  label: TranslationKey;
   href: string;
 }
 
 interface NavSection {
-  title?: string;
+  title?: TranslationKey;
   items: NavItem[];
 }
 
@@ -47,159 +51,171 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
   OWNER: [
     {
       items: [
-        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/owner" },
-        { icon: Store, label: "Shop", href: "/shop" },
+        { icon: Home, label: "home", href: "/" },
+        { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/owner" },
+        { icon: Store, label: "shop", href: "/shop" },
       ],
     },
     {
-      title: "Management",
+      title: "management",
       items: [
-        { icon: BarChart3, label: "Reports", href: "/dashboard/owner/reports" },
-        { icon: Shield, label: "Users", href: "/dashboard/owner/users" },
-        { icon: Settings, label: "Settings", href: "/dashboard/owner/settings" },
+        { icon: BarChart3, label: "reports", href: "/dashboard/owner/reports" },
+        { icon: Shield, label: "users", href: "/dashboard/owner/users" },
+        { icon: Building2, label: "branches", href: "/dashboard/owner/branches" },
+        { icon: Settings, label: "settings", href: "/dashboard/owner/settings" },
       ],
     },
   ],
   MANAGER: [
     {
       items: [
-        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/manager" },
-        { icon: Store, label: "Shop", href: "/shop" },
+        { icon: Home, label: "home", href: "/" },
+        { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/manager" },
+        { icon: Store, label: "shop", href: "/shop" },
       ],
     },
     {
-      title: "Operations",
+      title: "operations",
       items: [
-        { icon: ShoppingCart, label: "Sales", href: "/dashboard/sales-manager/sales" },
-        { icon: Package, label: "Inventory", href: "/dashboard/inventory" },
-        { icon: Truck, label: "Procurement", href: "/dashboard/procurement" },
+        { icon: ShoppingCart, label: "sales", href: "/dashboard/sales-manager/sales" },
+        { icon: Package, label: "inventory", href: "/dashboard/inventory" },
+        { icon: Truck, label: "procurement", href: "/dashboard/procurement" },
       ],
     },
     {
-      title: "Finance",
+      title: "finance",
       items: [
-        { icon: BarChart3, label: "Reports", href: "/dashboard/owner/reports" },
+        { icon: BarChart3, label: "reports", href: "/dashboard/owner/reports" },
       ],
     },
   ],
   WAREHOUSE_MANAGER: [
     {
       items: [
-        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/inventory" },
+        { icon: Home, label: "home", href: "/" },
+        { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/inventory" },
       ],
     },
     {
-      title: "Warehouse",
+      title: "warehouse",
       items: [
-        { icon: Package, label: "Products", href: "/dashboard/inventory/products" },
-        { icon: ClipboardList, label: "Stock", href: "/dashboard/inventory/stock" },
-        { icon: FileText, label: "Categories", href: "/dashboard/inventory/categories" },
+        { icon: Package, label: "products", href: "/dashboard/inventory/products" },
+        { icon: ClipboardList, label: "stock", href: "/dashboard/inventory/stock" },
+        { icon: FileText, label: "categories", href: "/dashboard/inventory/categories" },
       ],
     },
   ],
   WAREHOUSE_REP: [
     {
       items: [
-        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/inventory" },
+        { icon: Home, label: "home", href: "/" },
+        { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/inventory" },
       ],
     },
     {
-      title: "Warehouse",
+      title: "warehouse",
       items: [
-        { icon: Package, label: "Products", href: "/dashboard/inventory/products" },
-        { icon: ClipboardList, label: "Stock Adjustments", href: "/dashboard/inventory/stock" },
+        { icon: Package, label: "products", href: "/dashboard/inventory/products" },
+        { icon: ClipboardList, label: "stockAdjustments", href: "/dashboard/inventory/stock" },
       ],
     },
   ],
   PROCUREMENT_MANAGER: [
     {
       items: [
-        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/procurement" },
+        { icon: Home, label: "home", href: "/" },
+        { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/procurement" },
       ],
     },
     {
-      title: "Procurement",
+      title: "procurement",
       items: [
-        { icon: Truck, label: "Suppliers", href: "/dashboard/procurement" },
-        { icon: ClipboardList, label: "Purchase Orders", href: "/dashboard/procurement" },
+        { icon: Truck, label: "suppliers", href: "/dashboard/procurement" },
+        { icon: ClipboardList, label: "purchaseOrders", href: "/dashboard/procurement" },
       ],
     },
     {
-      title: "Finance",
+      title: "finance",
       items: [
-        { icon: BarChart3, label: "Reports", href: "/dashboard/owner/reports" },
+        { icon: BarChart3, label: "reports", href: "/dashboard/owner/reports" },
       ],
     },
   ],
   PROCUREMENT_REP: [
     {
       items: [
-        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/procurement" },
+        { icon: Home, label: "home", href: "/" },
+        { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/procurement" },
       ],
     },
     {
-      title: "Procurement",
+      title: "procurement",
       items: [
-        { icon: Truck, label: "Suppliers", href: "/dashboard/procurement" },
-        { icon: ClipboardList, label: "Stock Requests", href: "/dashboard/procurement" },
+        { icon: Truck, label: "suppliers", href: "/dashboard/procurement" },
+        { icon: ClipboardList, label: "stockRequests", href: "/dashboard/procurement" },
       ],
     },
   ],
   SALES_MANAGER: [
     {
       items: [
-        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/sales-manager" },
+        { icon: Home, label: "home", href: "/" },
+        { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/sales-manager" },
       ],
     },
     {
-      title: "Sales",
+      title: "sales",
       items: [
-        { icon: ShoppingCart, label: "Sales", href: "/dashboard/sales-manager/sales" },
-        { icon: Package, label: "Products", href: "/dashboard/sales-manager/products" },
-        { icon: Users, label: "Customers", href: "/dashboard/sales-manager/customers" },
+        { icon: ShoppingCart, label: "sales", href: "/dashboard/sales-manager/sales" },
+        { icon: Package, label: "products", href: "/dashboard/sales-manager/products" },
+        { icon: Users, label: "customers", href: "/dashboard/sales-manager/customers" },
       ],
     },
   ],
   SALES_REP: [
     {
       items: [
-        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/cashier" },
+        { icon: Home, label: "home", href: "/" },
+        { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/cashier" },
       ],
     },
     {
-      title: "Sales",
+      title: "sales",
       items: [
-        { icon: ShoppingCart, label: "POS Terminal", href: "/dashboard/cashier/pos" },
-        { icon: ClipboardList, label: "My Sales", href: "/dashboard/sales-manager/sales" },
-        { icon: Users, label: "Customers", href: "/dashboard/sales-manager/customers" },
+        { icon: ShoppingCart, label: "pos", href: "/dashboard/cashier/pos" },
+        { icon: ClipboardList, label: "mySales", href: "/dashboard/sales-manager/sales" },
+        { icon: Users, label: "customers", href: "/dashboard/sales-manager/customers" },
       ],
     },
   ],
   ACCOUNTANT: [
     {
       items: [
-        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/accounting" },
+        { icon: Home, label: "home", href: "/" },
+        { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/accounting" },
       ],
     },
     {
-      title: "Finance",
+      title: "finance",
       items: [
-        { icon: CreditCard, label: "Expenses", href: "/dashboard/accounting/expenses" },
-        { icon: FileText, label: "Invoices", href: "/dashboard/accounting/invoices" },
+        { icon: CreditCard, label: "expenses", href: "/dashboard/accounting/expenses" },
+        { icon: FileText, label: "invoices", href: "/dashboard/accounting/invoices" },
       ],
     },
   ],
   AUDITOR: [
     {
       items: [
-        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/auditor" },
+        { icon: Home, label: "home", href: "/" },
+        { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/auditor" },
       ],
     },
   ],
   CUSTOMER: [
     {
       items: [
-        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/customer" },
+        { icon: Home, label: "home", href: "/" },
+        { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/customer" },
       ],
     },
   ],
@@ -211,6 +227,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ role, currentPath }: SidebarProps) {
+  const { t } = useTranslation();
   const sections = roleNavConfig[role] || roleNavConfig.SALES_REP;
 
   return (
@@ -226,7 +243,7 @@ export default function Sidebar({ role, currentPath }: SidebarProps) {
         {sections.map((section, si) => (
           <div key={si} className="sidebar-section">
             {section.title && (
-              <div className="sidebar-section-title">{section.title}</div>
+              <div className="sidebar-section-title">{t(section.title)}</div>
             )}
             <div className="space-y-0.5">
               {section.items.map((item) => {
@@ -239,7 +256,7 @@ export default function Sidebar({ role, currentPath }: SidebarProps) {
                     className={`sidebar-link ${isActive ? "active" : ""}`}
                   >
                     <Icon size={18} />
-                    <span>{item.label}</span>
+                    <span>{t(item.label)}</span>
                   </Link>
                 );
               })}

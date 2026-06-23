@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { generateInvoiceNumber } from "@/lib/utils";
+import { sendSMS } from "@/lib/sms";
 
 export async function GET(request: NextRequest) {
   try {
@@ -156,6 +157,17 @@ export async function POST(request: NextRequest) {
 
       return newSale;
     });
+
+    if (sale.customer) {
+      const customerPhone = await db.customer.findUnique({
+        where: { id: customerId },
+        select: { phone: true },
+      });
+      if (customerPhone?.phone) {
+        const message = `SSV Shop Receipt: Invoice ${sale.invoiceNumber}, Total: \u20A6${Number(sale.total).toLocaleString("en-NG", { minimumFractionDigits: 2 })}. Thank you for your purchase!`;
+        sendSMS(customerPhone.phone, message);
+      }
+    }
 
     return NextResponse.json(sale, { status: 201 });
   } catch (error: any) {

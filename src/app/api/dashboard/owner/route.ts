@@ -18,6 +18,7 @@ export async function GET() {
       monthlyRevenueData,
       recentSales,
       topProducts,
+      lowStockProducts,
     ] = await Promise.all([
       db.sale.aggregate({
         _sum: { total: true },
@@ -60,6 +61,15 @@ export async function GET() {
         orderBy: { _sum: { quantity: "desc" } },
         take: 5,
       }),
+      db.$queryRaw<
+        { id: string; name: string; sku: string; stockQuantity: number; minStockLevel: number }[]
+      >`
+        SELECT "id", "name", "sku", "stockQuantity", "minStockLevel"
+        FROM "Product"
+        WHERE "isActive" = true
+          AND "stockQuantity" <= "minStockLevel"
+        ORDER BY "stockQuantity" ASC
+      `,
     ]);
 
     const totalRevenue = Number(totalRevenueResult._sum.total ?? 0);
@@ -107,6 +117,13 @@ export async function GET() {
         status: s.status,
       })),
       topProducts: resolvedTopProducts,
+      lowStockProducts: lowStockProducts.map((p) => ({
+        id: p.id,
+        name: p.name,
+        sku: p.sku,
+        stockQuantity: p.stockQuantity,
+        minStockLevel: p.minStockLevel,
+      })),
     });
   } catch (error) {
     console.error("Owner dashboard API error:", error);

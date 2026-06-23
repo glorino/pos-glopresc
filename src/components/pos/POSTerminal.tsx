@@ -20,7 +20,9 @@ import {
   Filter,
   Menu,
   Receipt,
+  ScanBarcode,
 } from "lucide-react";
+import BarcodeScanner from "@/components/ui/BarcodeScanner";
 
 interface Product {
   id: string;
@@ -85,6 +87,7 @@ export default function POSTerminal() {
   const [showReceipt, setShowReceipt] = useState(false);
   const [lastReceipt, setLastReceipt] = useState<SaleReceipt | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -128,6 +131,30 @@ export default function POSTerminal() {
   function showNotification(type: "success" | "error", message: string) {
     setNotification({ type, message });
     setTimeout(() => setNotification(null), 4000);
+  }
+
+  async function handleBarcodeScan(barcode: string) {
+    setShowScanner(false);
+    try {
+      const res = await fetch(`/api/products?search=${encodeURIComponent(barcode)}&isActive=true`);
+      if (res.ok) {
+        const data = await res.json();
+        const found = data.products?.find(
+          (p: Product & { barcode?: string }) =>
+            p.sku.toLowerCase() === barcode.toLowerCase() ||
+            (p as any).barcode?.toLowerCase() === barcode.toLowerCase() ||
+            p.name.toLowerCase().includes(barcode.toLowerCase())
+        );
+        if (found) {
+          addToCart(found);
+          showNotification("success", `Added ${found.name} to cart`);
+        } else {
+          showNotification("error", `No product found for barcode: ${barcode}`);
+        }
+      }
+    } catch {
+      showNotification("error", "Failed to look up product");
+    }
   }
 
   function addToCart(product: Product) {
@@ -303,6 +330,14 @@ export default function POSTerminal() {
                 className="input pl-10"
               />
             </div>
+            <button
+              onClick={() => setShowScanner(true)}
+              className="flex h-10 items-center gap-2 rounded-xl border border-[#2a2a3a] bg-[#1c1c28] px-3 text-[#9090a0] transition-colors hover:border-[#d4a843]/50 hover:text-[#d4a843]"
+              title="Scan barcode"
+            >
+              <ScanBarcode size={18} />
+              <span className="hidden text-xs font-medium sm:inline">Scan</span>
+            </button>
             <button
               onClick={() => setCartOpen(true)}
               className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-[#2a2a3a] bg-[#1c1c28] text-[#9090a0] transition-colors hover:border-[#d4a843]/50 hover:text-[#d4a843] lg:hidden"
@@ -575,6 +610,10 @@ export default function POSTerminal() {
       </div>
 
       {/* Receipt Modal */}
+      {showScanner && (
+        <BarcodeScanner onScan={handleBarcodeScan} onClose={() => setShowScanner(false)} />
+      )}
+
       {showReceipt && lastReceipt && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="mx-4 w-full max-w-md rounded-2xl border border-[#2a2a3a] bg-[#111118] p-6 shadow-2xl">

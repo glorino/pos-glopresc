@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
   Search,
   Eye,
@@ -11,6 +13,7 @@ import {
   X,
   ShoppingCart,
   Filter,
+  ChevronDown,
 } from "lucide-react";
 
 interface SaleItem {
@@ -51,6 +54,7 @@ export default function SalesManagementPage() {
   );
   const [endDate, setEndDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   async function fetchSales() {
     setLoading(true);
@@ -89,21 +93,21 @@ export default function SalesManagementPage() {
     fetchSales();
   }, [statusFilter, paymentFilter]);
 
-  const handleExport = () => {
-    const csv = [
-      ["Invoice", "Customer", "Items", "Total", "Payment", "Status", "Date"].join(","),
-      ...sales.map((s) =>
-        [
-          s.invoiceNumber,
-          s.customer,
-          s.items.length,
-          s.total,
-          s.paymentMethod,
-          s.status,
-          s.createdAt,
-        ].join(",")
-      ),
-    ].join("\n");
+  const headers = ["Invoice", "Customer", "Items", "Total", "Payment", "Status", "Date"];
+
+  const getExportRows = () =>
+    sales.map((s) => [
+      s.invoiceNumber,
+      s.customer,
+      String(s.items.length),
+      `₦${s.total.toLocaleString("en-NG", { minimumFractionDigits: 2 })}`,
+      s.paymentMethod,
+      s.status,
+      s.createdAt,
+    ]);
+
+  const handleExportCSV = () => {
+    const csv = [headers.join(","), ...getExportRows().map((r) => r.join(","))].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -111,6 +115,24 @@ export default function SalesManagementPage() {
     a.download = `sales-${new Date().toISOString().split("T")[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+    setShowExportMenu(false);
+  };
+
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text("Sales Report", 14, 22);
+    doc.setFontSize(10);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 30);
+    autoTable(doc, {
+      startY: 35,
+      head: [headers],
+      body: getExportRows(),
+      theme: "grid",
+      headStyles: { fillColor: [212, 168, 67] },
+    });
+    doc.save(`sales-${new Date().toISOString().split("T")[0]}.pdf`);
+    setShowExportMenu(false);
   };
 
   async function handleReturn(sale: Sale) {
@@ -182,10 +204,26 @@ export default function SalesManagementPage() {
               <Filter size={14} />
             </button>
           </div>
-          <button onClick={handleExport} className="btn btn-secondary">
-            <Download size={16} />
-            Export
-          </button>
+          <div className="relative">
+            <button onClick={() => setShowExportMenu(!showExportMenu)} className="btn btn-secondary">
+              <Download size={16} />
+              Export
+              <ChevronDown size={14} />
+            </button>
+            {showExportMenu && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowExportMenu(false)} />
+                <div className="absolute right-0 z-50 mt-2 w-44 rounded-xl border border-[#2a2a3a] bg-[#1c1c28] py-1 shadow-lg">
+                  <button onClick={handleExportCSV} className="flex w-full items-center gap-2 px-4 py-2 text-sm text-[#f0f0f5] hover:bg-[#2a2a3a]">
+                    Export as CSV
+                  </button>
+                  <button onClick={handleExportPDF} className="flex w-full items-center gap-2 px-4 py-2 text-sm text-[#f0f0f5] hover:bg-[#2a2a3a]">
+                    Export as PDF
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {loading ? (

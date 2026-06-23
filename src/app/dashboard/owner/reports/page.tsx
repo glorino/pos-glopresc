@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
   BarChart3,
   Download,
@@ -12,6 +14,7 @@ import {
   Users,
   AlertTriangle,
   RefreshCw,
+  ChevronDown,
 } from "lucide-react";
 import {
   LineChart,
@@ -166,6 +169,7 @@ export default function OwnerReportsPage() {
     null
   );
   const [customerData, setCustomerData] = useState<CustomerReport | null>(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   async function fetchReport() {
     setLoading(true);
@@ -193,7 +197,7 @@ export default function OwnerReportsPage() {
     fetchReport();
   }, []);
 
-  const handleExport = (tab: string) => {
+  const getExportData = (tab: string) => {
     const data =
       tab === "sales"
         ? salesData
@@ -202,16 +206,64 @@ export default function OwnerReportsPage() {
         : tab === "financial"
         ? financialData
         : customerData;
+    return data;
+  };
+
+  const handleExportCSV = (tab: string) => {
+    const data = getExportData(tab);
     if (!data) return;
-    const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: "application/json",
-    });
+    const csv = JSON.stringify(data, null, 2);
+    const blob = new Blob([csv], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${tab}-report-${new Date().toISOString().split("T")[0]}.json`;
+    a.download = `${tab}-report-${new Date().toISOString().split("T")[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+    setShowExportMenu(false);
+  };
+
+  const handleExportPDF = (tab: string) => {
+    const data = getExportData(tab);
+    if (!data) return;
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text(`${tab.charAt(0).toUpperCase() + tab.slice(1)} Report`, 14, 22);
+    doc.setFontSize(10);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 30);
+
+    let startY = 35;
+    const summary = (data as any).summary;
+    if (summary) {
+      const entries = Object.entries(summary).map(([k, v]) => [
+        k.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()),
+        typeof v === "number" ? `₦${v.toLocaleString("en-NG", { minimumFractionDigits: 2 })}` : String(v),
+      ]);
+      autoTable(doc, {
+        startY,
+        head: [["Metric", "Value"]],
+        body: entries,
+        theme: "grid",
+        headStyles: { fillColor: [212, 168, 67] },
+      });
+      startY = (doc as any).lastAutoTable.finalY + 10;
+    }
+
+    const detailData = (data as any).salesByPeriod || (data as any).products || (data as any).cashFlow || (data as any).topProducts || (data as any).topCustomers || (data as any).expensesByCategory;
+    if (detailData && Array.isArray(detailData) && detailData.length > 0) {
+      const keys = Object.keys(detailData[0]);
+      const rows = detailData.map((item: any) => keys.map((k) => String(item[k])));
+      autoTable(doc, {
+        startY,
+        head: [keys.map((k) => k.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()))],
+        body: rows,
+        theme: "grid",
+        headStyles: { fillColor: [212, 168, 67] },
+      });
+    }
+
+    doc.save(`${tab}-report-${new Date().toISOString().split("T")[0]}.pdf`);
+    setShowExportMenu(false);
   };
 
   function renderSalesTab() {
@@ -666,10 +718,26 @@ export default function OwnerReportsPage() {
             <button onClick={fetchReport} className="btn btn-secondary btn-sm">
               <RefreshCw size={14} />
             </button>
-            <button onClick={() => handleExport(activeTab)} className="btn btn-secondary btn-sm">
-              <Download size={14} />
-              Export
-            </button>
+            <div className="relative">
+              <button onClick={() => setShowExportMenu(!showExportMenu)} className="btn btn-secondary btn-sm">
+                <Download size={14} />
+                Export
+                <ChevronDown size={12} />
+              </button>
+              {showExportMenu && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowExportMenu(false)} />
+                  <div className="absolute right-0 z-50 mt-2 w-44 rounded-xl border border-[#2a2a3a] bg-[#1c1c28] py-1 shadow-lg">
+                    <button onClick={() => handleExportCSV(activeTab)} className="flex w-full items-center gap-2 px-4 py-2 text-sm text-[#f0f0f5] hover:bg-[#2a2a3a]">
+                      Export as CSV
+                    </button>
+                    <button onClick={() => handleExportPDF(activeTab)} className="flex w-full items-center gap-2 px-4 py-2 text-sm text-[#f0f0f5] hover:bg-[#2a2a3a]">
+                      Export as PDF
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
 

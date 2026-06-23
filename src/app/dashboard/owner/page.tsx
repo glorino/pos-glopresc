@@ -55,6 +55,13 @@ interface DashboardData {
     status: string;
   }[];
   topProducts: { name: string; totalSold: number; totalRevenue: number }[];
+  lowStockProducts: {
+    id: string;
+    name: string;
+    sku: string;
+    stockQuantity: number;
+    minStockLevel: number;
+  }[];
 }
 
 const COLORS = ["#d4a843", "#3b82f6", "#8b5cf6", "#10b981", "#f59e0b"];
@@ -179,6 +186,26 @@ export default function OwnerDashboard() {
   return (
     <DashboardLayout role="OWNER" title="Owner Dashboard">
       <div className="space-y-6">
+        {(data?.lowStockItems ?? 0) > 0 && (
+          <button
+            onClick={() => router.push("/dashboard/inventory/stock")}
+            className="flex w-full items-center justify-between rounded-xl border border-[#f59e0b]/30 bg-gradient-to-r from-[#f59e0b]/10 to-[#f59e0b]/5 p-4 transition-all hover:border-[#f59e0b]/50 hover:from-[#f59e0b]/15 hover:to-[#f59e0b]/10"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f59e0b]/20">
+                <AlertTriangle size={18} className="text-[#f59e0b]" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold text-[#f0f0f5]">
+                  Stock Alert — {data?.lowStockItems ?? 0} product{(data?.lowStockItems ?? 0) !== 1 ? "s" : ""} below minimum level
+                </p>
+                <p className="text-xs text-[#9090a0]">Click to view and manage inventory</p>
+              </div>
+            </div>
+            <ArrowRight size={16} className="text-[#f59e0b]" />
+          </button>
+        )}
+
         {/* Stats Grid */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           {stats.map((stat) => {
@@ -460,6 +487,54 @@ export default function OwnerDashboard() {
             </div>
           </div>
         </div>
+
+        {/* Low Stock Alerts */}
+        {data?.lowStockProducts && data.lowStockProducts.length > 0 && (
+          <div className="glass-card p-6">
+            <div className="mb-4 flex items-center gap-2">
+              <AlertTriangle size={18} className="text-[#f43f5e]" />
+              <h3 className="text-lg font-semibold text-[#f0f0f5]">
+                Low Stock Alerts
+              </h3>
+              <span className="ml-2 rounded-full bg-[#f43f5e]/15 px-2 py-0.5 text-xs font-medium text-[#f43f5e]">
+                {data.lowStockProducts.length}
+              </span>
+            </div>
+            <div className="space-y-3">
+              {data.lowStockProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="flex items-center justify-between rounded-xl border border-[#f43f5e]/20 bg-[#f43f5e]/5 p-3 transition-all hover:bg-[#f43f5e]/10"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f43f5e]/10">
+                      <Package size={14} className="text-[#f43f5e]" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-[#f0f0f5]">
+                        {product.name}
+                      </p>
+                      <p className="text-xs text-[#606070]">SKU: {product.sku}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-[#f43f5e]">
+                        {product.stockQuantity}
+                      </p>
+                      <p className="text-xs text-[#606070]">
+                        Min: {product.minStockLevel}
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-[#f43f5e]/15 px-2 py-0.5 text-xs font-medium text-[#f43f5e]">
+                      Low Stock
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

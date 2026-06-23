@@ -134,6 +134,26 @@ export default function ManagerDashboard() {
   return (
     <DashboardLayout role="MANAGER" title="Manager Dashboard">
       <div className="space-y-6">
+        {data?.lowStockItems && data.lowStockItems.length > 0 && (
+          <button
+            onClick={() => router.push("/dashboard/inventory/stock")}
+            className="flex w-full items-center justify-between rounded-xl border border-[#f59e0b]/30 bg-gradient-to-r from-[#f59e0b]/10 to-[#f59e0b]/5 p-4 transition-all hover:border-[#f59e0b]/50 hover:from-[#f59e0b]/15 hover:to-[#f59e0b]/10"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f59e0b]/20">
+                <AlertTriangle size={18} className="text-[#f59e0b]" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold text-[#f0f0f5]">
+                  Stock Alert — {data.lowStockItems.length} product{data.lowStockItems.length !== 1 ? "s" : ""} below minimum level
+                </p>
+                <p className="text-xs text-[#9090a0]">Click to view and manage inventory</p>
+              </div>
+            </div>
+            <ArrowRight size={16} className="text-[#f59e0b]" />
+          </button>
+        )}
+
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           {stats.map((stat) => {
             const Icon = stat.icon;

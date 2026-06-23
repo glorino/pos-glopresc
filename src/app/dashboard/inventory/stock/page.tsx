@@ -11,7 +11,9 @@ import {
   ArrowDown,
   ArrowUp,
   RefreshCw,
+  ScanBarcode,
 } from "lucide-react";
+import BarcodeScanner from "@/components/ui/BarcodeScanner";
 
 interface StockAdjustment {
   id: string;
@@ -58,6 +60,7 @@ export default function InventoryStockPage() {
   const [error, setError] = useState("");
 
   const [lowStockAlerts, setLowStockAlerts] = useState<Product[]>([]);
+  const [showScanner, setShowScanner] = useState(false);
 
   async function fetchAdjustments() {
     setLoading(true);
@@ -93,6 +96,20 @@ export default function InventoryStockPage() {
       }
     } catch (error) {
       console.error("Failed to fetch products:", error);
+    }
+  }
+
+  function handleBarcodeScan(barcode: string) {
+    setShowScanner(false);
+    const match = products.find(
+      (p) =>
+        p.sku.toLowerCase() === barcode.toLowerCase() ||
+        (p as any).barcode?.toLowerCase() === barcode.toLowerCase()
+    );
+    if (match) {
+      setFormData({ ...formData, productId: match.id });
+    } else {
+      setSearch(barcode);
     }
   }
 
@@ -165,7 +182,17 @@ export default function InventoryStockPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Product</label>
+                <div className="mb-1 flex items-center justify-between">
+                  <label className="text-sm text-[#9090a0]">Product</label>
+                  <button
+                    type="button"
+                    onClick={() => setShowScanner(true)}
+                    className="flex items-center gap-1 text-xs font-medium text-[#d4a843] hover:text-[#c49a38]"
+                  >
+                    <ScanBarcode size={12} />
+                    Scan Product
+                  </button>
+                </div>
                 <select
                   required
                   value={formData.productId}
@@ -358,6 +385,10 @@ export default function InventoryStockPage() {
           )}
         </div>
       </div>
+
+      {showScanner && (
+        <BarcodeScanner onScan={handleBarcodeScan} onClose={() => setShowScanner(false)} />
+      )}
     </DashboardLayout>
   );
 }

@@ -168,6 +168,28 @@ export async function POST(request: NextRequest) {
         },
       });
 
+      if (newStock <= product.minStockLevel) {
+        const procurementUsers = await tx.user.findMany({
+          where: {
+            isActive: true,
+            role: { in: ["PROCUREMENT_MANAGER", "PROCUREMENT_REP"] },
+          },
+          select: { id: true },
+        });
+
+        const notifications = procurementUsers.map((u) => ({
+          userId: u.id,
+          title: "Low Stock Alert",
+          message: `${product.name} (${product.sku}) is low on stock. Current: ${newStock}, Min: ${product.minStockLevel}`,
+          type: "WARNING" as const,
+          link: "/dashboard/inventory/stock",
+        }));
+
+        if (notifications.length > 0) {
+          await tx.notification.createMany({ data: notifications });
+        }
+      }
+
       return adj;
     });
 

@@ -26,6 +26,7 @@ interface Customer {
   totalSpent: number;
   isActive: boolean;
   createdAt: string;
+  _count?: { sales: number };
   sales?: {
     id: string;
     invoiceNumber: string;
@@ -139,15 +140,15 @@ export default function SalesCustomersPage() {
     }
   }
 
-  async function viewCustomerHistory(customer: Customer) {
+  async function viewCustomerDetail(customer: Customer) {
     try {
-      const res = await fetch(`/api/sales?search=${customer.firstName}&limit=20`);
+      const res = await fetch(`/api/customers/${customer.id}`);
       if (res.ok) {
         const data = await res.json();
-        setSelectedCustomer({ ...customer, sales: data.sales });
+        setSelectedCustomer(data);
       }
     } catch (error) {
-      console.error("Failed to fetch customer history:", error);
+      console.error("Failed to fetch customer detail:", error);
     }
   }
 
@@ -196,7 +197,12 @@ export default function SalesCustomersPage() {
                 {customers.map((customer) => (
                   <tr key={customer.id}>
                     <td className="font-medium text-[#f0f0f5]">
-                      {customer.firstName} {customer.lastName}
+                      <button
+                        onClick={() => viewCustomerDetail(customer)}
+                        className="cursor-pointer text-left hover:text-[#d4a843] transition-colors"
+                      >
+                        {customer.firstName} {customer.lastName}
+                      </button>
                     </td>
                     <td className="text-[#9090a0]">{customer.email || "-"}</td>
                     <td className="text-[#9090a0]">{customer.phone || "-"}</td>
@@ -227,9 +233,9 @@ export default function SalesCustomersPage() {
                           <Edit2 size={14} />
                         </button>
                         <button
-                          onClick={() => viewCustomerHistory(customer)}
+                          onClick={() => viewCustomerDetail(customer)}
                           className="rounded-lg p-2 text-[#9090a0] hover:bg-[#2a2a3a] hover:text-[#d4a843]"
-                          title="View History"
+                          title="View Details"
                         >
                           <Eye size={14} />
                         </button>
@@ -362,10 +368,10 @@ export default function SalesCustomersPage() {
 
       {selectedCustomer && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="glass-card w-full max-w-lg p-6">
+          <div className="glass-card w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-[#f0f0f5]">
-                {selectedCustomer.firstName} {selectedCustomer.lastName} - Purchase History
+                {selectedCustomer.firstName} {selectedCustomer.lastName}
               </h2>
               <button
                 onClick={() => setSelectedCustomer(null)}
@@ -375,55 +381,89 @@ export default function SalesCustomersPage() {
               </button>
             </div>
 
-            <div className="mb-4 grid grid-cols-2 gap-4 text-sm">
+            <div className="mb-6 grid grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-[#6060a0]">Total Spent</p>
-                <p className="font-bold text-[#d4a843]">{formatCurrency(selectedCustomer.totalSpent)}</p>
+                <p className="text-[#606070]">Email</p>
+                <p className="text-[#f0f0f5]">{selectedCustomer.email || "-"}</p>
               </div>
               <div>
-                <p className="text-[#606070]">Loyalty Points</p>
-                <p className="font-bold text-[#8b5cf6]">{selectedCustomer.loyaltyPoints}</p>
+                <p className="text-[#606070]">Phone</p>
+                <p className="text-[#f0f0f5]">{selectedCustomer.phone || "-"}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-[#606070]">Address</p>
+                <p className="text-[#f0f0f5]">
+                  {selectedCustomer.address
+                    ? `${selectedCustomer.address}${selectedCustomer.city ? ", " + selectedCustomer.city : ""}${selectedCustomer.state ? ", " + selectedCustomer.state : ""}`
+                    : "-"}
+                </p>
               </div>
             </div>
 
-            {selectedCustomer.sales && selectedCustomer.sales.length > 0 ? (
-              <div className="table-container">
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Invoice</th>
-                      <th>Total</th>
-                      <th>Status</th>
-                      <th>Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedCustomer.sales.map((sale) => (
-                      <tr key={sale.id}>
-                        <td className="font-medium text-[#f0f0f5]">{sale.invoiceNumber}</td>
-                        <td className="font-medium text-[#d4a843]">{formatCurrency(sale.total)}</td>
-                        <td>
-                          <span
-                            className={`badge ${
-                              sale.status === "COMPLETED"
-                                ? "badge-success"
-                                : sale.status === "RETURNED"
-                                ? "badge-warning"
-                                : "badge-danger"
-                            }`}
-                          >
-                            {sale.status}
-                          </span>
-                        </td>
-                        <td className="text-[#9090a0]">{formatDateTime(sale.createdAt)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            <div className="mb-6 grid grid-cols-3 gap-4">
+              <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4 text-center">
+                <p className="text-2xl font-bold text-[#d4a843]">
+                  {formatCurrency(selectedCustomer.totalSpent)}
+                </p>
+                <p className="mt-1 text-xs text-[#606070]">Total Spent</p>
               </div>
-            ) : (
-              <p className="text-center text-sm text-[#606070]">No purchase history</p>
-            )}
+              <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4 text-center">
+                <p className="text-2xl font-bold text-[#8b5cf6]">
+                  {selectedCustomer.loyaltyPoints?.toLocaleString() ?? 0}
+                </p>
+                <p className="mt-1 text-xs text-[#606070]">Loyalty Points</p>
+              </div>
+              <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4 text-center">
+                <p className="text-2xl font-bold text-[#3b82f6]">
+                  {selectedCustomer._count?.sales ?? 0}
+                </p>
+                <p className="mt-1 text-xs text-[#606070]">Total Orders</p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-sm font-semibold text-[#f0f0f5]">
+                Recent Transactions
+              </h3>
+              {selectedCustomer.sales && selectedCustomer.sales.length > 0 ? (
+                <div className="table-container">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>Invoice</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedCustomer.sales.map((sale: any) => (
+                        <tr key={sale.id}>
+                          <td className="font-medium text-[#f0f0f5]">{sale.invoiceNumber}</td>
+                          <td className="text-[#9090a0]">{formatDateTime(sale.createdAt)}</td>
+                          <td className="font-medium text-[#d4a843]">{formatCurrency(sale.total)}</td>
+                          <td>
+                            <span
+                              className={`badge ${
+                                sale.status === "COMPLETED"
+                                  ? "badge-success"
+                                  : sale.status === "RETURNED"
+                                  ? "badge-warning"
+                                  : "badge-danger"
+                              }`}
+                            >
+                              {sale.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-center text-sm text-[#606070]">No purchase history</p>
+              )}
+            </div>
           </div>
         </div>
       )}

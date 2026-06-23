@@ -4,7 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, AlertCircle, ArrowLeft } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -59,6 +59,13 @@ export default function LoginPage() {
   return (
     <div className="login-container">
       <div className="login-card">
+        <Link
+          href="/"
+          className="mb-4 inline-flex items-center gap-1.5 text-sm text-[#9090a0] transition-colors hover:text-[#f0f0f5]"
+        >
+          <ArrowLeft size={14} />
+          Back to Home
+        </Link>
         <div className="mb-8 text-center">
           <Link href="/" className="mb-6 inline-flex items-center gap-2">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843] to-[#c49a38]">
@@ -141,7 +148,7 @@ export default function LoginPage() {
               Remember me
             </label>
             <Link
-              href="#"
+              href="/forgot-password"
               className="text-sm font-medium text-[#d4a843] hover:text-[#c49a38]"
             >
               Forgot password?
@@ -185,7 +192,7 @@ export default function LoginPage() {
         <p className="mt-6 text-center text-sm text-[#606070]">
           Don&apos;t have an account?{" "}
           <Link
-            href="#"
+            href="mailto:sales@ssvshop.com"
             className="font-medium text-[#d4a843] hover:text-[#c49a38]"
           >
             Contact Sales

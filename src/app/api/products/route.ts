@@ -129,6 +129,27 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    if (stockQuantity <= minStockLevel) {
+      const procurementUsers = await db.user.findMany({
+        where: {
+          isActive: true,
+          role: { in: ["PROCUREMENT_MANAGER", "PROCUREMENT_REP"] },
+        },
+        select: { id: true },
+      });
+      if (procurementUsers.length > 0) {
+        await db.notification.createMany({
+          data: procurementUsers.map((u) => ({
+            userId: u.id,
+            title: "Low Stock Alert",
+            message: `${product.name} (${product.sku}) is below minimum stock level. Current: ${stockQuantity}, Min: ${minStockLevel}`,
+            type: "WARNING" as const,
+            link: "/dashboard/inventory/stock",
+          })),
+        });
+      }
+    }
+
     return NextResponse.json(
       {
         ...product,

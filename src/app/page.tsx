@@ -5,16 +5,15 @@ import Link from "next/link";
 import {
   ShoppingCart,
   Package,
-  Users,
   BarChart3,
-  Shield,
-  Activity,
   ArrowRight,
-  Menu,
-  X,
+  Activity,
+  Check,
 } from "lucide-react";
+import PublicHeader from "@/components/layout/PublicHeader";
+import PublicFooter from "@/components/layout/PublicFooter";
 
-const features = [
+const topFeatures = [
   {
     icon: ShoppingCart,
     title: "Sales Management",
@@ -28,37 +27,20 @@ const features = [
       "Track stock levels in real-time. Set minimum thresholds, manage suppliers, and automate purchase orders.",
   },
   {
-    icon: Users,
-    title: "Customer Management",
-    description:
-      "Build lasting relationships with customer profiles, loyalty points, purchase history, and targeted communications.",
-  },
-  {
     icon: BarChart3,
     title: "Financial Reporting",
     description:
       "Generate comprehensive reports on sales, expenses, profits, and cash flow. Export to PDF or Excel.",
   },
-  {
-    icon: Shield,
-    title: "Multi-Role Access",
-    description:
-      "Granular role-based access control for owners, managers, cashiers, accountants, and more.",
-  },
-  {
-    icon: Activity,
-    title: "Real-time Analytics",
-    description:
-      "Live dashboards with key metrics. Track performance, identify trends, and make data-driven decisions.",
-  },
 ];
 
 const phrases = [
-  "Manage Sales & Inventory",
-  "Track Finances & Expenses",
-  "Process Orders Faster",
-  "Grow Your Business",
-  "Real-time Analytics",
+  "Point of Sale System",
+  "Inventory Management",
+  "Customer Tracking",
+  "Financial Reporting",
+  "Multi-Branch Setup",
+  "Smart Analytics",
 ];
 
 const stats = [
@@ -68,8 +50,14 @@ const stats = [
   { value: "24/7", label: "Support" },
 ];
 
+const ctaFeatures = [
+  "Real-time inventory tracking",
+  "Multi-payment support",
+  "Role-based access control",
+  "Comprehensive reporting",
+];
+
 export default function LandingPage() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentPhrase, setCurrentPhrase] = useState(0);
 
   useEffect(() => {
@@ -81,71 +69,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
-      {/* ── Navbar ─────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 border-b border-[#2a2a3a] bg-[#0a0a0f]/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#d4a843] to-[#c49a38]">
-              <span className="text-sm font-bold text-black">G</span>
-            </div>
-            <span className="text-lg font-bold text-[#f0f0f5]">SSV Shop</span>
-          </Link>
-
-          <div className="hidden items-center gap-8 md:flex">
-            <a
-              href="#features"
-              className="text-sm font-medium text-[#9090a0] transition-colors hover:text-[#f0f0f5]"
-            >
-              Features
-            </a>
-            <a
-              href="#about"
-              className="text-sm font-medium text-[#9090a0] transition-colors hover:text-[#f0f0f5]"
-            >
-              About
-            </a>
-          </div>
-
-          <div className="hidden items-center gap-3 md:flex">
-            <Link
-              href="/login"
-              className="btn btn-secondary !py-2 !px-4 text-sm"
-            >
-              Login
-            </Link>
-            <Link href="/dashboard/owner" className="btn btn-primary !py-2 !px-4 text-sm">
-              Go to Dashboard
-            </Link>
-          </div>
-
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="rounded-lg p-2 text-[#9090a0] hover:bg-white/5 md:hidden"
-          >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </div>
-
-        {mobileMenuOpen && (
-          <div className="border-t border-[#2a2a3a] px-4 pb-4 pt-2 md:hidden">
-            <div className="flex flex-col gap-3">
-              <a href="#features" className="text-sm text-[#9090a0] hover:text-[#f0f0f5]">
-                Features
-              </a>
-              <a href="#about" className="text-sm text-[#9090a0] hover:text-[#f0f0f5]">
-                About
-              </a>
-              <hr className="border-[#2a2a3a]" />
-              <Link href="/login" className="btn btn-secondary text-sm">
-                Login
-              </Link>
-              <Link href="/dashboard/owner" className="btn btn-primary text-sm">
-                Go to Dashboard
-              </Link>
-            </div>
-          </div>
-        )}
-      </nav>
+      <PublicHeader />
 
       {/* ── Hero ───────────────────────────────────────────── */}
       <section className="hero-gradient relative overflow-hidden">
@@ -157,8 +81,11 @@ export default function LandingPage() {
             </div>
             <h1 className="mx-auto max-w-4xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
               SSV Shop{" "}
-              <span className="bg-gradient-to-r from-[#d4a843] to-[#c49a38] bg-clip-text text-transparent">
-                Point of Sale System
+              <span
+                key={currentPhrase}
+                className="inline-block bg-gradient-to-r from-[#d4a843] to-[#c49a38] bg-clip-text text-transparent animate-[fadeIn_0.5s_ease-in-out]"
+              >
+                {phrases[currentPhrase]}
               </span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[#9090a0]">
@@ -166,11 +93,6 @@ export default function LandingPage() {
               Everything you need to run your retail business — from sales and
               inventory to customer management and financial reporting.
             </p>
-            <div className="h-8 overflow-hidden">
-              <p className="text-xl text-[#9090a0] transition-all duration-500 ease-in-out" key={currentPhrase}>
-                {phrases[currentPhrase]}
-              </p>
-            </div>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
                 href="/dashboard/owner"
@@ -182,16 +104,17 @@ export default function LandingPage() {
                   className="transition-transform group-hover:translate-x-0.5"
                 />
               </Link>
+              <Link href="/features" className="btn btn-secondary btn-lg">
+                Explore Features
+              </Link>
             </div>
           </div>
         </div>
-
-        {/* Glow effect */}
         <div className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-[#d4a843]/5 blur-[120px]" />
       </section>
 
-      {/* ── Features ───────────────────────────────────────── */}
-      <section id="features" className="relative py-24">
+      {/* ── Feature Preview ────────────────────────────────── */}
+      <section className="relative py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
             <h2 className="text-3xl font-bold sm:text-4xl">
@@ -199,12 +122,12 @@ export default function LandingPage() {
               <span className="text-[#d4a843]">Run Your Business</span>
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-[#9090a0]">
-              Everything you need to run your retail business. Streamline
-              operations, boost efficiency, and make smarter decisions.
+              Streamline operations, boost efficiency, and make smarter
+              decisions with our powerful POS platform.
             </p>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature) => {
+            {topFeatures.map((feature) => {
               const Icon = feature.icon;
               return (
                 <div
@@ -223,6 +146,18 @@ export default function LandingPage() {
                 </div>
               );
             })}
+          </div>
+          <div className="mt-12 text-center">
+            <Link
+              href="/features"
+              className="btn btn-secondary group inline-flex items-center gap-2"
+            >
+              View All Features
+              <ArrowRight
+                size={14}
+                className="transition-transform group-hover:translate-x-0.5"
+              />
+            </Link>
           </div>
         </div>
       </section>
@@ -243,94 +178,47 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Footer ─────────────────────────────────────────── */}
-      <footer id="about" className="border-t border-[#2a2a3a] bg-[#0c0c14]">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#d4a843] to-[#c49a38]">
-                  <span className="text-sm font-bold text-black">G</span>
+      {/* ── CTA ────────────────────────────────────────────── */}
+      <section className="relative py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="glass-card relative overflow-hidden px-8 py-16 text-center sm:px-16">
+            <div className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full bg-[#d4a843]/10 blur-[80px]" />
+            <div className="pointer-events-none absolute -bottom-20 -left-20 h-60 w-60 rounded-full bg-[#3b82f6]/10 blur-[80px]" />
+            <h2 className="relative text-3xl font-bold sm:text-4xl">
+              Ready to Transform Your Business?
+            </h2>
+            <p className="relative mx-auto mt-4 max-w-xl text-[#9090a0]">
+              Join hundreds of businesses using SSV Shop to streamline their
+              operations and boost profitability.
+            </p>
+            <div className="relative mx-auto mt-8 grid max-w-lg gap-3 text-left sm:grid-cols-2">
+              {ctaFeatures.map((f) => (
+                <div key={f} className="flex items-center gap-2 text-sm text-[#9090a0]">
+                  <Check size={16} className="text-[#d4a843]" />
+                  {f}
                 </div>
-                <span className="text-lg font-bold text-[#f0f0f5]">
-                  SSV Shop
-                </span>
-              </div>
-              <p className="mt-4 text-sm leading-relaxed text-[#9090a0]">
-                The complete POS system for SSV Shop.
-                Manage sales, inventory, customers, and finances with confidence.
-              </p>
+              ))}
             </div>
-            <div>
-              <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#606070]">
-                Product
-              </h4>
-              <ul className="space-y-2 text-sm text-[#9090a0]">
-                <li>
-                  <a href="#features" className="hover:text-[#f0f0f5]">
-                    Features
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-[#f0f0f5]">
-                    Reports
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-[#f0f0f5]">
-                    Integrations
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-[#f0f0f5]">
-                    Changelog
-                  </a>
-                </li>
-              </ul>
+            <div className="relative mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link
+                href="/dashboard/owner"
+                className="btn btn-primary btn-lg group"
+              >
+                Get Started Free
+                <ArrowRight
+                  size={16}
+                  className="transition-transform group-hover:translate-x-0.5"
+                />
+              </Link>
+              <Link href="/pricing" className="btn btn-secondary btn-lg">
+                Request a Quote
+              </Link>
             </div>
-            <div>
-              <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#606070]">
-                Company
-              </h4>
-              <ul className="space-y-2 text-sm text-[#9090a0]">
-                <li>
-                  <a href="#about" className="hover:text-[#f0f0f5]">
-                    About
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-[#f0f0f5]">
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-[#f0f0f5]">
-                    Careers
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-[#f0f0f5]">
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#606070]">
-                Contact
-              </h4>
-              <ul className="space-y-2 text-sm text-[#9090a0]">
-                <li>support@ssvshop.com</li>
-                <li>+234 800 SSVSHOP</li>
-                <li>Lagos, Nigeria</li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-12 border-t border-[#2a2a3a] pt-8 text-center text-xs text-[#606070]">
-            &copy; 2026 SSV Shop. All rights reserved.
           </div>
         </div>
-      </footer>
+      </section>
+
+      <PublicFooter />
     </div>
   );
 }

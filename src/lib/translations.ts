@@ -2,6 +2,7 @@ export type TranslationKey = keyof typeof en;
 
 export const en = {
   // Navigation
+  home: "Home",
   dashboard: "Dashboard",
   sales: "Sales",
   inventory: "Inventory",
@@ -161,6 +162,19 @@ export const en = {
   // Currency
   currency: "₦ NGN",
 
+  // Sidebar section titles
+  management: "Management",
+  operations: "Operations",
+  warehouse: "Warehouse",
+  finance: "Finance",
+
+  // Sidebar extra labels
+  stockAdjustments: "Stock Adjustments",
+  stockRequests: "Stock Requests",
+  branches: "Branches",
+  profile: "Profile",
+  logout: "Logout",
+
   // Language
   language: "Language",
   english: "English",
@@ -169,6 +183,7 @@ export const en = {
 
 export const fr: Record<TranslationKey, string> = {
   // Navigation
+  home: "Accueil",
   dashboard: "Tableau de bord",
   sales: "Ventes",
   inventory: "Inventaire",
@@ -327,6 +342,19 @@ export const fr: Record<TranslationKey, string> = {
 
   // Currency
   currency: "₦ NGN",
+
+  // Sidebar section titles
+  management: "Gestion",
+  operations: "Opérations",
+  warehouse: "Entrepôt",
+  finance: "Finance",
+
+  // Sidebar extra labels
+  stockAdjustments: "Ajustements de stock",
+  stockRequests: "Demandes de stock",
+  branches: "Succursales",
+  profile: "Profil",
+  logout: "Déconnexion",
 
   // Language
   language: "Langue",

@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatDateTime } from "@/lib/utils";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
   Shield,
   Activity,
@@ -16,6 +18,7 @@ import {
   Search,
   Filter,
   Calendar,
+  ChevronDown,
 } from "lucide-react";
 import {
   BarChart,
@@ -61,6 +64,7 @@ export default function AuditorDashboard() {
   const [actionFilter, setActionFilter] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -126,10 +130,60 @@ export default function AuditorDashboard() {
   ];
 
   const quickActions = [
-    { label: "Export Logs", href: "#", icon: Download, onClick: () => window.alert("Export feature coming soon") },
+    { label: "Export Logs", href: "#", icon: Download, onClick: () => setShowExportMenu(!showExportMenu) },
     { label: "View Details", href: "#", icon: Eye, onClick: () => window.alert("Details feature coming soon") },
     { label: "User Activity Report", href: "#", icon: FileText, onClick: () => window.alert("Report feature coming soon") },
   ];
+
+  function handleExportCSV() {
+    const logs = data?.auditLogs ?? [];
+    const headers = ["Timestamp", "User", "Action", "Resource", "Details", "IP Address"];
+    const rows = logs.map((log) => [
+      formatDateTime(log.createdAt),
+      `${log.user.firstName} ${log.user.lastName}`,
+      log.action,
+      log.resource,
+      log.details ? JSON.stringify(log.details) : "",
+      log.ipAddress ?? "",
+    ]);
+    const csv = [headers.join(","), ...rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","))].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `audit-logs-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setShowExportMenu(false);
+  }
+
+  function handleExportPDF() {
+    const logs = data?.auditLogs ?? [];
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text("Audit Logs Report", 14, 22);
+    doc.setFontSize(10);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 30);
+    const headers = ["Timestamp", "User", "Action", "Resource", "Details", "IP Address"];
+    const rows = logs.map((log) => [
+      formatDateTime(log.createdAt),
+      `${log.user.firstName} ${log.user.lastName}`,
+      log.action,
+      log.resource,
+      log.details ? JSON.stringify(log.details) : "",
+      log.ipAddress ?? "",
+    ]);
+    autoTable(doc, {
+      startY: 35,
+      head: [headers],
+      body: rows,
+      theme: "grid",
+      headStyles: { fillColor: [212, 168, 67] },
+      styles: { fontSize: 8 },
+    });
+    doc.save(`audit-logs-${new Date().toISOString().split("T")[0]}.pdf`);
+    setShowExportMenu(false);
+  }
 
   function getActionBadge(action: string) {
     const upper = action.toUpperCase();
@@ -168,7 +222,30 @@ export default function AuditorDashboard() {
         <div className="glass-card p-6">
           <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {quickActions.map((action) => {
+            <div className="relative">
+              <button
+                onClick={() => setShowExportMenu(!showExportMenu)}
+                className="flex w-full items-center gap-3 rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-3 transition-all hover:border-[#d4a843]/30 hover:bg-[#1c1c28]/80"
+              >
+                <Download size={18} className="text-[#d4a843]" />
+                <span className="text-sm font-medium text-[#f0f0f5]">Export Logs</span>
+                <ChevronDown size={14} className="ml-auto text-[#9090a0]" />
+              </button>
+              {showExportMenu && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowExportMenu(false)} />
+                  <div className="absolute left-0 z-50 mt-2 w-44 rounded-xl border border-[#2a2a3a] bg-[#1c1c28] py-1 shadow-lg">
+                    <button onClick={handleExportCSV} className="flex w-full items-center gap-2 px-4 py-2 text-sm text-[#f0f0f5] hover:bg-[#2a2a3a]">
+                      Export as CSV
+                    </button>
+                    <button onClick={handleExportPDF} className="flex w-full items-center gap-2 px-4 py-2 text-sm text-[#f0f0f5] hover:bg-[#2a2a3a]">
+                      Export as PDF
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+            {quickActions.slice(1).map((action) => {
               const Icon = action.icon;
               return (
                 <button
