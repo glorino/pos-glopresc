@@ -168,7 +168,6 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
       title: "sales",
       items: [
         { icon: ShoppingCart, label: "sales", href: "/dashboard/sales-manager/sales" },
-        { icon: Package, label: "products", href: "/dashboard/sales-manager/products" },
         { icon: Users, label: "customers", href: "/dashboard/sales-manager/customers" },
       ],
     },

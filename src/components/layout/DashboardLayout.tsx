@@ -62,9 +62,9 @@ export default function DashboardLayout({
       />
 
       <div
-        className={`lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform lg:transition-none`}
+        } transition-transform lg:sticky lg:transition-none`}
       >
         <Sidebar role={role} currentPath={pathname} />
       </div>

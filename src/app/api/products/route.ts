@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getToken } from "next-auth/jwt";
+
+const PRODUCT_ROLES = ["OWNER", "MANAGER", "WAREHOUSE_MANAGER"];
 
 function generateSKU(name: string): string {
   const prefix = name
@@ -88,6 +91,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    if (!token || !PRODUCT_ROLES.includes(token.role as string)) {
+      return NextResponse.json({ error: "Unauthorized: Only owners, managers, and warehouse managers can manage products" }, { status: 403 });
+    }
+
     const body = await request.json();
     const {
       name,
@@ -185,6 +193,11 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    if (!token || !PRODUCT_ROLES.includes(token.role as string)) {
+      return NextResponse.json({ error: "Unauthorized: Only owners, managers, and warehouse managers can manage products" }, { status: 403 });
+    }
+
     const body = await request.json();
     const { id, ...data } = body;
 
@@ -223,6 +236,11 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    if (!token || !PRODUCT_ROLES.includes(token.role as string)) {
+      return NextResponse.json({ error: "Unauthorized: Only owners, managers, and warehouse managers can manage products" }, { status: 403 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
