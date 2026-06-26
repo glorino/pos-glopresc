@@ -88,7 +88,7 @@ export async function GET(request: Request) {
         where: {
           isActive: true,
           role: { in: ["SALES_REP", "SALES_MANAGER"] },
-          ...(branchFilter ? { branchId: branchFilter.branchId } : {}),
+          ...(branchFilter || {}),
         },
         select: {
           id: true,
@@ -109,7 +109,7 @@ export async function GET(request: Request) {
         where: {
           isActive: true,
           stockQuantity: { lte: 10 },
-          ...(branchFilter ? { branchId: branchFilter.branchId } : {}),
+          ...(branchFilter || {}),
         },
         select: { id: true, name: true, stockQuantity: true, minStockLevel: true },
         take: 5,

@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     const branchFilter = await getBranchFilter(request);
     if (branchFilter) {
-      where.sales = { some: { branchId: branchFilter.branchId } };
+      where.sales = { some: { OR: branchFilter.OR } };
     }
 
     const skip = (page - 1) * limit;

@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 
     const branchFilter = await getBranchFilter(request);
     if (branchFilter) {
-      where.branchId = branchFilter.branchId;
+      where.AND = [branchFilter];
     }
 
     const skip = (page - 1) * limit;

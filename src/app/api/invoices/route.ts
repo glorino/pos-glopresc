@@ -30,16 +30,7 @@ export async function GET(request: NextRequest) {
 
     const branchFilter = await getBranchFilter(request);
     if (branchFilter) {
-      const branchOR = [
-        { sale: { branchId: branchFilter.branchId } },
-        { expense: { branchId: branchFilter.branchId } },
-      ];
-      if (where.OR) {
-        where.AND = [{ OR: where.OR }, { OR: branchOR }];
-        delete where.OR;
-      } else {
-        where.OR = branchOR;
-      }
+      where.AND = Array.isArray(where.AND) ? [...where.AND, branchFilter] : [branchFilter];
     }
 
     const skip = (page - 1) * limit;

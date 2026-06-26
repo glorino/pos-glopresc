@@ -20,14 +20,14 @@ export async function GET(request: NextRequest) {
         _sum: { total: true },
         where: {
           status: "COMPLETED",
-          ...(branchFilter ? { branchId: branchFilter.branchId } : {}),
+          ...(branchFilter || {}),
         },
       }),
       db.expense.aggregate({
         _sum: { amount: true },
         where: {
           status: { in: ["APPROVED", "PAID"] },
-          ...(branchFilter ? { branchId: branchFilter.branchId } : {}),
+          ...(branchFilter || {}),
         },
       }),
       db.invoice.count({
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
           where: {
             status: "COMPLETED",
             createdAt: { gte: monthStart, lte: monthEnd },
-            ...(branchFilter ? { branchId: branchFilter.branchId } : {}),
+            ...(branchFilter || {}),
           },
         }),
         db.expense.aggregate({
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
           where: {
             status: { in: ["APPROVED", "PAID"] },
             createdAt: { gte: monthStart, lte: monthEnd },
-            ...(branchFilter ? { branchId: branchFilter.branchId } : {}),
+            ...(branchFilter || {}),
           },
         }),
       ]);
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
         expenses: {
           where: {
             status: { in: ["APPROVED", "PAID"] },
-            ...(branchFilter ? { branchId: branchFilter.branchId } : {}),
+            ...(branchFilter || {}),
           },
           select: { amount: true },
         },
@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
       take: 10,
       orderBy: { createdAt: "desc" },
       where: {
-        ...(branchFilter ? { branchId: branchFilter.branchId } : {}),
+        ...(branchFilter || {}),
       },
       include: {
         user: { select: { firstName: true, lastName: true } },

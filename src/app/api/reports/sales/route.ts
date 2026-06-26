@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { Prisma } from "@prisma/client";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { getBranchFilterFromSession } from "@/lib/branch-filter";
+import { getBranchFilterFromSession, getBranchIdFromSession } from "@/lib/branch-filter";
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
     }
 
     const branchFilter = getBranchFilterFromSession(session);
+    const branchId = getBranchIdFromSession(session);
 
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get("startDate");
@@ -32,8 +33,8 @@ export async function GET(request: NextRequest) {
       AND "createdAt" <= ${endDate ? new Date(endDate + "T23:59:59") : new Date()}
     `;
 
-    const branchSql = branchFilter
-      ? Prisma.sql`AND "branchId" = ${branchFilter.branchId}`
+    const branchSql = branchId
+      ? Prisma.sql`AND "branchId" = ${branchId}`
       : Prisma.sql``;
 
     const groupExpr =

@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     const branchFilter = await getBranchFilter(request);
     if (branchFilter) {
-      where.branchId = branchFilter.branchId;
+      where.AND = Array.isArray(where.AND) ? [...where.AND, branchFilter] : [branchFilter];
     }
 
     if (status) where.status = status;
