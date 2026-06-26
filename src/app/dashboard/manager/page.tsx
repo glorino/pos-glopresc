@@ -37,6 +37,7 @@ interface ManagerData {
   inventoryValue: number;
   pendingApprovals: number;
   customerVisits: number;
+  totalPayments: number;
   weeklyComparison: { name: string; thisWeek: number; lastWeek: number }[];
   staffPerformance: { name: string; sales: number; revenue: number }[];
   expenseSummary: { status: string; count: number; total: number }[];
@@ -52,11 +53,16 @@ export default function ManagerDashboard() {
   const router = useRouter();
   const [data, setData] = useState<ManagerData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch("/api/dashboard/manager");
+        const params = new URLSearchParams();
+        if (dateFrom) params.set("dateFrom", dateFrom);
+        if (dateTo) params.set("dateTo", dateTo);
+        const res = await fetch(`/api/dashboard/manager?${params.toString()}`);
         if (res.ok) {
           const json = await res.json();
           setData(json);
@@ -68,7 +74,7 @@ export default function ManagerDashboard() {
       }
     }
     fetchData();
-  }, []);
+  }, [dateFrom, dateTo]);
 
   if (loading) {
     return (
@@ -134,6 +140,42 @@ export default function ManagerDashboard() {
   return (
     <DashboardLayout role="MANAGER" title="Manager Dashboard">
       <div className="space-y-6">
+        {/* Date Range Filter & Total Payments */}
+        <div className="glass-card p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="input w-40"
+              />
+              <span className="text-sm text-[#606070]">to</span>
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="input w-40"
+              />
+              {(dateFrom || dateTo) && (
+                <button
+                  onClick={() => { setDateFrom(""); setDateTo(""); }}
+                  className="btn btn-secondary btn-sm"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <div className="flex items-center gap-2 rounded-xl border border-[#10b981]/30 bg-[#10b981]/10 px-4 py-2">
+              <DollarSign size={18} className="text-[#10b981]" />
+              <span className="text-sm font-medium text-[#9090a0]">Total Payments:</span>
+              <span className="text-lg font-bold text-[#10b981]">
+                {formatCurrency(data?.totalPayments ?? 0)}
+              </span>
+            </div>
+          </div>
+        </div>
+
         {data?.lowStockItems && data.lowStockItems.length > 0 && (
           <button
             onClick={() => router.push("/dashboard/inventory/stock")}

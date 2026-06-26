@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency, formatDateTime, formatDate } from "@/lib/utils";
 import {
@@ -15,7 +16,18 @@ import {
   Edit3,
   RefreshCw,
   ArrowRight,
+  MessageSquare,
+  Package,
+  CheckCircle,
+  AlertCircle,
+  RotateCcw,
+  TrendingUp,
+  ChevronRight,
+  Filter,
+  BadgeCheck,
 } from "lucide-react";
+
+type OrderStatus = "ALL" | "COMPLETED" | "PENDING" | "REFUNDED";
 
 interface CustomerProfile {
   customer: {
@@ -62,10 +74,29 @@ interface CustomerProfile {
   };
 }
 
+const LOYALTY_TIERS = [
+  { name: "Bronze", min: 0, max: 499, color: "text-amber-600", bg: "bg-amber-900/30" },
+  { name: "Silver", min: 500, max: 1999, color: "text-gray-300", bg: "bg-gray-500/20" },
+  { name: "Gold", min: 2000, max: 4999, color: "text-[#d4a843]", bg: "bg-[#d4a843]/20" },
+  { name: "Platinum", min: 5000, max: Infinity, color: "text-purple-400", bg: "bg-purple-500/20" },
+];
+
+function getLoyaltyTier(points: number) {
+  return LOYALTY_TIERS.find((t) => points >= t.min && points <= t.max) ?? LOYALTY_TIERS[0];
+}
+
+function getNextTier(points: number) {
+  const idx = LOYALTY_TIERS.findIndex((t) => points >= t.min && points <= t.max);
+  return idx < LOYALTY_TIERS.length - 1 ? LOYALTY_TIERS[idx + 1] : null;
+}
+
 export default function CustomerDashboard() {
+  const router = useRouter();
+  const ordersRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<CustomerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
+  const [orderFilter, setOrderFilter] = useState<OrderStatus>("ALL");
   const [profileForm, setProfileForm] = useState({
     firstName: "",
     lastName: "",
@@ -122,9 +153,13 @@ export default function CustomerDashboard() {
     }
   }
 
+  function scrollToOrders() {
+    ordersRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
+
   const stats = [
     {
-      label: "My Orders",
+      label: "Total Orders",
       value: data?.stats?.totalOrders ?? 0,
       icon: ShoppingCart,
       color: "from-[#d4a843]/20 to-[#d4a843]/5",
@@ -154,19 +189,51 @@ export default function CustomerDashboard() {
   ];
 
   const quickActions = [
-    { label: "Browse Shop", href: "/shop", icon: Store },
-    { label: "Make Booking", href: "/booking", icon: Calendar },
-    { label: "View History", href: "/dashboard/customer", icon: History },
-    { label: "Edit Profile", href: "#", icon: Edit3, onClick: () => setEditing(true) },
+    { label: "Browse Shop", icon: Store, action: () => router.push("/shop") },
+    { label: "Track Orders", icon: Package, action: scrollToOrders },
+    { label: "Update Profile", icon: Edit3, action: () => setEditing(true) },
+    {
+      label: "Contact Support",
+      icon: MessageSquare,
+      action: () => window.open("mailto:support@glopresc.com?subject=Customer%20Support%20Request", "_blank"),
+    },
   ];
 
   const orders = data?.orders ?? [];
   const bookings = data?.bookings ?? [];
 
+  const filteredOrders = orders.filter((order) => {
+    if (orderFilter === "ALL") return true;
+    return order.status === orderFilter;
+  });
+
+  const orderCounts = {
+    ALL: orders.length,
+    COMPLETED: orders.filter((o) => o.status === "COMPLETED").length,
+    PENDING: orders.filter((o) => o.status === "PENDING").length,
+    REFUNDED: orders.filter((o) => o.status === "RETURNED" || o.status === "REFUNDED").length,
+  };
+
+  const loyaltyPoints = data?.stats?.loyaltyPoints ?? 0;
+  const currentTier = getLoyaltyTier(loyaltyPoints);
+  const nextTier = getNextTier(loyaltyPoints);
+  const tierProgress = nextTier
+    ? ((loyaltyPoints - currentTier.min) / (nextTier.min - currentTier.min)) * 100
+    : 100;
+
+  const filterTabs: { key: OrderStatus; label: string; icon: typeof Package }[] = [
+    { key: "ALL", label: "All", icon: Package },
+    { key: "COMPLETED", label: "Completed", icon: CheckCircle },
+    { key: "PENDING", label: "Pending", icon: Clock },
+    { key: "REFUNDED", label: "Refunded", icon: RotateCcw },
+  ];
+
+  const recentOrders = filteredOrders.slice(0, 5);
+
   return (
     <DashboardLayout role="CUSTOMER" title="My Account">
       <div className="space-y-6">
-        {/* Stats */}
+        {/* Stats Row */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => {
             const Icon = stat.icon;
@@ -192,26 +259,57 @@ export default function CustomerDashboard() {
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {quickActions.map((action) => {
               const Icon = action.icon;
-              return action.onClick ? (
+              return (
                 <button
                   key={action.label}
-                  onClick={action.onClick}
-                  className="flex items-center gap-3 rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-3 transition-all hover:border-[#d4a843]/30 hover:bg-[#1c1c28]/80"
+                  onClick={action.action}
+                  className="flex items-center gap-3 rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-3 transition-all hover:border-[#d4a843]/30 hover:bg-[#1c1c28]/80 active:scale-[0.98]"
                 >
                   <Icon size={18} className="text-[#d4a843]" />
                   <span className="text-sm font-medium text-[#f0f0f5]">{action.label}</span>
                 </button>
-              ) : (
-                <Link
-                  key={action.label}
-                  href={action.href}
-                  className="flex items-center gap-3 rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-3 transition-all hover:border-[#d4a843]/30 hover:bg-[#1c1c28]/80"
-                >
-                  <Icon size={18} className="text-[#d4a843]" />
-                  <span className="text-sm font-medium text-[#f0f0f5]">{action.label}</span>
-                </Link>
               );
             })}
+          </div>
+        </div>
+
+        {/* Loyalty Points Progress */}
+        <div className="glass-card p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-[#f0f0f5]">Loyalty Status</h3>
+            <span className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${currentTier.bg} ${currentTier.color}`}>
+              <BadgeCheck size={14} />
+              {currentTier.name} Member
+            </span>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-[#9090a0]">{loyaltyPoints.toLocaleString()} points</span>
+              {nextTier && (
+                <span className="text-[#9090a0]">
+                  {nextTier.min.toLocaleString()} pts to {nextTier.name}
+                </span>
+              )}
+              {!nextTier && (
+                <span className="text-[#8b5cf6]">Maximum tier reached!</span>
+              )}
+            </div>
+            <div className="h-2.5 w-full overflow-hidden rounded-full bg-[#1c1c28]">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-[#d4a843] to-[#8b5cf6] transition-all duration-500"
+                style={{ width: `${Math.min(tierProgress, 100)}%` }}
+              />
+            </div>
+            <div className="flex justify-between">
+              {LOYALTY_TIERS.map((tier) => (
+                <span
+                  key={tier.name}
+                  className={`text-xs ${loyaltyPoints >= tier.min ? tier.color : "text-[#606070]"}`}
+                >
+                  {tier.name}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -220,56 +318,121 @@ export default function CustomerDashboard() {
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4a843] border-t-transparent" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-            {/* Recent Orders */}
-            <div className="glass-card p-6">
+          <>
+            {/* Order History with Filters */}
+            <div ref={ordersRef} className="glass-card p-6">
               <div className="mb-4 flex items-center justify-between">
-                <h4 className="text-base font-semibold text-[#f0f0f5]">My Recent Orders</h4>
-                <Link href="/dashboard/customer" className="text-xs text-[#d4a843] hover:underline">
-                  View All
-                </Link>
+                <h4 className="text-base font-semibold text-[#f0f0f5]">Order History</h4>
+                <button onClick={fetchData} className="flex items-center gap-1 text-xs text-[#d4a843] hover:underline">
+                  <RefreshCw size={12} />
+                  Refresh
+                </button>
               </div>
-              <div className="space-y-3">
-                {orders.slice(0, 5).map((order) => (
-                  <div
-                    key={order.id}
-                    className="flex items-center justify-between rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-3"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="font-mono text-xs font-medium text-[#f0f0f5]">
-                          {order.invoiceNumber}
-                        </p>
-                        <span className={`badge ${
-                          order.status === "COMPLETED" ? "badge-success"
-                          : order.status === "PENDING" ? "badge-warning"
-                          : order.status === "RETURNED" ? "badge-info"
-                          : "badge-danger"
-                        }`}>
-                          {order.status}
-                        </span>
-                      </div>
-                      <p className="mt-1 text-xs text-[#606070]">
-                        {formatDateTime(order.createdAt)} · {order.items.length} item(s)
-                      </p>
-                    </div>
-                    <p className="font-semibold text-[#d4a843]">
-                      {formatCurrency(order.total)}
-                    </p>
-                  </div>
-                ))}
-                {orders.length === 0 && (
-                  <p className="text-center text-sm text-[#606070] py-4">No orders yet</p>
-                )}
+
+              {/* Filter Tabs */}
+              <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
+                {filterTabs.map((tab) => {
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.key}
+                      onClick={() => setOrderFilter(tab.key)}
+                      className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all whitespace-nowrap ${
+                        orderFilter === tab.key
+                          ? "bg-[#d4a843]/20 text-[#d4a843] border border-[#d4a843]/30"
+                          : "bg-[#1c1c28] text-[#9090a0] border border-[#2a2a3a] hover:border-[#3a3a4a]"
+                      }`}
+                    >
+                      <Icon size={14} />
+                      {tab.label}
+                      <span className={`ml-1 rounded-full px-1.5 py-0.5 text-[10px] ${
+                        orderFilter === tab.key ? "bg-[#d4a843]/30" : "bg-[#2a2a3a]"
+                      }`}>
+                        {orderCounts[tab.key]}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Order Table */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-[#2a2a3a] text-xs text-[#606070]">
+                      <th className="pb-3 font-medium">Order</th>
+                      <th className="pb-3 font-medium">Items</th>
+                      <th className="pb-3 font-medium">Total</th>
+                      <th className="pb-3 font-medium">Status</th>
+                      <th className="pb-3 font-medium">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#2a2a3a]/50">
+                    {recentOrders.map((order) => (
+                      <tr key={order.id} className="hover:bg-[#1c1c28]/50 transition-colors">
+                        <td className="py-3">
+                          <p className="font-mono text-xs font-medium text-[#f0f0f5]">
+                            {order.invoiceNumber}
+                          </p>
+                          <p className="mt-0.5 text-[10px] text-[#606070]">
+                            {order.paymentMethod}
+                          </p>
+                        </td>
+                        <td className="py-3">
+                          <div className="flex flex-col gap-0.5">
+                            {order.items.slice(0, 2).map((item) => (
+                              <p key={item.id} className="text-xs text-[#9090a0]">
+                                {item.quantity}x {item.product.name}
+                              </p>
+                            ))}
+                            {order.items.length > 2 && (
+                              <p className="text-[10px] text-[#606070]">
+                                +{order.items.length - 2} more
+                              </p>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-3 font-semibold text-[#d4a843]">
+                          {formatCurrency(order.total)}
+                        </td>
+                        <td className="py-3">
+                          <span
+                            className={`badge ${
+                              order.status === "COMPLETED"
+                                ? "badge-success"
+                                : order.status === "PENDING"
+                                ? "badge-warning"
+                                : order.status === "RETURNED"
+                                ? "badge-info"
+                                : "badge-danger"
+                            }`}
+                          >
+                            {order.status}
+                          </span>
+                        </td>
+                        <td className="py-3 text-xs text-[#9090a0]">
+                          {formatDateTime(order.createdAt)}
+                        </td>
+                      </tr>
+                    ))}
+                    {recentOrders.length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="py-8 text-center text-sm text-[#606070]">
+                          No orders found for this filter
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
 
-            {/* Bookings */}
+            {/* Bookings Section */}
             <div className="glass-card p-6">
               <div className="mb-4 flex items-center justify-between">
-                <h4 className="text-base font-semibold text-[#f0f0f5]">My Bookings</h4>
-                <Link href="/booking" className="text-xs text-[#d4a843] hover:underline">
-                  View All
+                <h4 className="text-base font-semibold text-[#f0f0f5]">Booking History</h4>
+                <Link href="/booking" className="flex items-center gap-1 text-xs text-[#d4a843] hover:underline">
+                  New Booking <ChevronRight size={12} />
                 </Link>
               </div>
               <div className="space-y-3">
@@ -283,14 +446,19 @@ export default function CustomerDashboard() {
                         <p className="font-mono text-xs font-medium text-[#f0f0f5]">
                           {booking.bookingNumber}
                         </p>
-                        <span className={`badge ${
-                          booking.status === "CONFIRMED" ? "badge-success"
-                          : booking.status === "PENDING" ? "badge-warning"
-                          : booking.status === "COMPLETED" ? "badge-info"
-                          : booking.status === "CANCELLED"
-                          ? "badge-danger"
-                          : "badge-purple"
-                        }`}>
+                        <span
+                          className={`badge ${
+                            booking.status === "CONFIRMED"
+                              ? "badge-success"
+                              : booking.status === "PENDING"
+                              ? "badge-warning"
+                              : booking.status === "COMPLETED"
+                              ? "badge-info"
+                              : booking.status === "CANCELLED"
+                              ? "badge-danger"
+                              : "badge-purple"
+                          }`}
+                        >
                           {booking.status}
                         </span>
                       </div>
@@ -306,11 +474,17 @@ export default function CustomerDashboard() {
                   </div>
                 ))}
                 {bookings.length === 0 && (
-                  <p className="text-center text-sm text-[#606070] py-4">No bookings yet</p>
+                  <div className="flex flex-col items-center py-6 text-center">
+                    <Calendar size={32} className="mb-2 text-[#606070]" />
+                    <p className="text-sm text-[#606070]">No bookings yet</p>
+                    <Link href="/booking" className="mt-2 text-xs text-[#d4a843] hover:underline">
+                      Make your first booking
+                    </Link>
+                  </div>
                 )}
               </div>
             </div>
-          </div>
+          </>
         )}
 
         {/* Profile Edit Section */}

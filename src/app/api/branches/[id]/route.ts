@@ -24,8 +24,21 @@ export async function GET(
       );
     }
 
+    const users = await db.user.findMany({
+      where: { branchId: id },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+        branchId: true,
+      },
+    });
+
     return NextResponse.json({
       ...branch,
+      users,
       userCount: branch._count.users,
       productCount: branch._count.products,
       saleCount: branch._count.sales,

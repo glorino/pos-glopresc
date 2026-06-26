@@ -12,6 +12,7 @@ import {
   Filter,
   FileText,
   X,
+  Truck,
 } from "lucide-react";
 
 interface Invoice {
@@ -24,6 +25,16 @@ interface Invoice {
   status: string;
   dueDate: string;
   paidDate: string | null;
+  createdAt: string;
+}
+
+interface SupplierInvoice {
+  id: string;
+  orderNumber: string;
+  supplierName: string;
+  total: number;
+  status: string;
+  expectedDate: string | null;
   createdAt: string;
 }
 
@@ -50,12 +61,14 @@ const emptyForm: InvoiceFormData = {
 export default function InvoicesPage() {
   const { t } = useTranslation();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [supplierInvoices, setSupplierInvoices] = useState<SupplierInvoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [invoiceType, setInvoiceType] = useState<"customer" | "supplier">("customer");
   const [formData, setFormData] = useState<InvoiceFormData>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -81,9 +94,40 @@ export default function InvoicesPage() {
     }
   }
 
+  async function fetchSupplierInvoices() {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (statusFilter) params.set("status", statusFilter);
+      params.set("limit", "100");
+      const res = await fetch(`/api/purchase-orders?${params}`);
+      if (res.ok) {
+        const data = await res.json();
+        const orders = (data.purchaseOrders || []).map((po: any) => ({
+          id: po.id,
+          orderNumber: po.orderNumber,
+          supplierName: po.supplier.name,
+          total: po.total,
+          status: po.status,
+          expectedDate: po.expectedDate || null,
+          createdAt: po.createdAt,
+        }));
+        setSupplierInvoices(orders);
+      }
+    } catch (error) {
+      console.error("Failed to fetch supplier invoices:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
-    fetchInvoices();
-  }, [statusFilter]);
+    if (invoiceType === "customer") {
+      fetchInvoices();
+    } else {
+      fetchSupplierInvoices();
+    }
+  }, [statusFilter, invoiceType]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -137,6 +181,23 @@ export default function InvoicesPage() {
     }
   }
 
+  async function markSupplierAsPaid(poId: string) {
+    if (!confirm("Mark this supplier invoice as paid?")) return;
+    try {
+      const res = await fetch("/api/purchase-orders", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: poId,
+          status: "RECEIVED",
+        }),
+      });
+      if (res.ok) fetchSupplierInvoices();
+    } catch (error) {
+      console.error("Failed to mark supplier invoice as paid:", error);
+    }
+  }
+
   function sendReminder(invoice: Invoice) {
     alert(`Reminder sent for invoice ${invoice.invoiceNumber}`);
   }
@@ -161,6 +222,28 @@ export default function InvoicesPage() {
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3">
+            <div className="flex rounded-lg border border-[#2a2a3a] bg-[#1c1c28]">
+              <button
+                onClick={() => setInvoiceType("customer")}
+                className={`px-4 py-2 text-sm font-medium rounded-l-lg transition-colors ${
+                  invoiceType === "customer"
+                    ? "bg-[#d4a843]/20 text-[#d4a843]"
+                    : "text-[#9090a0] hover:text-[#f0f0f5]"
+                }`}
+              >
+                Customer Invoices
+              </button>
+              <button
+                onClick={() => setInvoiceType("supplier")}
+                className={`px-4 py-2 text-sm font-medium rounded-r-lg transition-colors ${
+                  invoiceType === "supplier"
+                    ? "bg-[#d4a843]/20 text-[#d4a843]"
+                    : "text-[#9090a0] hover:text-[#f0f0f5]"
+                }`}
+              >
+                Supplier Invoices
+              </button>
+            </div>
             <div className="relative">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
@@ -168,7 +251,7 @@ export default function InvoicesPage() {
                 placeholder="Search invoices..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && fetchInvoices()}
+                onKeyDown={(e) => e.key === "Enter" && (invoiceType === "customer" ? fetchInvoices() : fetchSupplierInvoices())}
                 className="input w-64 pl-10"
               />
             </div>
@@ -183,30 +266,36 @@ export default function InvoicesPage() {
               <option value="OVERDUE">Overdue</option>
               <option value="CANCELLED">Cancelled</option>
             </select>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="input w-auto"
-            />
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="input w-auto"
-            />
+            {invoiceType === "customer" && (
+              <>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="input w-auto"
+                />
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="input w-auto"
+                />
+              </>
+            )}
           </div>
-          <button onClick={() => setShowModal(true)} className="btn btn-primary">
-            <Plus size={16} />
-            Create Invoice
-          </button>
+          {invoiceType === "customer" && (
+            <button onClick={() => setShowModal(true)} className="btn btn-primary">
+              <Plus size={16} />
+              Create Invoice
+            </button>
+          )}
         </div>
 
         {loading ? (
           <div className="flex h-[40vh] items-center justify-center">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4a843] border-t-transparent" />
           </div>
-        ) : (
+        ) : invoiceType === "customer" ? (
           <div className="table-container">
             <table className="table">
               <thead>
@@ -270,6 +359,65 @@ export default function InvoicesPage() {
                   <tr>
                     <td colSpan={8} className="text-center text-[#606070]">
                       No invoices found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="table-container">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>PO Number</th>
+                  <th>Supplier</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Expected Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {supplierInvoices.map((inv) => (
+                  <tr key={inv.id}>
+                    <td className="font-medium text-[#f0f0f5]">
+                      <div className="flex items-center gap-2">
+                        <Truck size={14} className="text-[#d4a843]" />
+                        {inv.orderNumber}
+                      </div>
+                    </td>
+                    <td className="text-[#9090a0]">{inv.supplierName}</td>
+                    <td className="font-medium text-[#d4a843]">
+                      {formatCurrency(inv.total)}
+                    </td>
+                    <td>
+                      <span className={`badge ${getStatusBadge(inv.status)}`}>
+                        {inv.status}
+                      </span>
+                    </td>
+                    <td className="text-[#9090a0]">
+                      {inv.expectedDate ? formatDate(inv.expectedDate) : "—"}
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-1">
+                        {inv.status === "PENDING" && (
+                          <button
+                            onClick={() => markSupplierAsPaid(inv.id)}
+                            className="rounded-lg p-2 text-[#9090a0] hover:bg-[#10b981]/20 hover:text-[#10b981]"
+                            title="Mark as Received"
+                          >
+                            <Check size={14} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {supplierInvoices.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="text-center text-[#606070]">
+                      No supplier invoices found
                     </td>
                   </tr>
                 )}

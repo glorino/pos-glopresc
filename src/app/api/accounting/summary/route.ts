@@ -9,12 +9,30 @@ export async function GET(request: NextRequest) {
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
 
+    const url = new URL(request.url);
+    const dateFrom = url.searchParams.get("dateFrom");
+    const dateTo = url.searchParams.get("dateTo");
+
+    const totalPaymentsWhere: any = {
+      status: "COMPLETED",
+      ...(branchFilter || {}),
+    };
+    if (dateFrom) {
+      totalPaymentsWhere.createdAt = { ...(totalPaymentsWhere.createdAt || {}), gte: new Date(dateFrom) };
+    }
+    if (dateTo) {
+      const to = new Date(dateTo);
+      to.setHours(23, 59, 59);
+      totalPaymentsWhere.createdAt = { ...(totalPaymentsWhere.createdAt || {}), lte: to };
+    }
+
     const [
       totalRevenueResult,
       totalExpensesResult,
       pendingInvoices,
       pendingExpenses,
       overdueInvoices,
+      totalPaymentsResult,
     ] = await Promise.all([
       db.sale.aggregate({
         _sum: { total: true },
@@ -38,6 +56,10 @@ export async function GET(request: NextRequest) {
       }),
       db.invoice.count({
         where: { status: "OVERDUE" },
+      }),
+      db.sale.aggregate({
+        _sum: { total: true },
+        where: totalPaymentsWhere,
       }),
     ]);
 
@@ -155,6 +177,7 @@ export async function GET(request: NextRequest) {
       pendingInvoices,
       pendingExpenses,
       overdueInvoices,
+      totalPayments: Number(totalPaymentsResult._sum.total ?? 0),
       monthlyCashFlow,
       expenseByCategory,
       recentTransactions,

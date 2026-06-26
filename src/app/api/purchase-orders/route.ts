@@ -127,3 +127,43 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { id, ...data } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Purchase order ID is required" },
+        { status: 400 }
+      );
+    }
+
+    if (data.expectedDate) data.expectedDate = new Date(data.expectedDate);
+
+    const purchaseOrder = await db.purchaseOrder.update({
+      where: { id },
+      data,
+      include: {
+        supplier: { select: { id: true, name: true } },
+        items: {
+          include: {
+            product: { select: { id: true, name: true, sku: true } },
+          },
+        },
+      },
+    });
+
+    return NextResponse.json({
+      ...purchaseOrder,
+      total: Number(purchaseOrder.total),
+    });
+  } catch (error: any) {
+    console.error("Purchase Orders PUT error:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to update purchase order" },
+      { status: 500 }
+    );
+  }
+}

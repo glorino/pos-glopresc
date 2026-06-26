@@ -11,6 +11,44 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const branchFilter = getBranchFilterFromSession(session);
+    const url = new URL(request.url);
+    const view = url.searchParams.get("view");
+    const dateFrom = url.searchParams.get("dateFrom");
+    const dateTo = url.searchParams.get("dateTo");
+
+    const totalPaymentsWhere: any = {
+      status: "COMPLETED",
+      ...(branchFilter || {}),
+    };
+    if (dateFrom) {
+      totalPaymentsWhere.createdAt = { ...(totalPaymentsWhere.createdAt || {}), gte: new Date(dateFrom) };
+    }
+    if (dateTo) {
+      const to = new Date(dateTo);
+      to.setHours(23, 59, 59);
+      totalPaymentsWhere.createdAt = { ...(totalPaymentsWhere.createdAt || {}), lte: to };
+    }
+
+    if (view === "staff") {
+      const users = await db.user.findMany({
+        where: {
+          ...(branchFilter || {}),
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          phone: true,
+          role: true,
+          isActive: true,
+          lastLoginAt: true,
+          createdAt: true,
+        },
+        orderBy: { role: "asc" },
+      });
+      return NextResponse.json({ users });
+    }
 
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -37,6 +75,7 @@ export async function GET(request: Request) {
       staffPerformance,
       expenseSummary,
       lowStockItems,
+      totalPaymentsResult,
     ] = await Promise.all([
       db.sale.aggregate({
         _sum: { total: true },
@@ -115,6 +154,10 @@ export async function GET(request: Request) {
         take: 5,
         orderBy: { stockQuantity: "asc" },
       }),
+      db.sale.aggregate({
+        _sum: { total: true },
+        where: totalPaymentsWhere,
+      }),
     ]);
 
     const todayRevenue = Number(todayRevenueResult._sum.total ?? 0);
@@ -144,6 +187,7 @@ export async function GET(request: Request) {
       inventoryValue: totalInventoryQuantity,
       pendingApprovals,
       customerVisits,
+      totalPayments: Number(totalPaymentsResult._sum.total ?? 0),
       weeklyComparison: thisWeekData,
       staffPerformance: staffPerformance.map((s) => ({
         name: `${s.firstName} ${s.lastName}`,

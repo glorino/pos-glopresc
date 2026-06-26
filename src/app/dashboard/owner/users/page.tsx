@@ -7,10 +7,10 @@ import {
   UserPlus,
   Search,
   Edit2,
-  ShieldOff,
   X,
   Users,
   Shield,
+  Building2,
 } from "lucide-react";
 
 interface User {
@@ -20,9 +20,17 @@ interface User {
   lastName: string;
   phone: string | null;
   role: string;
+  branchId: string | null;
   isActive: boolean;
   lastLoginAt: string | null;
   createdAt: string;
+  branch?: { id: string; name: string; code: string } | null;
+}
+
+interface Branch {
+  id: string;
+  name: string;
+  code: string;
 }
 
 const roleColors: Record<string, string> = {
@@ -54,6 +62,7 @@ interface UserFormData {
   phone: string;
   role: string;
   password: string;
+  branchId: string;
 }
 
 const emptyForm: UserFormData = {
@@ -63,6 +72,7 @@ const emptyForm: UserFormData = {
   phone: "",
   role: "SALES_REP",
   password: "",
+  branchId: "",
 };
 
 export default function UserManagementPage() {
@@ -70,11 +80,25 @@ export default function UserManagementPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
+  const [branchFilter, setBranchFilter] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [formData, setFormData] = useState<UserFormData>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [branches, setBranches] = useState<Branch[]>([]);
+
+  async function fetchBranches() {
+    try {
+      const res = await fetch("/api/branches");
+      if (res.ok) {
+        const data = await res.json();
+        setBranches(data.branches || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch branches:", error);
+    }
+  }
 
   async function fetchUsers() {
     setLoading(true);
@@ -82,6 +106,7 @@ export default function UserManagementPage() {
       const params = new URLSearchParams();
       if (search) params.set("search", search);
       if (roleFilter) params.set("role", roleFilter);
+      if (branchFilter) params.set("branchId", branchFilter);
       params.set("limit", "100");
       const res = await fetch(`/api/users?${params}`);
       if (res.ok) {
@@ -96,8 +121,12 @@ export default function UserManagementPage() {
   }
 
   useEffect(() => {
+    fetchBranches();
+  }, []);
+
+  useEffect(() => {
     fetchUsers();
-  }, [search, roleFilter]);
+  }, [search, roleFilter, branchFilter]);
 
   function openAddModal() {
     setEditingUser(null);
@@ -115,6 +144,7 @@ export default function UserManagementPage() {
       phone: user.phone || "",
       role: user.role,
       password: "",
+      branchId: user.branchId || "",
     });
     setError("");
     setShowModal(true);
@@ -134,6 +164,7 @@ export default function UserManagementPage() {
           email: formData.email,
           phone: formData.phone || null,
           role: formData.role,
+          branchId: formData.branchId || null,
         };
         if (formData.password) body.password = formData.password;
         const res = await fetch("/api/users", {
@@ -159,6 +190,7 @@ export default function UserManagementPage() {
             phone: formData.phone || null,
             role: formData.role,
             password: formData.password,
+            branchId: formData.branchId || null,
           }),
         });
         if (!res.ok) {
@@ -175,13 +207,13 @@ export default function UserManagementPage() {
     }
   }
 
-  async function handleDeactivate(user: User) {
-    if (!confirm(`Are you sure you want to ${user.isActive ? "deactivate" : "activate"} ${user.firstName} ${user.lastName}?`)) return;
+  async function handleToggleActive(user: User) {
+    const newActive = !user.isActive;
     try {
       const res = await fetch("/api/users", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: user.id, isActive: !user.isActive }),
+        body: JSON.stringify({ id: user.id, isActive: newActive }),
       });
       if (res.ok) fetchUsers();
     } catch (error) {
@@ -193,7 +225,7 @@ export default function UserManagementPage() {
     <DashboardLayout role="OWNER" title="User Management">
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <div className="relative flex-1 sm:w-72">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
@@ -213,6 +245,18 @@ export default function UserManagementPage() {
               {roleOptions.map((r) => (
                 <option key={r} value={r}>
                   {r.replace("_", " ")}
+                </option>
+              ))}
+            </select>
+            <select
+              value={branchFilter}
+              onChange={(e) => setBranchFilter(e.target.value)}
+              className="input select w-auto"
+            >
+              <option value="">All Branches</option>
+              {branches.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name} ({b.code})
                 </option>
               ))}
             </select>
@@ -242,6 +286,7 @@ export default function UserManagementPage() {
                   <th>Name</th>
                   <th>Email</th>
                   <th>Role</th>
+                  <th>Branch</th>
                   <th>Status</th>
                   <th>Last Login</th>
                   <th>Actions</th>
@@ -260,9 +305,24 @@ export default function UserManagementPage() {
                       </span>
                     </td>
                     <td>
-                      <span className={`badge ${user.isActive ? "badge-success" : "badge-danger"}`}>
-                        {user.isActive ? "Active" : "Inactive"}
+                      <span className="text-sm text-[#9090a0]">
+                        {user.branch ? `${user.branch.name}` : "—"}
                       </span>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => handleToggleActive(user)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                          user.isActive ? "bg-[#10b981]" : "bg-[#3a3a4a]"
+                        }`}
+                        title={user.isActive ? "Deactivate user" : "Activate user"}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            user.isActive ? "translate-x-6" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
                     </td>
                     <td className="text-[#9090a0]">
                       {user.lastLoginAt ? formatDateTime(user.lastLoginAt) : "Never"}
@@ -275,23 +335,13 @@ export default function UserManagementPage() {
                         >
                           <Edit2 size={14} />
                         </button>
-                        <button
-                          onClick={() => handleDeactivate(user)}
-                          className={`rounded-lg p-2 hover:bg-[#2a2a3a] ${
-                            user.isActive
-                              ? "text-[#9090a0] hover:text-[#f43f5e]"
-                              : "text-[#9090a0] hover:text-[#10b981]"
-                          }`}
-                        >
-                          <ShieldOff size={14} />
-                        </button>
                       </div>
                     </td>
                   </tr>
                 ))}
                 {users.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="text-center text-[#606070]">
+                    <td colSpan={7} className="text-center text-[#606070]">
                       No users found
                     </td>
                   </tr>
@@ -375,6 +425,22 @@ export default function UserManagementPage() {
                   {roleOptions.map((r) => (
                     <option key={r} value={r}>
                       {r.replace("_", " ")}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm text-[#9090a0]">Branch</label>
+                <select
+                  value={formData.branchId}
+                  onChange={(e) => setFormData({ ...formData, branchId: e.target.value })}
+                  className="input select"
+                >
+                  <option value="">No Branch</option>
+                  {branches.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.name} ({b.code})
                     </option>
                   ))}
                 </select>

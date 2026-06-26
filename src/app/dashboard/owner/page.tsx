@@ -26,6 +26,7 @@ import {
   UserPlus,
   RefreshCw,
 } from "lucide-react";
+import Pagination from "@/components/ui/Pagination";
 import {
   AreaChart,
   Area,
@@ -78,6 +79,8 @@ export default function OwnerDashboard() {
   const { t } = useTranslation();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [lowStockPage, setLowStockPage] = useState(1);
+  const LOW_STOCK_PER_PAGE = 10;
 
   useEffect(() => {
     async function fetchData() {
@@ -168,6 +171,13 @@ export default function OwnerDashboard() {
       trendUp: false,
     },
   ];
+
+  const lowStockProducts = data?.lowStockProducts ?? [];
+  const lowStockTotalPages = Math.ceil(lowStockProducts.length / LOW_STOCK_PER_PAGE);
+  const paginatedLowStock = lowStockProducts.slice(
+    (lowStockPage - 1) * LOW_STOCK_PER_PAGE,
+    lowStockPage * LOW_STOCK_PER_PAGE
+  );
 
   const quickActions = [
     { label: t("viewReports"), action: () => router.push('/dashboard/owner/reports'), icon: BarChart3, color: "text-[#3b82f6]" },
@@ -568,7 +578,7 @@ export default function OwnerDashboard() {
         </div>
 
         {/* Low Stock Alerts */}
-        {data?.lowStockProducts && data.lowStockProducts.length > 0 && (
+        {lowStockProducts.length > 0 && (
           <div className="glass-card p-6">
             <div className="mb-4 flex items-center gap-2">
               <AlertTriangle size={18} className="text-[#f43f5e]" />
@@ -576,11 +586,11 @@ export default function OwnerDashboard() {
                 {t("lowStockAlerts")}
               </h3>
               <span className="ml-2 rounded-full bg-[#f43f5e]/15 px-2 py-0.5 text-xs font-medium text-[#f43f5e]">
-                {data.lowStockProducts.length}
+                {lowStockProducts.length}
               </span>
             </div>
             <div className="space-y-3">
-              {data.lowStockProducts.map((product) => (
+              {paginatedLowStock.map((product) => (
                 <div
                   key={product.id}
                   className="flex items-center justify-between rounded-xl border border-[#f43f5e]/20 bg-[#f43f5e]/5 p-3 transition-all hover:bg-[#f43f5e]/10"
@@ -612,6 +622,7 @@ export default function OwnerDashboard() {
                 </div>
               ))}
             </div>
+            <Pagination currentPage={lowStockPage} totalPages={lowStockTotalPages} onPageChange={setLowStockPage} />
           </div>
         )}
       </div>

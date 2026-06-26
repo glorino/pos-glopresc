@@ -139,6 +139,14 @@ body {
   box-shadow: 0 0 15px rgba(212, 168, 67, 0.12);
 }
 
+.stat-card .stat-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  display: block;
+}
+
 .stat-card p {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -251,6 +259,39 @@ select option {
   background-color: #1c1c28;
   color: #f0f0f5;
   padding: 8px;
+}
+
+/* Fix Recharts tooltip on dark background */
+.recharts-tooltip-wrapper {
+  z-index: 1000 !important;
+}
+
+.recharts-default-tooltip {
+  background-color: #1c1c28 !important;
+  border: 1px solid #3a3a4a !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+}
+
+.recharts-tooltip-label {
+  color: #f0f0f5 !important;
+}
+
+.recharts-tooltip-item {
+  color: #f0f0f5 !important;
+}
+
+.recharts-cartesian-axis-tick-value {
+  fill: #606070 !important;
+}
+
+/* Fix all cards with amount overflow */
+.glass-card .text-2xl,
+.glass-card .text-3xl,
+.glass-card .text-xl {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ── Tables ─────────────────────────────────────────────── */

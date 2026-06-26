@@ -13,6 +13,9 @@ import {
   ArrowUp,
   RefreshCw,
   ScanBarcode,
+  Check,
+  X,
+  Clock,
 } from "lucide-react";
 import BarcodeScanner from "@/components/ui/BarcodeScanner";
 
@@ -25,6 +28,7 @@ interface StockAdjustment {
   quantity: number;
   reason: string;
   reference: string | null;
+  status: string;
   performedBy: string;
   createdAt: string;
 }
@@ -47,9 +51,12 @@ const adjustmentTypes = [
 export default function InventoryStockPage() {
   const { t } = useTranslation();
   const [adjustments, setAdjustments] = useState<StockAdjustment[]>([]);
+  const [pendingAdjustments, setPendingAdjustments] = useState<StockAdjustment[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [userRole, setUserRole] = useState<string>("");
+  const [processingId, setProcessingId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     productId: "",
@@ -60,9 +67,24 @@ export default function InventoryStockPage() {
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const [lowStockAlerts, setLowStockAlerts] = useState<Product[]>([]);
   const [showScanner, setShowScanner] = useState(false);
+
+  const isManager = ["OWNER", "MANAGER", "WAREHOUSE_MANAGER"].includes(userRole);
+
+  async function fetchUserRole() {
+    try {
+      const res = await fetch("/api/auth/session");
+      if (res.ok) {
+        const data = await res.json();
+        setUserRole(data?.user?.role || "");
+      }
+    } catch (error) {
+      console.error("Failed to fetch user role:", error);
+    }
+  }
 
   async function fetchAdjustments() {
     setLoading(true);
@@ -79,6 +101,19 @@ export default function InventoryStockPage() {
       console.error("Failed to fetch adjustments:", error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchPendingAdjustments() {
+    if (!isManager) return;
+    try {
+      const res = await fetch("/api/stock-adjustments?status=PENDING&limit=50");
+      if (res.ok) {
+        const data = await res.json();
+        setPendingAdjustments(data.adjustments);
+      }
+    } catch (error) {
+      console.error("Failed to fetch pending adjustments:", error);
     }
   }
 
@@ -116,14 +151,22 @@ export default function InventoryStockPage() {
   }
 
   useEffect(() => {
+    fetchUserRole();
     fetchAdjustments();
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    if (isManager) {
+      fetchPendingAdjustments();
+    }
+  }, [userRole]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setError("");
+    setSuccess("");
     try {
       const res = await fetch("/api/stock-adjustments", {
         method: "POST",
@@ -136,17 +179,46 @@ export default function InventoryStockPage() {
           reference: formData.reference || null,
         }),
       });
+      const data = await res.json();
       if (!res.ok) {
-        const data = await res.json();
         throw new Error(data.error || "Failed to create adjustment");
       }
+      setSuccess(data.message || "Adjustment created successfully");
       setFormData({ productId: "", type: "ADDITION", quantity: "", reason: "", reference: "" });
+      fetchAdjustments();
+      fetchProducts();
+      if (isManager) {
+        fetchPendingAdjustments();
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleApproval(adjustmentId: string, action: "APPROVED" | "REJECTED") {
+    setProcessingId(adjustmentId);
+    setError("");
+    setSuccess("");
+    try {
+      const res = await fetch("/api/stock-adjustments", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: adjustmentId, status: action }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || `Failed to ${action.toLowerCase()} adjustment`);
+      }
+      setSuccess(`Adjustment ${action.toLowerCase()} successfully`);
+      fetchPendingAdjustments();
       fetchAdjustments();
       fetchProducts();
     } catch (err: any) {
       setError(err.message);
     } finally {
-      setSaving(false);
+      setProcessingId(null);
     }
   }
 
@@ -166,9 +238,98 @@ export default function InventoryStockPage() {
     }
   }
 
+  function getStatusBadge(status: string) {
+    switch (status) {
+      case "PENDING":
+        return "badge-warning";
+      case "APPROVED":
+        return "badge-success";
+      case "REJECTED":
+        return "badge-danger";
+      default:
+        return "badge-info";
+    }
+  }
+
   return (
     <DashboardLayout role="WAREHOUSE_MANAGER" title={t("stock")}>
       <div className="space-y-6">
+        {error && (
+          <div className="rounded-lg border border-[#f43f5e]/20 bg-[#f43f5e]/10 p-3 text-sm text-[#f43f5e]">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="rounded-lg border border-[#10b981]/20 bg-[#10b981]/10 p-3 text-sm text-[#10b981]">
+            {success}
+          </div>
+        )}
+
+        {isManager && pendingAdjustments.length > 0 && (
+          <div className="glass-card p-6">
+            <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-[#f0f0f5]">
+              <Clock size={18} className="text-[#f59e0b]" />
+              Pending Approvals ({pendingAdjustments.length})
+            </h3>
+            <div className="table-container">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Type</th>
+                    <th>Qty</th>
+                    <th>Reason</th>
+                    <th>Requested By</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pendingAdjustments.map((adj) => (
+                    <tr key={adj.id}>
+                      <td>
+                        <div>
+                          <p className="font-medium text-[#f0f0f5]">{adj.productName}</p>
+                          <p className="text-xs text-[#606070]">{adj.productSku}</p>
+                        </div>
+                      </td>
+                      <td>
+                        <span className={`badge ${getTypeBadge(adj.type)}`}>
+                          {adj.type}
+                        </span>
+                      </td>
+                      <td className="font-medium text-[#f0f0f5]">{adj.quantity}</td>
+                      <td className="max-w-[200px] truncate text-[#9090a0]">{adj.reason}</td>
+                      <td className="text-[#9090a0]">{adj.performedBy}</td>
+                      <td className="text-[#9090a0]">{formatDateTime(adj.createdAt)}</td>
+                      <td>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => handleApproval(adj.id, "APPROVED")}
+                            disabled={processingId === adj.id}
+                            className="rounded-lg bg-[#10b981]/20 p-2 text-[#10b981] hover:bg-[#10b981]/30 disabled:opacity-50"
+                            title="Approve"
+                          >
+                            <Check size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleApproval(adj.id, "REJECTED")}
+                            disabled={processingId === adj.id}
+                            className="rounded-lg bg-[#f43f5e]/20 p-2 text-[#f43f5e] hover:bg-[#f43f5e]/30 disabled:opacity-50"
+                            title="Reject"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="glass-card p-6">
             <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-[#f0f0f5]">
@@ -176,9 +337,9 @@ export default function InventoryStockPage() {
               {t("stockAdjustment")}
             </h3>
 
-            {error && (
-              <div className="mb-4 rounded-lg border border-[#f43f5e]/20 bg-[#f43f5e]/10 p-3 text-sm text-[#f43f5e]">
-                {error}
+            {!isManager && (
+              <div className="mb-4 rounded-lg border border-[#f59e0b]/20 bg-[#f59e0b]/10 p-3 text-sm text-[#f59e0b]">
+                Stock adjustments require manager approval. Your request will be submitted as pending.
               </div>
             )}
 
@@ -266,7 +427,11 @@ export default function InventoryStockPage() {
               </div>
 
               <button type="submit" disabled={saving} className="btn btn-primary w-full">
-                {saving ? "Processing..." : "Submit Adjustment"}
+                {saving
+                  ? "Processing..."
+                  : isManager
+                  ? "Submit Adjustment"
+                  : "Submit for Approval"}
               </button>
             </form>
           </div>
@@ -348,7 +513,7 @@ export default function InventoryStockPage() {
                     <th>Type</th>
                     <th>Qty</th>
                     <th>Reason</th>
-                    <th>Reference</th>
+                    <th>Status</th>
                     <th>By</th>
                     <th>Date</th>
                   </tr>
@@ -369,7 +534,11 @@ export default function InventoryStockPage() {
                       </td>
                       <td className="font-medium text-[#f0f0f5]">{adj.quantity}</td>
                       <td className="max-w-[200px] truncate text-[#9090a0]">{adj.reason}</td>
-                      <td className="text-[#9090a0]">{adj.reference || "-"}</td>
+                      <td>
+                        <span className={`badge ${getStatusBadge(adj.status)}`}>
+                          {adj.status}
+                        </span>
+                      </td>
                       <td className="text-[#9090a0]">{adj.performedBy}</td>
                       <td className="text-[#9090a0]">{formatDateTime(adj.createdAt)}</td>
                     </tr>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { formatCurrency } from "@/lib/utils";
@@ -11,6 +12,7 @@ import {
   Package,
   AlertTriangle,
   Filter,
+  X,
 } from "lucide-react";
 
 interface Product {
@@ -31,15 +33,44 @@ interface Product {
   isOutOfStock: boolean;
 }
 
+interface Category {
+  id: string;
+  name: string;
+}
+
 export default function InventoryProductsPage() {
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [quickAdjustId, setQuickAdjustId] = useState<string | null>(null);
   const [adjustValue, setAdjustValue] = useState("");
   const [adjustType, setAdjustType] = useState<"add" | "subtract">("add");
+
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addForm, setAddForm] = useState({
+    name: "",
+    description: "",
+    price: "",
+    costPrice: "",
+    stockQuantity: "",
+    minStockLevel: "5",
+    maxStockLevel: "1000",
+    unit: "piece",
+    barcode: "",
+    categoryId: "",
+  });
+  const [addSaving, setAddSaving] = useState(false);
+  const [addError, setAddError] = useState("");
+
+  useEffect(() => {
+    if (searchParams.get("action") === "add") {
+      setShowAddModal(true);
+    }
+  }, [searchParams]);
 
   async function fetchProducts() {
     setLoading(true);
@@ -67,8 +98,21 @@ export default function InventoryProductsPage() {
     }
   }
 
+  async function fetchCategories() {
+    try {
+      const res = await fetch("/api/categories");
+      if (res.ok) {
+        const json = await res.json();
+        setCategories(json.categories ?? json ?? []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+    }
+  }
+
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, [categoryFilter]);
 
   async function handleQuickAdjust(productId: string) {
@@ -92,6 +136,52 @@ export default function InventoryProductsPage() {
       }
     } catch (error) {
       console.error("Failed to adjust stock:", error);
+    }
+  }
+
+  async function handleAddProduct(e: React.FormEvent) {
+    e.preventDefault();
+    setAddSaving(true);
+    setAddError("");
+    try {
+      const res = await fetch("/api/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: addForm.name,
+          description: addForm.description || undefined,
+          price: parseFloat(addForm.price),
+          costPrice: addForm.costPrice ? parseFloat(addForm.costPrice) : 0,
+          stockQuantity: addForm.stockQuantity ? parseInt(addForm.stockQuantity) : 0,
+          minStockLevel: parseInt(addForm.minStockLevel) || 5,
+          maxStockLevel: parseInt(addForm.maxStockLevel) || 1000,
+          unit: addForm.unit || "piece",
+          barcode: addForm.barcode || undefined,
+          categoryId: addForm.categoryId || undefined,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to create product");
+      }
+      setShowAddModal(false);
+      setAddForm({
+        name: "",
+        description: "",
+        price: "",
+        costPrice: "",
+        stockQuantity: "",
+        minStockLevel: "5",
+        maxStockLevel: "1000",
+        unit: "piece",
+        barcode: "",
+        categoryId: "",
+      });
+      fetchProducts();
+    } catch (err: any) {
+      setAddError(err.message);
+    } finally {
+      setAddSaving(false);
     }
   }
 
@@ -134,6 +224,13 @@ export default function InventoryProductsPage() {
               <Filter size={14} />
             </button>
           </div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="btn btn-primary btn-sm"
+          >
+            <Plus size={14} />
+            Add Product
+          </button>
         </div>
 
         {loading ? (
@@ -250,6 +347,177 @@ export default function InventoryProductsPage() {
           </div>
         )}
       </div>
+
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="glass-card mx-4 max-h-[90vh] w-full max-w-lg overflow-y-auto p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="flex items-center gap-2 text-lg font-semibold text-[#f0f0f5]">
+                <Plus size={18} className="text-[#d4a843]" />
+                Add New Product
+              </h3>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="rounded-lg p-1 text-[#9090a0] hover:text-[#f0f0f5]"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {addError && (
+              <div className="mb-4 rounded-lg border border-[#f43f5e]/20 bg-[#f43f5e]/10 p-3 text-sm text-[#f43f5e]">
+                {addError}
+              </div>
+            )}
+
+            <form onSubmit={handleAddProduct} className="space-y-4">
+              <div>
+                <label className="mb-1 block text-sm text-[#9090a0]">Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={addForm.name}
+                  onChange={(e) => setAddForm({ ...addForm, name: e.target.value })}
+                  className="input"
+                  placeholder="Product name"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm text-[#9090a0]">Description</label>
+                <textarea
+                  value={addForm.description}
+                  onChange={(e) => setAddForm({ ...addForm, description: e.target.value })}
+                  className="input min-h-[60px]"
+                  placeholder="Product description"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1 block text-sm text-[#9090a0]">Price *</label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    step="0.01"
+                    value={addForm.price}
+                    onChange={(e) => setAddForm({ ...addForm, price: e.target.value })}
+                    className="input"
+                    placeholder="0.00"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm text-[#9090a0]">Cost Price</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={addForm.costPrice}
+                    onChange={(e) => setAddForm({ ...addForm, costPrice: e.target.value })}
+                    className="input"
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1 block text-sm text-[#9090a0]">Initial Stock</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={addForm.stockQuantity}
+                    onChange={(e) => setAddForm({ ...addForm, stockQuantity: e.target.value })}
+                    className="input"
+                    placeholder="0"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm text-[#9090a0]">Unit</label>
+                  <select
+                    value={addForm.unit}
+                    onChange={(e) => setAddForm({ ...addForm, unit: e.target.value })}
+                    className="input select"
+                  >
+                    <option value="piece">Piece</option>
+                    <option value="kg">Kilogram</option>
+                    <option value="g">Gram</option>
+                    <option value="l">Litre</option>
+                    <option value="ml">Millilitre</option>
+                    <option value="box">Box</option>
+                    <option value="pack">Pack</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1 block text-sm text-[#9090a0]">Min Stock Level</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={addForm.minStockLevel}
+                    onChange={(e) => setAddForm({ ...addForm, minStockLevel: e.target.value })}
+                    className="input"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm text-[#9090a0]">Max Stock Level</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={addForm.maxStockLevel}
+                    onChange={(e) => setAddForm({ ...addForm, maxStockLevel: e.target.value })}
+                    className="input"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1 block text-sm text-[#9090a0]">Barcode</label>
+                  <input
+                    type="text"
+                    value={addForm.barcode}
+                    onChange={(e) => setAddForm({ ...addForm, barcode: e.target.value })}
+                    className="input"
+                    placeholder="Optional"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm text-[#9090a0]">Category</label>
+                  <select
+                    value={addForm.categoryId}
+                    onChange={(e) => setAddForm({ ...addForm, categoryId: e.target.value })}
+                    className="input select"
+                  >
+                    <option value="">No Category</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="btn btn-secondary flex-1"
+                >
+                  Cancel
+                </button>
+                <button type="submit" disabled={addSaving} className="btn btn-primary flex-1">
+                  {addSaving ? "Creating..." : "Create Product"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

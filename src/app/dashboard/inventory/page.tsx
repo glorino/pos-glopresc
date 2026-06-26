@@ -21,6 +21,7 @@ import {
   TrendingUp,
   TrendingDown,
 } from "lucide-react";
+import Pagination from "@/components/ui/Pagination";
 
 interface Product {
   id: string;
@@ -58,11 +59,19 @@ export default function InventoryDashboard() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, categoryFilter]);
 
   useEffect(() => {
     fetchProducts();
+  }, [search, categoryFilter, page]);
+
+  useEffect(() => {
     fetchCategories();
-  }, [search, categoryFilter]);
+  }, []);
 
   async function fetchProducts() {
     setLoading(true);
@@ -70,6 +79,8 @@ export default function InventoryDashboard() {
       const params = new URLSearchParams();
       if (search) params.set("search", search);
       if (categoryFilter) params.set("categoryId", categoryFilter);
+      params.set("page", String(page));
+      params.set("limit", "10");
       const res = await fetch(`/api/products?${params.toString()}`);
       if (res.ok) {
         const json = await res.json();
@@ -145,7 +156,7 @@ export default function InventoryDashboard() {
   ];
 
   const quickActions = [
-    { label: t("addProduct"), href: "/dashboard/inventory/products", icon: Plus },
+    { label: t("addProduct"), href: "/dashboard/inventory/products?action=add", icon: Plus },
     { label: t("stockAdjustment"), href: "/dashboard/inventory/stock", icon: ArrowUpDown },
     { label: t("categories"), href: "/dashboard/inventory/categories", icon: Eye },
     { label: t("reports"), href: "/dashboard/owner/reports", icon: BarChart3 },
@@ -316,6 +327,7 @@ export default function InventoryDashboard() {
                   )}
                 </tbody>
               </table>
+              <Pagination currentPage={data?.page ?? 1} totalPages={data?.totalPages ?? 1} onPageChange={setPage} />
             </div>
           )}
         </div>

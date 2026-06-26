@@ -81,6 +81,7 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
         { icon: ShoppingCart, label: "sales", href: "/dashboard/sales-manager/sales" },
         { icon: Package, label: "inventory", href: "/dashboard/inventory" },
         { icon: Truck, label: "procurement", href: "/dashboard/procurement" },
+        { icon: Users, label: "branchStaff", href: "/dashboard/manager/branch-staff" },
       ],
     },
     {
@@ -131,8 +132,9 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
     {
       title: "procurement",
       items: [
-        { icon: Truck, label: "suppliers", href: "/dashboard/procurement" },
-        { icon: ClipboardList, label: "purchaseOrders", href: "/dashboard/procurement" },
+        { icon: Truck, label: "suppliers", href: "/dashboard/procurement/suppliers" },
+        { icon: ClipboardList, label: "purchaseOrders", href: "/dashboard/procurement/purchase-orders" },
+        { icon: FileText, label: "stockRequests", href: "/dashboard/procurement/stock-requests" },
       ],
     },
     {
@@ -152,8 +154,8 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
     {
       title: "procurement",
       items: [
-        { icon: Truck, label: "suppliers", href: "/dashboard/procurement" },
-        { icon: ClipboardList, label: "stockRequests", href: "/dashboard/procurement" },
+        { icon: Truck, label: "suppliers", href: "/dashboard/procurement/suppliers" },
+        { icon: FileText, label: "stockRequests", href: "/dashboard/procurement/stock-requests" },
       ],
     },
   ],

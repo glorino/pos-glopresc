@@ -36,6 +36,7 @@ interface SalesData {
   averageSaleValue: number;
   topCashier: string;
   returnRate: number;
+  totalPayments: number;
   salesTrend: { name: string; revenue: number; transactions: number }[];
   categorySales: { name: string; value: number; color: string }[];
   topProducts: {
@@ -60,32 +61,29 @@ export default function SalesManagerDashboard() {
   const { t } = useTranslation();
   const [data, setData] = useState<SalesData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch("/api/dashboard/manager");
+        const params = new URLSearchParams();
+        if (dateFrom) params.set("dateFrom", dateFrom);
+        if (dateTo) params.set("dateTo", dateTo);
+        const res = await fetch(`/api/dashboard/sales-manager?${params.toString()}`);
         if (res.ok) {
           const json = await res.json();
           setData({
             todayRevenue: json.todayRevenue ?? 0,
-            todayTransactions: json.todaySales ?? 0,
-            averageSaleValue:
-              json.todaySales > 0
-                ? Math.round((json.todayRevenue ?? 0) / json.todaySales)
-                : 0,
-            topCashier: json.staffPerformance?.[0]?.name ?? "N/A",
-            returnRate: 2.3,
-            salesTrend: json.weeklyComparison ?? [],
-            categorySales: [
-              { name: "Electronics", value: 45000, color: "#d4a843" },
-              { name: "Groceries", value: 32000, color: "#3b82f6" },
-              { name: "Clothing", value: 28000, color: "#8b5cf6" },
-              { name: "Home & Garden", value: 15000, color: "#10b981" },
-              { name: "Others", value: 8000, color: "#f43f5e" },
-            ],
-            topProducts: [],
-            recentTransactions: [],
+            todayTransactions: json.todayTransactions ?? 0,
+            averageSaleValue: json.averageSaleValue ?? 0,
+            topCashier: json.topCashier ?? "N/A",
+            returnRate: json.returnRate ?? 0,
+            totalPayments: json.totalPayments ?? 0,
+            salesTrend: json.salesTrend ?? [],
+            categorySales: json.categorySales ?? [],
+            topProducts: json.topProducts ?? [],
+            recentTransactions: json.recentTransactions ?? [],
           });
         }
       } catch (error) {
@@ -95,7 +93,7 @@ export default function SalesManagerDashboard() {
       }
     }
     fetchData();
-  }, []);
+  }, [dateFrom, dateTo]);
 
   if (loading) {
     return (
@@ -166,6 +164,42 @@ export default function SalesManagerDashboard() {
   return (
     <DashboardLayout role="SALES_MANAGER" title="Sales Manager Dashboard">
       <div className="space-y-6">
+        {/* Date Range Filter & Total Payments */}
+        <div className="glass-card p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="input w-40"
+              />
+              <span className="text-sm text-[#606070]">to</span>
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="input w-40"
+              />
+              {(dateFrom || dateTo) && (
+                <button
+                  onClick={() => { setDateFrom(""); setDateTo(""); }}
+                  className="btn btn-secondary btn-sm"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <div className="flex items-center gap-2 rounded-xl border border-[#10b981]/30 bg-[#10b981]/10 px-4 py-2">
+              <DollarSign size={18} className="text-[#10b981]" />
+              <span className="text-sm font-medium text-[#9090a0]">Total Payments:</span>
+              <span className="text-lg font-bold text-[#10b981]">
+                {formatCurrency(data?.totalPayments ?? 0)}
+              </span>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {stats.map((stat) => {
             const Icon = stat.icon;

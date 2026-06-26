@@ -17,6 +17,8 @@ import {
   Package,
   ShoppingCart,
   Star,
+  UserPlus,
+  Check,
 } from "lucide-react";
 
 interface Branch {
@@ -65,6 +67,12 @@ export default function BranchesPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [showStaffModal, setShowStaffModal] = useState(false);
+  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [branchUsers, setBranchUsers] = useState<any[]>([]);
+  const [userSearch, setUserSearch] = useState("");
+  const [assigning, setAssigning] = useState<string | null>(null);
 
   async function fetchBranches() {
     setLoading(true);
@@ -180,6 +188,89 @@ export default function BranchesPage() {
       console.error("Failed to delete branch:", error);
     } finally {
       setDeleting(null);
+    }
+  }
+
+  async function openStaffModal(branch: Branch) {
+    setSelectedBranch(branch);
+    setShowStaffModal(true);
+    setUserSearch("");
+    try {
+      const [usersRes, branchRes] = await Promise.all([
+        fetch("/api/users?limit=100"),
+        fetch(`/api/branches/${branch.id}`),
+      ]);
+      if (usersRes.ok) {
+        const data = await usersRes.json();
+        setAllUsers(
+          (data.users || []).map((u: any) => ({
+            ...u,
+            name: [u.firstName, u.lastName].filter(Boolean).join(" ") || u.email,
+          }))
+        );
+      }
+      if (branchRes.ok) {
+        const data = await branchRes.json();
+        setBranchUsers(
+          (data.users || []).map((u: any) => ({
+            ...u,
+            name: [u.firstName, u.lastName].filter(Boolean).join(" ") || u.email,
+          }))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to load users:", error);
+    }
+  }
+
+  async function assignUserToBranch(userId: string, branchId: string) {
+    setAssigning(userId);
+    try {
+      const res = await fetch("/api/users", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: userId, branchId }),
+      });
+      if (res.ok) {
+        const user = allUsers.find((u) => u.id === userId);
+        if (user) {
+          setBranchUsers((prev) => [...prev, user]);
+          setAllUsers((prev) =>
+            prev.map((u) =>
+              u.id === userId ? { ...u, branchId } : u
+            )
+          );
+        }
+        fetchBranches();
+      }
+    } catch (error) {
+      console.error("Failed to assign user:", error);
+    } finally {
+      setAssigning(null);
+    }
+  }
+
+  async function removeUserFromBranch(userId: string) {
+    setAssigning(userId);
+    try {
+      const res = await fetch("/api/users", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: userId, branchId: null }),
+      });
+      if (res.ok) {
+        setBranchUsers((prev) => prev.filter((u) => u.id !== userId));
+        setAllUsers((prev) =>
+          prev.map((u) =>
+            u.id === userId ? { ...u, branchId: null } : u
+          )
+        );
+        fetchBranches();
+      }
+    } catch (error) {
+      console.error("Failed to remove user:", error);
+    } finally {
+      setAssigning(null);
     }
   }
 
@@ -379,6 +470,13 @@ export default function BranchesPage() {
                     <td>
                       <div className="flex items-center gap-2">
                         <button
+                          onClick={() => openStaffModal(branch)}
+                          className="rounded-lg p-2 text-[#9090a0] hover:bg-[#2a2a3a] hover:text-[#10b981]"
+                          title="Manage Staff"
+                        >
+                          <UserPlus size={14} />
+                        </button>
+                        <button
                           onClick={() => openEditModal(branch)}
                           className="rounded-lg p-2 text-[#9090a0] hover:bg-[#2a2a3a] hover:text-[#3b82f6]"
                         >
@@ -541,6 +639,144 @@ export default function BranchesPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Staff Assignment Modal */}
+      {showStaffModal && selectedBranch && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="glass-card w-full max-w-2xl p-6 max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-[#f0f0f5]">
+                  Manage Staff — {selectedBranch.name}
+                </h2>
+                <p className="mt-1 text-sm text-[#9090a0]">
+                  Assign users to this branch or remove them
+                </p>
+              </div>
+              <button
+                onClick={() => setShowStaffModal(false)}
+                className="text-[#606070] hover:text-[#f0f0f5]"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Assigned Staff */}
+            <div className="mb-4">
+              <h3 className="mb-2 text-sm font-medium text-[#9090a0]">
+                Assigned Staff ({branchUsers.length})
+              </h3>
+              <div className="max-h-40 space-y-1 overflow-y-auto rounded-lg border border-[#2a2a3a] bg-[#12121a] p-2">
+                {branchUsers.length === 0 ? (
+                  <p className="p-2 text-sm text-[#606070]">
+                    No users assigned yet
+                  </p>
+                ) : (
+                  branchUsers.map((user) => (
+                    <div
+                      key={user.id}
+                      className="flex items-center justify-between rounded-lg p-2 hover:bg-[#1e1e2a]"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#d4a843] to-[#b8860b] text-xs font-bold text-white">
+                          {user.name?.charAt(0) || "?"}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-[#f0f0f5]">
+                            {user.name}
+                          </p>
+                          <p className="text-xs text-[#606070]">{user.email}</p>
+                        </div>
+                        <span className="badge badge-info text-[10px]">
+                          {user.role}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => removeUserFromBranch(user.id)}
+                        disabled={assigning === user.id}
+                        className="rounded-lg p-1.5 text-[#9090a0] hover:bg-[#2a2a3a] hover:text-[#f43f5e] disabled:opacity-50"
+                        title="Remove from branch"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Assign New Users */}
+            <div>
+              <h3 className="mb-2 text-sm font-medium text-[#9090a0]">
+                Assign Users
+              </h3>
+              <div className="relative mb-2">
+                <Search
+                  size={14}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]"
+                />
+                <input
+                  type="text"
+                  placeholder="Search users by name or email..."
+                  value={userSearch}
+                  onChange={(e) => setUserSearch(e.target.value)}
+                  className="input pl-9 text-sm"
+                />
+              </div>
+              <div className="max-h-40 space-y-1 overflow-y-auto rounded-lg border border-[#2a2a3a] bg-[#12121a] p-2">
+                {allUsers
+                  .filter(
+                    (u) =>
+                      !branchUsers.find((bu) => bu.id === u.id) &&
+                      (userSearch === "" ||
+                        u.name
+                          ?.toLowerCase()
+                          .includes(userSearch.toLowerCase()) ||
+                        u.email
+                          ?.toLowerCase()
+                          .includes(userSearch.toLowerCase()))
+                  )
+                  .map((user) => (
+                    <div
+                      key={user.id}
+                      className="flex items-center justify-between rounded-lg p-2 hover:bg-[#1e1e2a]"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#3b82f6] to-[#2563eb] text-xs font-bold text-white">
+                          {user.name?.charAt(0) || "?"}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-[#f0f0f5]">
+                            {user.name}
+                          </p>
+                          <p className="text-xs text-[#606070]">{user.email}</p>
+                        </div>
+                        <span className="badge badge-info text-[10px]">
+                          {user.role}
+                        </span>
+                        {user.branchId && user.branchId !== selectedBranch.id && (
+                          <span className="text-[10px] text-[#f59e0b]">
+                            (in another branch)
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() =>
+                          assignUserToBranch(user.id, selectedBranch.id)
+                        }
+                        disabled={assigning === user.id}
+                        className="rounded-lg p-1.5 text-[#9090a0] hover:bg-[#2a2a3a] hover:text-[#10b981] disabled:opacity-50"
+                        title="Assign to branch"
+                      >
+                        <Check size={14} />
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            </div>
           </div>
         </div>
       )}

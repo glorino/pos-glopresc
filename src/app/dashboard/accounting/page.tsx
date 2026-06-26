@@ -38,6 +38,7 @@ interface AccountingSummary {
   pendingInvoices: number;
   pendingExpenses: number;
   overdueInvoices: number;
+  totalPayments: number;
   monthlyCashFlow: { name: string; income: number; expenses: number }[];
   expenseByCategory: { name: string; value: number }[];
   recentTransactions: {
@@ -63,15 +64,20 @@ const PIE_COLORS = ["#d4a843", "#3b82f6", "#8b5cf6", "#10b981", "#f43f5e", "#06b
 export default function AccountingDashboard() {
   const [data, setData] = useState<AccountingSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [dateFrom, dateTo]);
 
   async function fetchData() {
     setLoading(true);
     try {
-      const res = await fetch("/api/accounting/summary");
+      const params = new URLSearchParams();
+      if (dateFrom) params.set("dateFrom", dateFrom);
+      if (dateTo) params.set("dateTo", dateTo);
+      const res = await fetch(`/api/accounting/summary?${params.toString()}`);
       if (res.ok) {
         const json = await res.json();
         setData(json);
@@ -150,6 +156,42 @@ export default function AccountingDashboard() {
   return (
     <DashboardLayout role="ACCOUNTANT" title="Accounting & Finance">
       <div className="space-y-6">
+        {/* Date Range Filter & Total Payments */}
+        <div className="glass-card p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="input w-40"
+              />
+              <span className="text-sm text-[#606070]">to</span>
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="input w-40"
+              />
+              {(dateFrom || dateTo) && (
+                <button
+                  onClick={() => { setDateFrom(""); setDateTo(""); }}
+                  className="btn btn-secondary btn-sm"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <div className="flex items-center gap-2 rounded-xl border border-[#10b981]/30 bg-[#10b981]/10 px-4 py-2">
+              <DollarSign size={18} className="text-[#10b981]" />
+              <span className="text-sm font-medium text-[#9090a0]">Total Payments:</span>
+              <span className="text-lg font-bold text-[#10b981]">
+                {formatCurrency(data?.totalPayments ?? 0)}
+              </span>
+            </div>
+          </div>
+        </div>
+
         {/* Stats */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {stats.map((stat) => {

@@ -18,6 +18,7 @@ import {
   Calendar,
   Package,
 } from "lucide-react";
+import Pagination from "@/components/ui/Pagination";
 
 interface Supplier {
   id: string;
@@ -27,7 +28,10 @@ interface Supplier {
   phone: string | null;
   city: string | null;
   isActive: boolean;
-  _count?: { purchaseOrders: number };
+  _count?: { purchaseOrders: number; products: number };
+  avgItemCost?: number;
+  totalItemsSupplied?: number;
+  lastOrderDate?: string | null;
 }
 
 interface PurchaseOrder {
@@ -72,20 +76,34 @@ export default function ProcurementDashboard() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [supplierPage, setSupplierPage] = useState(1);
+  const [orderPage, setOrderPage] = useState(1);
+
+  useEffect(() => {
+    setSupplierPage(1);
+    setOrderPage(1);
+  }, [search, statusFilter]);
 
   useEffect(() => {
     fetchData();
-  }, [search, statusFilter]);
+  }, [search, statusFilter, supplierPage, orderPage]);
 
   async function fetchData() {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (search) params.set("search", search);
+      const supplierParams = new URLSearchParams();
+      if (search) supplierParams.set("search", search);
+      supplierParams.set("page", String(supplierPage));
+      supplierParams.set("limit", "10");
+
+      const orderParams = new URLSearchParams();
+      if (statusFilter) orderParams.set("status", statusFilter);
+      orderParams.set("page", String(orderPage));
+      orderParams.set("limit", "10");
 
       const [suppliersRes, ordersRes, requestsRes] = await Promise.all([
-        fetch(`/api/suppliers?${params.toString()}`),
-        fetch(`/api/purchase-orders?${statusFilter ? `status=${statusFilter}` : ""}`),
+        fetch(`/api/suppliers?${supplierParams.toString()}`),
+        fetch(`/api/purchase-orders?${orderParams.toString()}`),
         fetch("/api/supply-requests").catch(() => null),
       ]);
 
@@ -161,10 +179,10 @@ export default function ProcurementDashboard() {
   ];
 
   const quickActions = [
-    { label: "Add Supplier", href: "/dashboard/procurement", icon: Plus },
-    { label: "Create Order", href: "/dashboard/procurement", icon: ShoppingCart },
-    { label: "View Suppliers", href: "/dashboard/procurement", icon: Eye },
-    { label: "Stock Requests", href: "/dashboard/procurement", icon: FileText },
+    { label: "Add Supplier", href: "/dashboard/procurement/suppliers", icon: Plus },
+    { label: "Create Order", href: "/dashboard/procurement/purchase-orders/new", icon: ShoppingCart },
+    { label: "View Suppliers", href: "/dashboard/procurement/suppliers", icon: Eye },
+    { label: "Stock Requests", href: "/dashboard/procurement/stock-requests", icon: FileText },
   ];
 
   function getOrderStatusBadge(status: string) {
@@ -293,18 +311,20 @@ export default function ProcurementDashboard() {
                     <tr>
                       <th>Name</th>
                       <th>Contact</th>
-                      <th>Phone</th>
-                      <th>City</th>
+                      <th>Avg Cost</th>
+                      <th>Items</th>
                       <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {suppliers.slice(0, 8).map((supplier) => (
+                    {suppliers.map((supplier) => (
                       <tr key={supplier.id}>
                         <td className="font-medium text-[#f0f0f5]">{supplier.name}</td>
-                        <td className="text-[#9090a0]">{supplier.contactName ?? "—"}</td>
-                        <td className="text-[#9090a0]">{supplier.phone ?? "—"}</td>
-                        <td className="text-[#9090a0]">{supplier.city ?? "—"}</td>
+                        <td className="text-[#9090a0]">{supplier.contactName ?? supplier.phone ?? "—"}</td>
+                        <td className="font-medium text-[#d4a843]">
+                          {supplier.avgItemCost ? formatCurrency(supplier.avgItemCost) : "—"}
+                        </td>
+                        <td className="text-[#9090a0]">{supplier.totalItemsSupplied ?? supplier._count?.products ?? 0}</td>
                         <td>
                           <span className={`badge ${supplier.isActive ? "badge-success" : "badge-danger"}`}>
                             {supplier.isActive ? "Active" : "Inactive"}
@@ -322,6 +342,7 @@ export default function ProcurementDashboard() {
                   </tbody>
                 </table>
               </div>
+              <Pagination currentPage={suppliersData?.page ?? 1} totalPages={suppliersData?.totalPages ?? 1} onPageChange={setSupplierPage} />
             </div>
 
             {/* Purchase Orders Table */}
@@ -344,7 +365,7 @@ export default function ProcurementDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {orders.slice(0, 8).map((order) => (
+                    {orders.map((order) => (
                       <tr key={order.id}>
                         <td className="font-mono text-xs font-medium text-[#f0f0f5]">
                           {order.orderNumber}
@@ -373,6 +394,7 @@ export default function ProcurementDashboard() {
                   </tbody>
                 </table>
               </div>
+              <Pagination currentPage={ordersData?.page ?? 1} totalPages={ordersData?.totalPages ?? 1} onPageChange={setOrderPage} />
             </div>
           </div>
         )}

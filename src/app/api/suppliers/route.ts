@@ -35,13 +35,55 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: "desc" },
         include: {
           _count: { select: { purchaseOrders: true, products: true } },
+          products: {
+            select: { costPrice: true },
+            where: { isActive: true },
+          },
+          purchaseOrders: {
+            select: { createdAt: true, total: true },
+            orderBy: { createdAt: "desc" },
+            take: 1,
+          },
         },
       }),
       db.supplier.count({ where }),
     ]);
 
+    const enrichedSuppliers = suppliers.map((supplier) => {
+      const products = supplier.products;
+      const avgCost = products.length > 0
+        ? products.reduce((sum, p) => sum + Number(p.costPrice), 0) / products.length
+        : 0;
+      const lastOrderDate = supplier.purchaseOrders.length > 0
+        ? supplier.purchaseOrders[0].createdAt
+        : null;
+      const totalOrderValue = supplier.purchaseOrders.length > 0
+        ? Number(supplier.purchaseOrders[0].total)
+        : 0;
+
+      return {
+        id: supplier.id,
+        name: supplier.name,
+        contactName: supplier.contactName,
+        email: supplier.email,
+        phone: supplier.phone,
+        address: supplier.address,
+        city: supplier.city,
+        state: supplier.state,
+        country: supplier.country,
+        isActive: supplier.isActive,
+        createdAt: supplier.createdAt,
+        updatedAt: supplier.updatedAt,
+        _count: supplier._count,
+        avgItemCost: Math.round(avgCost * 100) / 100,
+        totalItemsSupplied: products.length,
+        lastOrderDate: lastOrderDate ? lastOrderDate.toISOString() : null,
+        lastOrderTotal: totalOrderValue,
+      };
+    });
+
     return NextResponse.json({
-      suppliers,
+      suppliers: enrichedSuppliers,
       total,
       page,
       totalPages: Math.ceil(total / limit),

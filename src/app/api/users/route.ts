@@ -9,10 +9,12 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") ?? "20");
     const search = searchParams.get("search");
     const role = searchParams.get("role");
+    const branchId = searchParams.get("branchId");
 
     const where: Record<string, any> = {};
 
     if (role) where.role = role;
+    if (branchId) where.branchId = branchId;
     if (search) {
       where.OR = [
         { firstName: { contains: search, mode: "insensitive" } },
@@ -36,10 +38,12 @@ export async function GET(request: NextRequest) {
           lastName: true,
           phone: true,
           role: true,
+          branchId: true,
           isActive: true,
           lastLoginAt: true,
           createdAt: true,
           updatedAt: true,
+          branch: { select: { id: true, name: true, code: true } },
         },
       }),
       db.user.count({ where }),
@@ -63,7 +67,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password, firstName, lastName, phone, role } = body;
+    const { email, password, firstName, lastName, phone, role, branchId } = body;
 
     if (!email || !password || !firstName || !lastName || !role) {
       return NextResponse.json(
@@ -90,6 +94,7 @@ export async function POST(request: NextRequest) {
         lastName,
         phone: phone || null,
         role,
+        branchId: branchId || null,
       },
       select: {
         id: true,

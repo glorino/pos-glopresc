@@ -172,6 +172,7 @@ export const en = {
   stockAdjustments: "Stock Adjustments",
   stockRequests: "Stock Requests",
   branches: "Branches",
+  branchStaff: "Branch Staff",
   profile: "Profile",
   logout: "Logout",
 
@@ -889,6 +890,7 @@ export const fr: Record<TranslationKey, string> = {
   stockAdjustments: "Ajustements de stock",
   stockRequests: "Demandes de stock",
   branches: "Succursales",
+  branchStaff: "Personnel de la succursale",
   profile: "Profil",
   logout: "Déconnexion",
 
