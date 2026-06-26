@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useTranslation } from "@/contexts/LanguageContext";
@@ -38,7 +38,19 @@ interface Category {
   name: string;
 }
 
-export default function InventoryProductsPage() {
+export default function InventoryProductsPageWrapper() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-[60vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4a843] border-t-transparent" />
+      </div>
+    }>
+      <InventoryProductsPage />
+    </Suspense>
+  );
+}
+
+function InventoryProductsPage() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
