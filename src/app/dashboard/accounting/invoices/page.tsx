@@ -19,6 +19,7 @@ interface Invoice {
   id: string;
   invoiceNumber: string;
   customer: string;
+  customerPhone: string | null;
   amount: number;
   tax: number;
   total: number;
@@ -198,8 +199,27 @@ export default function InvoicesPage() {
     }
   }
 
-  function sendReminder(invoice: Invoice) {
-    alert(`Reminder sent for invoice ${invoice.invoiceNumber}`);
+  async function sendReminder(invoice: Invoice) {
+    if (!invoice.customerPhone) {
+      setError(`No phone number on file for invoice ${invoice.invoiceNumber}`);
+      return;
+    }
+    try {
+      const message = `Reminder: Invoice ${invoice.invoiceNumber} for ₦${invoice.total.toLocaleString()} is pending payment.`;
+      const res = await fetch("/api/sms/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phoneNumber: invoice.customerPhone, message }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert(`Reminder sent to ${invoice.customer}`);
+      } else {
+        setError(data.error || "Failed to send reminder SMS");
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to send reminder SMS");
+    }
   }
 
   function getStatusBadge(status: string) {

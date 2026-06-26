@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { formatCurrency } from "@/lib/utils";
@@ -53,6 +54,7 @@ export default function InventoryProductsPageWrapper() {
 function InventoryProductsPage() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
+  const { data: session } = useSession();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,6 +79,9 @@ function InventoryProductsPage() {
   });
   const [addSaving, setAddSaving] = useState(false);
   const [addError, setAddError] = useState("");
+
+  const userRole = (session?.user as any)?.role as string | undefined;
+  const isReadOnly = userRole === "WAREHOUSE_REP";
 
   useEffect(() => {
     if (searchParams.get("action") === "add") {
@@ -202,8 +207,13 @@ function InventoryProductsPage() {
   const outOfStockCount = products.filter((p) => p.isOutOfStock).length;
 
   return (
-    <DashboardLayout role="WAREHOUSE_MANAGER" title={t("products")}>
+    <DashboardLayout role={(userRole as any) || "WAREHOUSE_MANAGER"} title={t("products")}>
       <div className="space-y-6">
+        {isReadOnly && (
+          <div className="rounded-lg border border-[#d4a843]/30 bg-[#d4a843]/10 p-4 text-sm text-[#d4a843]">
+            View-only access. Contact your manager for product changes.
+          </div>
+        )}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="stat-card">
             <p className="text-sm text-[#9090a0]">{t("stockValue")}</p>
@@ -236,13 +246,15 @@ function InventoryProductsPage() {
               <Filter size={14} />
             </button>
           </div>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="btn btn-primary btn-sm"
-          >
-            <Plus size={14} />
-            Add Product
-          </button>
+          {!isReadOnly && (
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="btn btn-primary btn-sm"
+            >
+              <Plus size={14} />
+              Add Product
+            </button>
+          )}
         </div>
 
         {loading ? (
@@ -261,7 +273,7 @@ function InventoryProductsPage() {
                   <th>Min</th>
                   <th>Status</th>
                   <th>Value</th>
-                  <th>Quick Adjust</th>
+                  {!isReadOnly && <th>Quick Adjust</th>}
                 </tr>
               </thead>
               <tbody>
@@ -301,7 +313,8 @@ function InventoryProductsPage() {
                       </div>
                     </td>
                     <td className="text-[#9090a0]">{formatCurrency(product.stockValue)}</td>
-                    <td>
+                    {!isReadOnly && (
+                      <td>
                       {quickAdjustId === product.id ? (
                         <div className="flex items-center gap-1">
                           <select
@@ -345,11 +358,12 @@ function InventoryProductsPage() {
                         </button>
                       )}
                     </td>
+                    )}
                   </tr>
                 ))}
                 {products.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="text-center text-[#606070]">
+                    <td colSpan={isReadOnly ? 7 : 8} className="text-center text-[#606070]">
                       No products found
                     </td>
                   </tr>

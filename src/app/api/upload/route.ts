@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { randomUUID } from "crypto";
+import { requireAuth } from "@/lib/api-auth";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function POST(request: NextRequest) {
+  const { error } = await requireAuth();
+  if (error) return error;
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;

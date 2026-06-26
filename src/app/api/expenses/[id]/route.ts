@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAuth } from "@/lib/api-auth";
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const { error } = await requireAuth(["OWNER", "MANAGER", "ACCOUNTANT"]);
+  if (error) return error;
   try {
     const { id } = params;
     const body = await request.json();
@@ -42,6 +45,8 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const { error } = await requireAuth(["OWNER", "MANAGER"]);
+  if (error) return error;
   try {
     const { id } = params;
 

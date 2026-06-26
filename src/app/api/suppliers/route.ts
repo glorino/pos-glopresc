@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAuth } from "@/lib/api-auth";
 
 export async function GET(request: NextRequest) {
+  const { error } = await requireAuth();
+  if (error) return error;
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") ?? "1");
@@ -98,6 +101,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const { error } = await requireAuth(["OWNER", "MANAGER", "PROCUREMENT_MANAGER"]);
+  if (error) return error;
   try {
     const body = await request.json();
     const { name, contactName, email, phone, address, city, state, country } = body;
@@ -133,6 +138,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  const { error } = await requireAuth(["OWNER", "MANAGER", "PROCUREMENT_MANAGER"]);
+  if (error) return error;
   try {
     const body = await request.json();
     const { id, ...data } = body;

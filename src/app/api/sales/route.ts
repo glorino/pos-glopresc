@@ -3,8 +3,11 @@ import { db } from "@/lib/db";
 import { generateInvoiceNumber } from "@/lib/utils";
 import { sendSMS } from "@/lib/sms";
 import { getToken } from "next-auth/jwt";
+import { requireAuth } from "@/lib/api-auth";
 
 export async function GET(request: NextRequest) {
+  const { error } = await requireAuth(["OWNER", "MANAGER", "SALES_MANAGER", "ACCOUNTANT"]);
+  if (error) return error;
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") ?? "1");
@@ -80,6 +83,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const { error } = await requireAuth();
+  if (error) return error;
   try {
     const body = await request.json();
     const { userId, customerId, items, paymentMethod, amountPaid, notes, discount = 0, tax = 0 } = body;

@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { hash } from "bcryptjs";
+import { requireAuth } from "@/lib/api-auth";
 
 export async function GET(request: NextRequest) {
+  const { error, session } = await requireAuth(["OWNER", "MANAGER"]);
+  if (error) return error;
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") ?? "1");
@@ -65,6 +68,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const { error } = await requireAuth(["OWNER"]);
+  if (error) return error;
   try {
     const body = await request.json();
     const { email, password, firstName, lastName, phone, role, branchId } = body;
@@ -119,6 +124,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  const { error } = await requireAuth(["OWNER", "MANAGER"]);
+  if (error) return error;
   try {
     const body = await request.json();
     const { id, password, ...data } = body;

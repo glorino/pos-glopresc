@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getBranchFilterFromSession } from "@/lib/branch-filter";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { Prisma } from "@prisma/client";
+import { requireAuth } from "@/lib/api-auth";
 
 export async function GET(request: NextRequest) {
+  const { error, session } = await requireAuth(["OWNER", "MANAGER", "AUDITOR"]);
+  if (error) return error;
   try {
-    const session = await getServerSession(authOptions);
     const branchFilter = session?.user
       ? getBranchFilterFromSession(session)
       : ({ branchId: "__NONE__" } as any);

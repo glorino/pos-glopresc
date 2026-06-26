@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getBranchFilter } from "@/lib/branch-filter";
+import { requireAuth } from "@/lib/api-auth";
 
 export async function GET(request: NextRequest) {
+  const { error } = await requireAuth(["OWNER", "MANAGER", "ACCOUNTANT"]);
+  if (error) return error;
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") ?? "1");
@@ -42,7 +45,7 @@ export async function GET(request: NextRequest) {
         take: limit,
         orderBy: { createdAt: "desc" },
         include: {
-          customer: { select: { firstName: true, lastName: true, email: true } },
+          customer: { select: { firstName: true, lastName: true, email: true, phone: true } },
         },
       }),
       db.invoice.count({ where }),
@@ -56,6 +59,7 @@ export async function GET(request: NextRequest) {
           ? `${inv.customer.firstName} ${inv.customer.lastName}`
           : "Walk-in",
         customerEmail: inv.customer?.email || null,
+        customerPhone: inv.customer?.phone || null,
         amount: Number(inv.amount),
         tax: Number(inv.tax),
         total: Number(inv.total),
@@ -78,6 +82,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const { error } = await requireAuth(["OWNER", "MANAGER", "ACCOUNTANT"]);
+  if (error) return error;
   try {
     const body = await request.json();
     const {
@@ -142,6 +148,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  const { error } = await requireAuth(["OWNER", "MANAGER", "ACCOUNTANT"]);
+  if (error) return error;
   try {
     const body = await request.json();
     const { id, ...data } = body;

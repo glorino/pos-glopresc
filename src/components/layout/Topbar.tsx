@@ -121,6 +121,21 @@ export default function Topbar({ title, user, onMenuToggle }: TopbarProps) {
     }
   }
 
+  const roleSettingsMap: Record<string, string> = {
+    OWNER: "/dashboard/owner/settings",
+    MANAGER: "/dashboard/owner/settings",
+    WAREHOUSE_MANAGER: "/dashboard/inventory",
+    WAREHOUSE_REP: "/dashboard/inventory",
+    PROCUREMENT_MANAGER: "/dashboard/procurement",
+    PROCUREMENT_REP: "/dashboard/procurement",
+    SALES_MANAGER: "/dashboard/sales-manager",
+    SALES_REP: "/dashboard/cashier",
+    ACCOUNTANT: "/dashboard/accounting",
+    AUDITOR: "/dashboard/auditor",
+    CUSTOMER: "/dashboard/customer",
+  };
+  const settingsRoute = roleSettingsMap[user.role] || "/dashboard/owner/settings";
+
   const initials = user.name
     .split(" ")
     .map((n) => n[0])
@@ -281,7 +296,7 @@ export default function Topbar({ title, user, onMenuToggle }: TopbarProps) {
               <button
                 onClick={() => {
                   setDropdownOpen(false);
-                  router.push("/dashboard/owner/settings");
+                  router.push(settingsRoute);
                 }}
                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#9090a0] hover:bg-white/5 hover:text-[#f0f0f5]"
               >
@@ -291,7 +306,7 @@ export default function Topbar({ title, user, onMenuToggle }: TopbarProps) {
               <button
                 onClick={() => {
                   setDropdownOpen(false);
-                  router.push("/dashboard/owner/settings");
+                  router.push(settingsRoute);
                 }}
                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#9090a0] hover:bg-white/5 hover:text-[#f0f0f5]"
               >

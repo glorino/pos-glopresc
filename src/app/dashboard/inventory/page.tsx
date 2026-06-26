@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { formatCurrency } from "@/lib/utils";
@@ -54,6 +55,7 @@ interface ProductData {
 
 export default function InventoryDashboard() {
   const { t } = useTranslation();
+  const { data: session } = useSession();
   const [data, setData] = useState<ProductData | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -168,8 +170,10 @@ export default function InventoryDashboard() {
     return { label: "In Stock", className: "badge-success" };
   }
 
+  const userRole = (session?.user as any)?.role as string | undefined;
+
   return (
-    <DashboardLayout role="WAREHOUSE_MANAGER" title={t("inventoryDashboard")}>
+    <DashboardLayout role={(userRole as any) || "WAREHOUSE_MANAGER"} title={t("inventoryDashboard")}>
       <div className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">

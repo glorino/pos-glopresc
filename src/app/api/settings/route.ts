@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAuth } from "@/lib/api-auth";
 
 export async function GET() {
+  const { error } = await requireAuth();
+  if (error) return error;
   try {
     const settings = await db.setting.findMany({
       orderBy: { key: "asc" },
@@ -26,6 +29,8 @@ export async function GET() {
 }
 
 export async function PUT(request: NextRequest) {
+  const { error } = await requireAuth(["OWNER"]);
+  if (error) return error;
   try {
     const body = await request.json();
     const { settings } = body;
