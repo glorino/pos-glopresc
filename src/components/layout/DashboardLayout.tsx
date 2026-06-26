@@ -61,15 +61,15 @@ export default function DashboardLayout({
         onClick={() => setSidebarOpen(false)}
       />
 
-      <div
-        className={`fixed inset-y-0 left-0 z-40 lg:translate-x-0 ${
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 w-[260px] lg:sticky lg:top-0 lg:z-30 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform lg:sticky lg:transition-none`}
+        } transition-transform lg:translate-x-0`}
       >
         <Sidebar role={role} currentPath={pathname} />
-      </div>
+      </aside>
 
-      <div className="flex flex-1 flex-col lg:pl-[260px]">
+      <div className="flex min-w-0 flex-1 flex-col">
         <Topbar title={title} user={displayUser} onMenuToggle={() => setSidebarOpen((p) => !p)} />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
       </div>
