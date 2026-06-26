@@ -68,8 +68,12 @@ export default function LoginPage() {
         </Link>
         <div className="mb-8 text-center">
           <Link href="/" className="mb-6 inline-flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843] to-[#c49a38]">
-              <span className="text-lg font-bold text-black">G</span>
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843] to-[#b8942f]">
+              <svg viewBox="0 0 64 64" fill="none" className="h-6 w-6">
+                <path d="M16 24 L22 24 L28 40 L48 40 L52 26 L24 26" stroke="#000" strokeWidth="3.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="30" cy="46" r="3" fill="#000"/>
+                <circle cx="46" cy="46" r="3" fill="#000"/>
+              </svg>
             </div>
             <span className="text-xl font-bold text-[#f0f0f5]">SSV Shop</span>
           </Link>

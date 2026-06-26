@@ -448,6 +448,14 @@ export default function POSTerminal() {
         </div>
       </div>
 
+      {/* Cart Backdrop (mobile) */}
+      {cartOpen && (
+        <div
+          className="cart-backdrop lg:hidden"
+          onClick={() => setCartOpen(false)}
+        />
+      )}
+
       {/* Cart Panel */}
       <div className={`cart-panel ${cartOpen ? "open" : ""}`}>
         <div className="flex items-center justify-between border-b border-[#2a2a3a] px-4 py-3">
@@ -646,8 +654,12 @@ export default function POSTerminal() {
 
             <div className="rounded-xl border border-[#2a2a3a] bg-[#0a0a0f] p-4">
               <div className="mb-3 text-center">
-                <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843] to-[#c49a38]">
-                  <span className="text-xl font-black text-black">S</span>
+                <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843] to-[#b8942f]">
+                  <svg viewBox="0 0 64 64" fill="none" className="h-8 w-8">
+                    <path d="M16 24 L22 24 L28 40 L48 40 L52 26 L24 26" stroke="#000" strokeWidth="3.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="30" cy="46" r="3" fill="#000"/>
+                    <circle cx="46" cy="46" r="3" fill="#000"/>
+                  </svg>
                 </div>
                 <p className="text-lg font-bold text-[#d4a843]">SSV SHOP</p>
                 <p className="text-xs text-[#606070]">POS Receipt</p>
@@ -720,12 +732,18 @@ export default function POSTerminal() {
                           .divider { border-top: 1px dashed #000; margin: 8px 0; }
                           .row { display: flex; justify-content: space-between; }
                           .footer { text-align: center; margin-top: 12px; font-size: 10px; }
-                          .logo { display: inline-block; background: #d4a843; color: #000; font-weight: 900; font-size: 18px; width: 32px; height: 32px; line-height: 32px; border-radius: 8px; text-align: center; }
+                          .logo-wrap { display: inline-block; background: linear-gradient(135deg, #d4a843, #b8942f); border-radius: 8px; padding: 4px; }
                         </style>
                       </head>
                       <body>
                         <div class="center">
-                          <span class="logo">S</span>
+                          <span class="logo-wrap">
+                            <svg viewBox="0 0 64 64" fill="none" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M16 24 L22 24 L28 40 L48 40 L52 26 L24 26" stroke="#000" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                              <circle cx="30" cy="46" r="3" fill="#000"/>
+                              <circle cx="46" cy="46" r="3" fill="#000"/>
+                            </svg>
+                          </span>
                         </div>
                         <div class="center bold" style="font-size: 16px; margin-top: 4px;">SSV SHOP</div>
                         <div class="center" style="font-size: 10px; color: #666;">POS Receipt</div>

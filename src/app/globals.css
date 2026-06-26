@@ -412,10 +412,30 @@ select option {
     display: flex;
     flex-direction: column;
     position: fixed;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 400px;
     z-index: 50;
     background: #111118;
+    box-shadow: -4px 0 24px rgba(0,0,0,0.5);
+    animation: slideInRight 0.25s ease-out;
   }
+
+  .cart-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 49;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease-out;
+  }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
 }
 
 /* ── Landing Page ───────────────────────────────────────── */
