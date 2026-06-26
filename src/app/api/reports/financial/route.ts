@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { Prisma } from "@prisma/client";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { getBranchFilterFromSession } from "@/lib/branch-filter";
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,6 +11,8 @@ export async function GET(request: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const branchFilter = getBranchFilterFromSession(session);
 
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get("startDate");
@@ -36,6 +39,10 @@ export async function GET(request: NextRequest) {
         `
       : Prisma.sql``;
 
+    const branchSql = branchFilter
+      ? Prisma.sql`AND "branchId" = ${branchFilter.branchId}`
+      : Prisma.sql``;
+
     const [
       salesResult,
       expensesResult,
@@ -49,11 +56,12 @@ export async function GET(request: NextRequest) {
       db.sale.aggregate({
         _sum: { total: true, discount: true, tax: true },
         _count: true,
-        where: { status: "COMPLETED" },
+        where: { status: "COMPLETED", ...(branchFilter || {}) },
       }),
       db.expense.aggregate({
         _sum: { amount: true },
         _count: true,
+        where: { ...(branchFilter || {}) },
       }),
       db.$queryRaw<{ category: string; total: number; count: number }[]>(Prisma.sql`
         SELECT
@@ -62,7 +70,7 @@ export async function GET(request: NextRequest) {
           COUNT(e."id")::int AS count
         FROM "Expense" e
         JOIN "ExpenseCategory" ec ON e."categoryId" = ec."id"
-        WHERE 1=1 ${expenseDateFilter}
+        WHERE 1=1 ${expenseDateFilter} ${branchSql}
         GROUP BY ec."name"
         ORDER BY total DESC
       `),
@@ -74,11 +82,12 @@ export async function GET(request: NextRequest) {
       db.expense.aggregate({
         _sum: { amount: true },
         _count: true,
-        where: { status: "PENDING" },
+        where: { status: "PENDING", ...(branchFilter || {}) },
       }),
       db.expense.findMany({
         take: 20,
         orderBy: { createdAt: "desc" },
+        where: { ...(branchFilter || {}) },
         include: {
           user: { select: { firstName: true, lastName: true } },
           category: { select: { name: true } },
@@ -91,6 +100,7 @@ export async function GET(request: NextRequest) {
         FROM "Sale"
         WHERE "status" = 'COMPLETED'
           AND "createdAt" >= ${new Date(new Date().getFullYear(), 0, 1)}
+          ${branchSql}
         GROUP BY month
         ORDER BY month ASC
       `),
@@ -100,6 +110,7 @@ export async function GET(request: NextRequest) {
           SUM("amount")::float AS expenses
         FROM "Expense"
         WHERE "date" >= ${new Date(new Date().getFullYear(), 0, 1)}
+          ${branchSql}
         GROUP BY month
         ORDER BY month ASC
       `),

@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getBranchFilter } from "@/lib/branch-filter";
 
 export async function GET(request: NextRequest) {
   try {
+    const branchFilter = await getBranchFilter(request);
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
@@ -18,12 +20,14 @@ export async function GET(request: NextRequest) {
         _sum: { total: true },
         where: {
           status: "COMPLETED",
+          ...(branchFilter ? { branchId: branchFilter.branchId } : {}),
         },
       }),
       db.expense.aggregate({
         _sum: { amount: true },
         where: {
           status: { in: ["APPROVED", "PAID"] },
+          ...(branchFilter ? { branchId: branchFilter.branchId } : {}),
         },
       }),
       db.invoice.count({
@@ -53,6 +57,7 @@ export async function GET(request: NextRequest) {
           where: {
             status: "COMPLETED",
             createdAt: { gte: monthStart, lte: monthEnd },
+            ...(branchFilter ? { branchId: branchFilter.branchId } : {}),
           },
         }),
         db.expense.aggregate({
@@ -60,6 +65,7 @@ export async function GET(request: NextRequest) {
           where: {
             status: { in: ["APPROVED", "PAID"] },
             createdAt: { gte: monthStart, lte: monthEnd },
+            ...(branchFilter ? { branchId: branchFilter.branchId } : {}),
           },
         }),
       ]);
@@ -76,6 +82,7 @@ export async function GET(request: NextRequest) {
         expenses: {
           where: {
             status: { in: ["APPROVED", "PAID"] },
+            ...(branchFilter ? { branchId: branchFilter.branchId } : {}),
           },
           select: { amount: true },
         },
@@ -93,6 +100,9 @@ export async function GET(request: NextRequest) {
     const recentExpenses = await db.expense.findMany({
       take: 10,
       orderBy: { createdAt: "desc" },
+      where: {
+        ...(branchFilter ? { branchId: branchFilter.branchId } : {}),
+      },
       include: {
         user: { select: { firstName: true, lastName: true } },
       },

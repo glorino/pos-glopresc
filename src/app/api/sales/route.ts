@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { generateInvoiceNumber } from "@/lib/utils";
 import { sendSMS } from "@/lib/sms";
+import { getToken } from "next-auth/jwt";
 
 export async function GET(request: NextRequest) {
   try {
@@ -83,6 +84,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { userId, customerId, items, paymentMethod, amountPaid, notes, discount = 0, tax = 0 } = body;
 
+    const token = await getToken({ req: request as any });
+    const branchId = token?.branchId as string | undefined || null;
+
     if (!userId || !items || items.length === 0) {
       return NextResponse.json(
         { error: "User ID and at least one item are required" },
@@ -120,6 +124,7 @@ export async function POST(request: NextRequest) {
         data: {
           invoiceNumber,
           userId,
+          branchId,
           customerId: customerId || null,
           subtotal,
           discount: Number(discount),

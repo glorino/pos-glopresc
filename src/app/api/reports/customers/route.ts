@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { Prisma } from "@prisma/client";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { getBranchFilterFromSession } from "@/lib/branch-filter";
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,6 +11,8 @@ export async function GET(request: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const branchFilter = getBranchFilterFromSession(session);
 
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get("startDate");
@@ -20,6 +24,10 @@ export async function GET(request: NextRequest) {
       if (startDate) dateFilter.createdAt.gte = new Date(startDate);
       if (endDate) dateFilter.createdAt.lte = new Date(endDate + "T23:59:59");
     }
+
+    const branchSql = branchFilter
+      ? Prisma.sql`AND "branchId" = ${branchFilter.branchId}`
+      : Prisma.sql``;
 
     const [
       totalCustomers,
@@ -39,7 +47,7 @@ export async function GET(request: NextRequest) {
       db.customer.count({
         where: {
           isActive: true,
-          sales: { some: { status: "COMPLETED" } },
+          sales: { some: { status: "COMPLETED", ...(branchFilter || {}) } },
         },
       }),
       db.customer.findMany({

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getToken } from "next-auth/jwt";
+import { getBranchFilter } from "@/lib/branch-filter";
 
 const PRODUCT_ROLES = ["OWNER", "MANAGER", "WAREHOUSE_MANAGER"];
 
@@ -42,6 +43,11 @@ export async function GET(request: NextRequest) {
         { barcode: { contains: search, mode: "insensitive" } },
         { description: { contains: search, mode: "insensitive" } },
       ];
+    }
+
+    const branchFilter = await getBranchFilter(request);
+    if (branchFilter) {
+      where.branchId = branchFilter.branchId;
     }
 
     const skip = (page - 1) * limit;
@@ -96,6 +102,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized: Only owners, managers, and warehouse managers can manage products" }, { status: 403 });
     }
 
+    const branchId = token.branchId as string | undefined;
+
     const body = await request.json();
     const {
       name,
@@ -140,6 +148,7 @@ export async function POST(request: NextRequest) {
         isFeatured,
         categoryId: categoryId || null,
         supplierId: supplierId || null,
+        branchId: branchId || null,
       },
       include: {
         category: { select: { id: true, name: true } },

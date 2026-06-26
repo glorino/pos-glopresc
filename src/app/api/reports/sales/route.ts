@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { Prisma } from "@prisma/client";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { getBranchFilterFromSession } from "@/lib/branch-filter";
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,6 +11,8 @@ export async function GET(request: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const branchFilter = getBranchFilterFromSession(session);
 
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get("startDate");
@@ -28,6 +31,10 @@ export async function GET(request: NextRequest) {
       AND "createdAt" >= ${startDate ? new Date(startDate) : new Date("2000-01-01")}
       AND "createdAt" <= ${endDate ? new Date(endDate + "T23:59:59") : new Date()}
     `;
+
+    const branchSql = branchFilter
+      ? Prisma.sql`AND "branchId" = ${branchFilter.branchId}`
+      : Prisma.sql``;
 
     const groupExpr =
       groupBy === "week"
@@ -48,16 +55,16 @@ export async function GET(request: NextRequest) {
       db.sale.aggregate({
         _sum: { total: true, discount: true, tax: true, subtotal: true },
         _avg: { total: true },
-        where,
+        where: { ...where, ...(branchFilter || {}) },
       }),
-      db.sale.count({ where }),
+      db.sale.count({ where: { ...where, ...(branchFilter || {}) } }),
       db.$queryRaw<{ period: string; revenue: number; count: number }[]>(Prisma.sql`
         SELECT
           ${Prisma.raw(groupExpr)} AS period,
           SUM("total")::float AS revenue,
           COUNT(*)::int AS count
         FROM "Sale"
-        WHERE "status" = 'COMPLETED' ${dateConditions}
+        WHERE "status" = 'COMPLETED' ${dateConditions} ${branchSql}
         GROUP BY period
         ORDER BY period ASC
       `),
@@ -65,7 +72,7 @@ export async function GET(request: NextRequest) {
         by: ["paymentMethod"],
         _sum: { total: true },
         _count: true,
-        where,
+        where: { ...where, ...(branchFilter || {}) },
       }),
       db.saleItem.groupBy({
         by: ["productId"],
@@ -80,12 +87,12 @@ export async function GET(request: NextRequest) {
           COUNT(*)::int AS count,
           SUM("total")::float AS revenue
         FROM "Sale"
-        WHERE "status" = 'COMPLETED' ${dateConditions}
+        WHERE "status" = 'COMPLETED' ${dateConditions} ${branchSql}
         GROUP BY hour
         ORDER BY hour ASC
       `),
       db.sale.findMany({
-        where,
+        where: { ...where, ...(branchFilter || {}) },
         take: 20,
         orderBy: { createdAt: "desc" },
         include: {

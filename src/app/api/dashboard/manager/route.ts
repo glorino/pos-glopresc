@@ -1,8 +1,17 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { getBranchFilterFromSession } from "@/lib/branch-filter";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const branchFilter = getBranchFilterFromSession(session);
+
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
@@ -34,12 +43,14 @@ export async function GET() {
         where: {
           status: "COMPLETED",
           createdAt: { gte: startOfToday, lte: endOfToday },
+          ...(branchFilter || {}),
         },
       }),
       db.sale.count({
         where: {
           status: "COMPLETED",
           createdAt: { gte: startOfToday, lte: endOfToday },
+          ...(branchFilter || {}),
         },
       }),
       db.user.count({
@@ -61,6 +72,7 @@ export async function GET() {
         where: {
           status: "COMPLETED",
           createdAt: { gte: startOfThisWeek, lte: now },
+          ...(branchFilter || {}),
         },
       }),
       db.sale.aggregate({
@@ -69,10 +81,15 @@ export async function GET() {
         where: {
           status: "COMPLETED",
           createdAt: { gte: startOfLastWeek, lte: endOfLastWeek },
+          ...(branchFilter || {}),
         },
       }),
       db.user.findMany({
-        where: { isActive: true, role: { in: ["SALES_REP", "SALES_MANAGER"] } },
+        where: {
+          isActive: true,
+          role: { in: ["SALES_REP", "SALES_MANAGER"] },
+          ...(branchFilter ? { branchId: branchFilter.branchId } : {}),
+        },
         select: {
           id: true,
           firstName: true,
@@ -89,7 +106,11 @@ export async function GET() {
         _sum: { amount: true },
       }),
       db.product.findMany({
-        where: { isActive: true, stockQuantity: { lte: 10 } },
+        where: {
+          isActive: true,
+          stockQuantity: { lte: 10 },
+          ...(branchFilter ? { branchId: branchFilter.branchId } : {}),
+        },
         select: { id: true, name: true, stockQuantity: true, minStockLevel: true },
         take: 5,
         orderBy: { stockQuantity: "asc" },

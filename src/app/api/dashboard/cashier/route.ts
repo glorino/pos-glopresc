@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { db } from "@/lib/db";
+import { getBranchFilter } from "@/lib/branch-filter";
 
 export async function GET(request: Request) {
   try {
@@ -10,6 +11,7 @@ export async function GET(request: Request) {
     }
 
     const userId = token.id as string;
+    const branchFilter = await getBranchFilter(request as any);
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
@@ -21,6 +23,7 @@ export async function GET(request: Request) {
           userId,
           status: "COMPLETED",
           createdAt: { gte: startOfToday, lte: endOfToday },
+          ...(branchFilter || {}),
         },
       }),
       db.sale.count({
@@ -28,10 +31,11 @@ export async function GET(request: Request) {
           userId,
           status: "COMPLETED",
           createdAt: { gte: startOfToday, lte: endOfToday },
+          ...(branchFilter || {}),
         },
       }),
       db.sale.findMany({
-        where: { userId },
+        where: { userId, ...(branchFilter || {}) },
         orderBy: { createdAt: "desc" },
         take: 10,
         select: {
@@ -53,7 +57,7 @@ export async function GET(request: Request) {
         },
       }),
       db.sale.count({
-        where: { userId, status: "PENDING" },
+        where: { userId, status: "PENDING", ...(branchFilter || {}) },
       }),
       db.sale.groupBy({
         by: ["paymentMethod"],
@@ -62,6 +66,7 @@ export async function GET(request: Request) {
           userId,
           status: "COMPLETED",
           createdAt: { gte: startOfToday, lte: endOfToday },
+          ...(branchFilter || {}),
         },
       }),
     ]);

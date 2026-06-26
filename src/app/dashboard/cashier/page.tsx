@@ -258,7 +258,7 @@ export default function CashierDashboard() {
             />
           </div>
           {dailySummary && (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
               <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
                 <p className="text-xs text-[#9090a0]">Opening Balance</p>
                 <p className="mt-1 text-lg font-bold text-[#f0f0f5]">{formatCurrency(dailySummary.drawer?.openingBalance ?? 0)}</p>
@@ -268,12 +268,20 @@ export default function CashierDashboard() {
                 <p className="mt-1 text-lg font-bold text-[#10b981]">{formatCurrency(dailySummary.totalSales)}</p>
               </div>
               <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
-                <p className="text-xs text-[#9090a0]">Cash Sales</p>
-                <p className="mt-1 text-lg font-bold text-[#d4a843]">{formatCurrency(dailySummary.cashSales)}</p>
+                <p className="text-xs text-[#9090a0]">Cash Received</p>
+                <p className="mt-1 text-lg font-bold text-[#3b82f6]">{formatCurrency(dailySummary.totalCashReceived ?? 0)}</p>
+              </div>
+              <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
+                <p className="text-xs text-[#9090a0]">Change Given</p>
+                <p className="mt-1 text-lg font-bold text-[#f43f5e]">{formatCurrency(dailySummary.totalChangeGiven ?? 0)}</p>
+              </div>
+              <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
+                <p className="text-xs text-[#9090a0]">Cash in Drawer</p>
+                <p className="mt-1 text-lg font-bold text-[#d4a843]">{formatCurrency((dailySummary.drawer?.openingBalance ?? 0) + (dailySummary.totalCashReceived ?? 0) - (dailySummary.totalChangeGiven ?? 0))}</p>
               </div>
               <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
                 <p className="text-xs text-[#9090a0]">Transactions</p>
-                <p className="mt-1 text-lg font-bold text-[#3b82f6]">{dailySummary.totalTransactions}</p>
+                <p className="mt-1 text-lg font-bold text-[#8b5cf6]">{dailySummary.totalTransactions}</p>
               </div>
             </div>
           )}

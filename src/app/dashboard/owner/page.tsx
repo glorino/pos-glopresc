@@ -63,6 +63,12 @@ interface DashboardData {
     stockQuantity: number;
     minStockLevel: number;
   }[];
+  branchRanking: {
+    id: string;
+    name: string;
+    revenue: number;
+    salesCount: number;
+  }[];
 }
 
 const COLORS = ["#d4a843", "#3b82f6", "#8b5cf6", "#10b981", "#f59e0b"];
@@ -393,6 +399,77 @@ export default function OwnerDashboard() {
             </div>
           </div>
         </div>
+
+        {/* Branch Performance Ranking */}
+        {(data?.branchRanking ?? []).length > 0 && (
+          <div className="glass-card p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843] to-[#b8942f]">
+                  <Store size={18} className="text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-[#f0f0f5]">Branch Performance</h3>
+                  <p className="text-sm text-[#9090a0]">Revenue ranking across all branches</p>
+                </div>
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-[#2a2a3a]">
+                    <th className="pb-3 text-left text-xs font-medium text-[#9090a0]">Rank</th>
+                    <th className="pb-3 text-left text-xs font-medium text-[#9090a0]">Branch</th>
+                    <th className="pb-3 text-right text-xs font-medium text-[#9090a0]">Revenue</th>
+                    <th className="pb-3 text-right text-xs font-medium text-[#9090a0]">Sales</th>
+                    <th className="pb-3 text-right text-xs font-medium text-[#9090a0]">Performance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data?.branchRanking?.map((branch, index) => {
+                    const maxRevenue = Math.max(...(data.branchRanking?.map(b => b.revenue) ?? [1]));
+                    const performance = maxRevenue > 0 ? Math.round((branch.revenue / maxRevenue) * 100) : 0;
+                    const medalColors = ["text-[#d4a843]", "text-[#94a3b8]", "text-[#cd7f32]"];
+                    return (
+                      <tr key={branch.id} className="border-b border-[#2a2a3a]/50 transition-colors hover:bg-white/5">
+                        <td className="py-3">
+                          <span className={`text-lg font-bold ${medalColors[index] ?? "text-[#606070]"}`}>
+                            #{index + 1}
+                          </span>
+                        </td>
+                        <td className="py-3">
+                          <div className="flex items-center gap-2">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2a2a3a]">
+                              <Store size={14} className="text-[#d4a843]" />
+                            </div>
+                            <span className="text-sm font-medium text-[#f0f0f5]">{branch.name}</span>
+                          </div>
+                        </td>
+                        <td className="py-3 text-right text-sm font-bold text-[#d4a843]">
+                          {formatCurrency(branch.revenue)}
+                        </td>
+                        <td className="py-3 text-right text-sm text-[#9090a0]">
+                          {branch.salesCount}
+                        </td>
+                        <td className="py-3 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <div className="h-2 w-24 overflow-hidden rounded-full bg-[#2a2a3a]">
+                              <div
+                                className="h-full rounded-full bg-gradient-to-r from-[#d4a843] to-[#b8942f] transition-all duration-500"
+                                style={{ width: `${performance}%` }}
+                              />
+                            </div>
+                            <span className="text-xs text-[#9090a0]">{performance}%</span>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         {/* Recent Sales + Top Products */}
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">

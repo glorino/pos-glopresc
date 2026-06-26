@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getBranchFilter } from "@/lib/branch-filter";
+import { getToken } from "next-auth/jwt";
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,6 +14,11 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search");
 
     const where: Record<string, any> = {};
+
+    const branchFilter = await getBranchFilter(request);
+    if (branchFilter) {
+      where.branchId = branchFilter.branchId;
+    }
 
     if (status) where.status = status;
     if (startDate || endDate) {
@@ -72,6 +79,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const token = await getToken({ req: request as any });
+    const branchId = token?.branchId as string | undefined || null;
+
     const expense = await db.expense.create({
       data: {
         userId,
@@ -81,6 +91,7 @@ export async function POST(request: NextRequest) {
         date: date ? new Date(date) : new Date(),
         receipt: receipt || null,
         notes: notes || null,
+        branchId: branchId,
       },
       include: {
         user: { select: { firstName: true, lastName: true } },

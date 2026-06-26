@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { db } from "@/lib/db";
+import { getBranchFilter } from "@/lib/branch-filter";
 
 export async function GET(request: Request) {
   try {
@@ -10,6 +11,7 @@ export async function GET(request: Request) {
     }
 
     const userId = token.id as string;
+    const branchFilter = await getBranchFilter(request as any);
     const { searchParams } = new URL(request.url);
     const date = searchParams.get("date") || new Date().toISOString().split("T")[0];
 
@@ -22,6 +24,7 @@ export async function GET(request: Request) {
           userId,
           status: "COMPLETED",
           createdAt: { gte: startOfDay, lte: endOfDay },
+          ...(branchFilter || {}),
         },
         orderBy: { createdAt: "asc" },
         select: {
@@ -68,6 +71,8 @@ export async function GET(request: Request) {
     const cardSales = sales.filter((s) => s.paymentMethod === "CARD").reduce((sum, s) => sum + Number(s.total), 0);
     const transferSales = sales.filter((s) => s.paymentMethod === "TRANSFER").reduce((sum, s) => sum + Number(s.total), 0);
     const otherSales = totalSales - cashSales - cardSales - transferSales;
+    const totalCashReceived = sales.filter((s) => s.paymentMethod === "CASH").reduce((sum, s) => sum + Number(s.amountPaid), 0);
+    const totalChangeGiven = sales.filter((s) => s.paymentMethod === "CASH").reduce((sum, s) => sum + Number(s.changeDue), 0);
 
     return NextResponse.json({
       date,
@@ -78,6 +83,8 @@ export async function GET(request: Request) {
       cardSales,
       transferSales,
       otherSales,
+      totalCashReceived,
+      totalChangeGiven,
       drawer: drawerSession ? {
         status: drawerSession.status,
         openingBalance: Number(drawerSession.openingBalance),

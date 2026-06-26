@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getBranchFilter } from "@/lib/branch-filter";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    const branchFilter = session?.user ? (() => {
+      if ((session.user as any).role === "OWNER") return null;
+      const bid = (session.user as any).branchId;
+      return bid ? { branchId: bid } : { branchId: "__NONE__" };
+    })() : { branchId: "__NONE__" };
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") ?? "1");
     const limit = parseInt(searchParams.get("limit") ?? "30");
@@ -35,6 +45,10 @@ export async function GET(request: NextRequest) {
       ];
     }
 
+    if (branchFilter) {
+      where.user = { branchId: branchFilter.branchId };
+    }
+
     const skip = (page - 1) * limit;
 
     const [auditLogs, total] = await Promise.all([
@@ -55,13 +69,28 @@ export async function GET(request: NextRequest) {
 
     const [totalLogs, todayActivities, failedLogins, modifiedRecords, systemAlerts] =
       await Promise.all([
-        db.auditLog.count(),
-        db.auditLog.count({ where: { createdAt: { gte: todayStart } } }),
         db.auditLog.count({
-          where: { action: { contains: "LOGIN_FAILED", mode: "insensitive" } },
+          where: {
+            ...(branchFilter ? { user: { branchId: branchFilter.branchId } } : {}),
+          },
         }),
         db.auditLog.count({
-          where: { action: { contains: "UPDATE", mode: "insensitive" } },
+          where: {
+            createdAt: { gte: todayStart },
+            ...(branchFilter ? { user: { branchId: branchFilter.branchId } } : {}),
+          },
+        }),
+        db.auditLog.count({
+          where: {
+            action: { contains: "LOGIN_FAILED", mode: "insensitive" },
+            ...(branchFilter ? { user: { branchId: branchFilter.branchId } } : {}),
+          },
+        }),
+        db.auditLog.count({
+          where: {
+            action: { contains: "UPDATE", mode: "insensitive" },
+            ...(branchFilter ? { user: { branchId: branchFilter.branchId } } : {}),
+          },
         }),
         db.auditLog.count({
           where: {
@@ -69,6 +98,7 @@ export async function GET(request: NextRequest) {
               { action: { contains: "ALERT", mode: "insensitive" } },
               { action: { contains: "ERROR", mode: "insensitive" } },
             ],
+            ...(branchFilter ? { user: { branchId: branchFilter.branchId } } : {}),
           },
         }),
       ]);
@@ -84,6 +114,7 @@ export async function GET(request: NextRequest) {
       const count = await db.auditLog.count({
         where: {
           createdAt: { gte: dayStart, lt: dayEnd },
+          ...(branchFilter ? { user: { branchId: branchFilter.branchId } } : {}),
         },
       });
 

@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const now = new Date();
     const currentYear = now.getFullYear();
     const startOfYear = new Date(currentYear, 0, 1);
@@ -19,6 +26,7 @@ export async function GET() {
       recentSales,
       topProducts,
       lowStockProducts,
+      branchRanking,
     ] = await Promise.all([
       db.sale.aggregate({
         _sum: { total: true },
@@ -69,6 +77,19 @@ export async function GET() {
         WHERE "isActive" = true
           AND "stockQuantity" <= "minStockLevel"
         ORDER BY "stockQuantity" ASC
+      `,
+      db.$queryRaw<
+        { id: string; name: string; revenue: number; salesCount: number }[]
+      >`
+        SELECT
+          b."id",
+          b."name",
+          COALESCE(SUM(s."total"), 0)::float AS revenue,
+          COUNT(s."id")::int AS "salesCount"
+        FROM "Branch" b
+        LEFT JOIN "Sale" s ON s."branchId" = b."id" AND s."status" = 'COMPLETED'
+        GROUP BY b."id", b."name"
+        ORDER BY revenue DESC
       `,
     ]);
 
@@ -123,6 +144,12 @@ export async function GET() {
         sku: p.sku,
         stockQuantity: p.stockQuantity,
         minStockLevel: p.minStockLevel,
+      })),
+      branchRanking: branchRanking.map((b) => ({
+        id: b.id,
+        name: b.name,
+        revenue: Number(b.revenue),
+        salesCount: b.salesCount,
       })),
     });
   } catch (error) {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getBranchFilter } from "@/lib/branch-filter";
 
 export async function GET(request: NextRequest) {
   try {
@@ -25,6 +26,20 @@ export async function GET(request: NextRequest) {
         { customer: { firstName: { contains: search, mode: "insensitive" } } },
         { customer: { lastName: { contains: search, mode: "insensitive" } } },
       ];
+    }
+
+    const branchFilter = await getBranchFilter(request);
+    if (branchFilter) {
+      const branchOR = [
+        { sale: { branchId: branchFilter.branchId } },
+        { expense: { branchId: branchFilter.branchId } },
+      ];
+      if (where.OR) {
+        where.AND = [{ OR: where.OR }, { OR: branchOR }];
+        delete where.OR;
+      } else {
+        where.OR = branchOR;
+      }
     }
 
     const skip = (page - 1) * limit;

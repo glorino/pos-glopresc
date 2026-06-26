@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getBranchFilter } from "@/lib/branch-filter";
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,6 +18,11 @@ export async function GET(request: NextRequest) {
         { email: { contains: search, mode: "insensitive" } },
         { phone: { contains: search, mode: "insensitive" } },
       ];
+    }
+
+    const branchFilter = await getBranchFilter(request);
+    if (branchFilter) {
+      where.sales = { some: { branchId: branchFilter.branchId } };
     }
 
     const skip = (page - 1) * limit;

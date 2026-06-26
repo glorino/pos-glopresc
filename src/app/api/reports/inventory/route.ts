@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { Prisma } from "@prisma/client";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { getBranchFilterFromSession } from "@/lib/branch-filter";
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,6 +11,8 @@ export async function GET(request: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const branchFilter = getBranchFilterFromSession(session);
 
     const { searchParams } = new URL(request.url);
     const categoryId = searchParams.get("categoryId");
@@ -22,6 +25,14 @@ export async function GET(request: NextRequest) {
       ? Prisma.sql`AND p."categoryId" = ${categoryId}`
       : Prisma.sql``;
 
+    const branchSql = branchFilter
+      ? Prisma.sql`AND "branchId" = ${branchFilter.branchId}`
+      : Prisma.sql``;
+
+    const branchSqlP = branchFilter
+      ? Prisma.sql`AND p."branchId" = ${branchFilter.branchId}`
+      : Prisma.sql``;
+
     const [
       totalProducts,
       totalStockValue,
@@ -32,24 +43,24 @@ export async function GET(request: NextRequest) {
       topMovingProducts,
       products,
     ] = await Promise.all([
-      db.product.count({ where: productWhere }),
+      db.product.count({ where: { ...productWhere, ...(branchFilter || {}) } }),
       db.$queryRaw<[{ total: number }]>(Prisma.sql`
         SELECT SUM("stockQuantity" * "costPrice")::float AS total
         FROM "Product"
-        WHERE "isActive" = true ${catFilter}
+        WHERE "isActive" = true ${catFilter} ${branchSql}
       `).then((r) => r[0].total ?? 0),
       db.$queryRaw<[{ count: number }]>(Prisma.sql`
         SELECT COUNT(*)::int AS count
         FROM "Product"
         WHERE "isActive" = true
           AND "stockQuantity" <= "minStockLevel"
-          AND "stockQuantity" > 0 ${catFilter}
+          AND "stockQuantity" > 0 ${catFilter} ${branchSql}
       `).then((r) => r[0].count),
       db.$queryRaw<[{ count: number }]>(Prisma.sql`
         SELECT COUNT(*)::int AS count
         FROM "Product"
         WHERE "isActive" = true
-          AND "stockQuantity" = 0 ${catFilter}
+          AND "stockQuantity" = 0 ${catFilter} ${branchSql}
       `).then((r) => r[0].count),
       db.$queryRaw<{ category: string; count: number; stockValue: number }[]>(Prisma.sql`
         SELECT
@@ -58,7 +69,7 @@ export async function GET(request: NextRequest) {
           COALESCE(SUM(p."stockQuantity" * p."costPrice")::float, 0) AS stockValue
         FROM "Product" p
         LEFT JOIN "Category" c ON p."categoryId" = c."id"
-        WHERE p."isActive" = true
+        WHERE p."isActive" = true ${branchSqlP}
         GROUP BY c."name"
         ORDER BY stockValue DESC
       `),
@@ -78,8 +89,8 @@ export async function GET(request: NextRequest) {
       }),
       db.product.findMany({
         where: lowStockOnly
-          ? { ...productWhere, stockQuantity: { lte: 5 } }
-          : productWhere,
+          ? { ...productWhere, stockQuantity: { lte: 5 }, ...(branchFilter || {}) }
+          : { ...productWhere, ...(branchFilter || {}) },
         include: {
           category: { select: { name: true } },
           supplier: { select: { name: true } },
@@ -93,6 +104,7 @@ export async function GET(request: NextRequest) {
       where: {
         isActive: true,
         stockQuantity: { lte: 5 },
+        ...(branchFilter || {}),
       },
       select: {
         id: true,
