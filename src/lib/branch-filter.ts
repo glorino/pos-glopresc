@@ -18,7 +18,7 @@ export async function getBranchFilter(request: NextRequest): Promise<Record<stri
   if (role === "OWNER") return null;
 
   const branchId = token.branchId as string | undefined;
-  if (!branchId) return { branchId: "__NONE__" };
+  if (!branchId) return null;
 
   return {
     OR: [
@@ -49,7 +49,7 @@ export function getBranchFilterFromSession(session: any): Record<string, any> | 
   if (role === "OWNER") return null;
 
   const branchId = session.user.branchId;
-  if (!branchId) return { branchId: "__NONE__" };
+  if (!branchId) return null;
 
   return {
     OR: [
