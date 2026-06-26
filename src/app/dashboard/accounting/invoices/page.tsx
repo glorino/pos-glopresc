@@ -73,6 +73,7 @@ export default function InvoicesPage() {
   const [formData, setFormData] = useState<InvoiceFormData>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   async function fetchInvoices() {
     setLoading(true);
@@ -213,7 +214,8 @@ export default function InvoicesPage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        alert(`Reminder sent to ${invoice.customer}`);
+        setSuccessMessage(`Reminder sent to ${invoice.customer}`);
+        setTimeout(() => setSuccessMessage(""), 4000);
       } else {
         setError(data.error || "Failed to send reminder SMS");
       }
@@ -240,6 +242,11 @@ export default function InvoicesPage() {
   return (
     <DashboardLayout role="ACCOUNTANT" title={t("invoices")}>
       <div className="space-y-6">
+        {successMessage && (
+          <div className="rounded-lg border border-[#10b981]/20 bg-[#10b981]/10 p-3 text-sm text-[#10b981]">
+            {successMessage}
+          </div>
+        )}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex rounded-lg border border-[#2a2a3a] bg-[#1c1c28]">

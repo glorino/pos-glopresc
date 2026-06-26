@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAuth } from "@/lib/api-auth";
 
 const productImages: Record<string, string> = {
   // Food & Snacks
@@ -54,6 +55,8 @@ const productImages: Record<string, string> = {
 };
 
 export async function POST() {
+  const { error } = await requireAuth(["OWNER", "MANAGER"]);
+  if (error) return error;
   try {
     let updated = 0;
     for (const [sku, image] of Object.entries(productImages)) {

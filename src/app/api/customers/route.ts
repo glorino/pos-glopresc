@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getBranchFilter } from "@/lib/branch-filter";
+import { requireAuth } from "@/lib/api-auth";
+
+const AUTH_ROLES = ["OWNER", "MANAGER", "SALES_MANAGER", "ACCOUNTANT"];
 
 export async function GET(request: NextRequest) {
+  const { error } = await requireAuth(AUTH_ROLES);
+  if (error) return error;
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") ?? "1");
@@ -59,6 +64,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const { error } = await requireAuth(AUTH_ROLES);
+  if (error) return error;
   try {
     const body = await request.json();
     const { firstName, lastName, email, phone, address, city, state, notes } = body;
@@ -103,6 +110,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  const { error } = await requireAuth(AUTH_ROLES);
+  if (error) return error;
   try {
     const body = await request.json();
     const { id, ...data } = body;

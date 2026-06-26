@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendSMS } from "@/lib/sms";
+import { requireAuth } from "@/lib/api-auth";
 
 export async function POST(request: NextRequest) {
+  const { error } = await requireAuth();
+  if (error) return error;
   try {
     const { phoneNumber, message } = await request.json();
 

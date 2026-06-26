@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAuth } from "@/lib/api-auth";
 
 export async function GET(request: NextRequest) {
+  const { error } = await requireAuth();
+  if (error) return error;
   try {
     const { searchParams } = new URL(request.url);
     const customerId = searchParams.get("customerId");
@@ -91,6 +94,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  const { error } = await requireAuth();
+  if (error) return error;
   try {
     const body = await request.json();
     const { id, firstName, lastName, email, phone, address, city, state } = body;
