@@ -286,6 +286,7 @@ model CashDrawer {
   closingBalance Decimal?     @db.Decimal(10, 2)
   actualBalance  Decimal?     @db.Decimal(10, 2)
   difference     Decimal?     @db.Decimal(10, 2)
+  notes          String?
   status         DrawerStatus @default(OPEN)
   openedAt       DateTime     @default(now())
   closedAt       DateTime?
@@ -293,6 +294,7 @@ model CashDrawer {
   user User @relation(fields: [userId], references: [id])
 
   @@index([openedAt])
+  @@index([userId])
 }
 
 enum DrawerStatus {

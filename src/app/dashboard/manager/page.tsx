@@ -20,6 +20,8 @@ import {
   BarChart3,
   FileText,
 } from "lucide-react";
+import AIInsightPanel from "@/components/ai/AIInsightPanel";
+import type { AIInsight } from "@/lib/ai-insights";
 import {
   BarChart,
   Bar,
@@ -55,6 +57,7 @@ export default function ManagerDashboard() {
   const { t } = useTranslation();
   const [data, setData] = useState<ManagerData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [insights, setInsights] = useState<AIInsight[]>([]);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
@@ -77,6 +80,10 @@ export default function ManagerDashboard() {
     }
     fetchData();
   }, [dateFrom, dateTo]);
+
+  useEffect(() => {
+    fetch("/api/ai-insights").then(r => r.json()).then(d => setInsights(d.insights ?? []));
+  }, []);
 
   if (loading) {
     return (
@@ -197,6 +204,9 @@ export default function ManagerDashboard() {
             <ArrowRight size={16} className="text-[#f59e0b]" />
           </button>
         )}
+
+        {/* AI Insights */}
+        <AIInsightPanel insights={insights} />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           {stats.map((stat) => {

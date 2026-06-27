@@ -18,6 +18,8 @@ import {
   BarChart3,
   RefreshCw,
 } from "lucide-react";
+import AIInsightPanel from "@/components/ai/AIInsightPanel";
+import type { AIInsight } from "@/lib/ai-insights";
 import {
   BarChart,
   Bar,
@@ -66,12 +68,17 @@ export default function AccountingDashboard() {
   const { t } = useTranslation();
   const [data, setData] = useState<AccountingSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [insights, setInsights] = useState<AIInsight[]>([]);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
   useEffect(() => {
     fetchData();
   }, [dateFrom, dateTo]);
+
+  useEffect(() => {
+    fetch("/api/ai-insights").then(r => r.json()).then(d => setInsights(d.insights ?? []));
+  }, []);
 
   async function fetchData() {
     setLoading(true);
@@ -232,6 +239,20 @@ export default function AccountingDashboard() {
               );
             })}
           </div>
+        </div>
+
+        {/* AI Insights */}
+        <AIInsightPanel insights={insights} />
+
+        {/* Cash Drawer Report */}
+        <div className="glass-card p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <h4 className="text-base font-semibold text-[#f0f0f5]">{t("cashDrawerOverShort")}</h4>
+            <Link href="/dashboard/accounting/cash-reports" className="text-xs text-[#d4a843] hover:underline">
+              {t("viewFullReport")}
+            </Link>
+          </div>
+          <p className="text-sm text-[#9090a0]">{t("cashDrawerOverShortDesc")}</p>
         </div>
 
         {loading ? (

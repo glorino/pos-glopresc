@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Store,
   Building2,
+  DollarSign,
 } from "lucide-react";
 import { useTranslation } from "@/contexts/LanguageContext";
 import type { TranslationKey } from "@/lib/translations";
@@ -204,6 +205,7 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
       items: [
         { icon: CreditCard, label: "expenses", href: "/dashboard/accounting/expenses" },
         { icon: FileText, label: "invoices", href: "/dashboard/accounting/invoices" },
+        { icon: DollarSign, label: "cashDrawerReports", href: "/dashboard/accounting/cash-reports" },
       ],
     },
   ],

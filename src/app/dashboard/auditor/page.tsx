@@ -22,6 +22,8 @@ import {
   RefreshCw,
   Search,
 } from "lucide-react";
+import AIInsightPanel from "@/components/ai/AIInsightPanel";
+import type { AIInsight } from "@/lib/ai-insights";
 import {
   BarChart,
   Bar,
@@ -107,6 +109,7 @@ export default function AuditorDashboard() {
   const { t } = useTranslation();
   const [data, setData] = useState<AuditData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [insights, setInsights] = useState<AIInsight[]>([]);
   const [search, setSearch] = useState("");
   const [actionFilter, setActionFilter] = useState("");
   const [dateFrom, setDateFrom] = useState("");
@@ -144,6 +147,10 @@ export default function AuditorDashboard() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    fetch("/api/ai-insights").then(r => r.json()).then(d => setInsights(d.insights ?? []));
+  }, []);
 
   function toggleDept(key: string) {
     setExpandedDepts((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -452,6 +459,9 @@ export default function AuditorDashboard() {
             })}
           </div>
         </div>
+
+        {/* AI Insights */}
+        <AIInsightPanel insights={insights} />
 
         {/* Department Audit Section */}
         <div className="glass-card p-6">

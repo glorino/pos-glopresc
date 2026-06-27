@@ -23,6 +23,8 @@ import {
   Package,
   BarChart3,
 } from "lucide-react";
+import AIInsightPanel from "@/components/ai/AIInsightPanel";
+import type { AIInsight } from "@/lib/ai-insights";
 import {
   BarChart,
   Bar,
@@ -59,6 +61,7 @@ export default function CashierDashboard() {
   const { t } = useTranslation();
   const [data, setData] = useState<CashierData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [insights, setInsights] = useState<AIInsight[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [animatedValues, setAnimatedValues] = useState({
     todaySales: 0,
@@ -105,6 +108,10 @@ export default function CashierDashboard() {
       }
     }
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/ai-insights").then(r => r.json()).then(d => setInsights(d.insights ?? []));
   }, []);
 
   useEffect(() => {
@@ -386,6 +393,9 @@ export default function CashierDashboard() {
             />
           </div>
         </div>
+
+        {/* AI Insights */}
+        <AIInsightPanel insights={insights} />
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">

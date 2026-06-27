@@ -16,6 +16,8 @@ import {
   Package,
   Eye,
 } from "lucide-react";
+import AIInsightPanel from "@/components/ai/AIInsightPanel";
+import type { AIInsight } from "@/lib/ai-insights";
 import {
   LineChart,
   Line,
@@ -61,6 +63,7 @@ export default function SalesManagerDashboard() {
   const { t } = useTranslation();
   const [data, setData] = useState<SalesData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [insights, setInsights] = useState<AIInsight[]>([]);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
@@ -94,6 +97,10 @@ export default function SalesManagerDashboard() {
     }
     fetchData();
   }, [dateFrom, dateTo]);
+
+  useEffect(() => {
+    fetch("/api/ai-insights").then(r => r.json()).then(d => setInsights(d.insights ?? []));
+  }, []);
 
   if (loading) {
     return (
@@ -216,6 +223,9 @@ export default function SalesManagerDashboard() {
             );
           })}
         </div>
+
+        {/* AI Insights */}
+        <AIInsightPanel insights={insights} />
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
           <div className="glass-card xl:col-span-2 p-6">

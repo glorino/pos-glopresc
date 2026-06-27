@@ -27,6 +27,8 @@ import {
   RefreshCw,
 } from "lucide-react";
 import Pagination from "@/components/ui/Pagination";
+import AIInsightPanel from "@/components/ai/AIInsightPanel";
+import type { AIInsight } from "@/lib/ai-insights";
 import {
   AreaChart,
   Area,
@@ -80,6 +82,7 @@ export default function OwnerDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [lowStockPage, setLowStockPage] = useState(1);
+  const [insights, setInsights] = useState<AIInsight[]>([]);
   const LOW_STOCK_PER_PAGE = 10;
 
   useEffect(() => {
@@ -97,6 +100,10 @@ export default function OwnerDashboard() {
       }
     }
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/ai-insights").then(r => r.json()).then(d => setInsights(d.insights ?? []));
   }, []);
 
   if (loading) {
@@ -255,6 +262,9 @@ export default function OwnerDashboard() {
             );
           })}
         </div>
+
+        {/* AI Insights */}
+        <AIInsightPanel insights={insights} />
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
