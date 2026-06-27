@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { hash } from "bcryptjs";
 import { generateInvoiceNumber } from "@/lib/utils";
 import { sendSMS } from "@/lib/sms";
 import { getToken } from "next-auth/jwt";
@@ -101,7 +102,7 @@ export async function POST(request: NextRequest) {
         guestUser = await db.user.create({
           data: {
             email: "guest@system.local",
-            password: "not-a-real-password",
+            password: await hash("not-a-real-password", 12),
             firstName: "Guest",
             lastName: "User",
             role: "CUSTOMER",
