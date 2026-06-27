@@ -208,13 +208,19 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, ...data } = body;
+    const { id, ...rawData } = body;
 
     if (!id) {
       return NextResponse.json(
         { error: "Product ID is required" },
         { status: 400 }
       );
+    }
+
+    const ALLOWED_FIELDS = ["name", "description", "price", "costPrice", "stockQuantity", "minStockLevel", "maxStockLevel", "unit", "barcode", "image", "isActive", "isFeatured", "categoryId", "supplierId"] as const;
+    const data: Record<string, any> = {};
+    for (const key of ALLOWED_FIELDS) {
+      if (key in rawData) data[key] = rawData[key];
     }
 
     if (data.price !== undefined) data.price = Number(data.price);

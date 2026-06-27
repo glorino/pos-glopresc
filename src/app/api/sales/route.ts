@@ -87,13 +87,13 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId: requestedUserId, customerId, items, paymentMethod, amountPaid, notes, discount = 0, tax = 0, customerName, customerEmail } = body;
+    const { customerId, items, paymentMethod, amountPaid, notes, discount = 0, tax = 0, customerName, customerEmail } = body;
 
     const token = await getToken({ req: request as any });
     const session = await getServerSession(authOptions);
     const branchId = token?.branchId as string | undefined || null;
 
-    let userId = requestedUserId || (session?.user as any)?.id;
+    let userId = (session?.user as any)?.id;
 
     if (!userId) {
       let guestUser = await db.user.findFirst({ where: { email: "guest@system.local" } });
@@ -146,6 +146,8 @@ export async function POST(request: NextRequest) {
     const saleItems = items.map((item: { productId: string; quantity: number }) => {
       const product = productMap.get(item.productId);
       if (!product) throw new Error(`Product ${item.productId} not found`);
+      if (!Number.isInteger(item.quantity) || item.quantity <= 0) throw new Error(`Invalid quantity for ${product.name}`);
+      if (Number(product.stockQuantity) < item.quantity) throw new Error(`Insufficient stock for ${product.name}`);
       const unitPrice = Number(product.price);
       const total = unitPrice * item.quantity;
       subtotal += total;

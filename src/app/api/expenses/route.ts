@@ -89,6 +89,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (typeof amount !== "number" || amount <= 0) {
+      return NextResponse.json(
+        { error: "Amount must be a positive number" },
+        { status: 400 }
+      );
+    }
+
     const token = await getToken({ req: request as any });
     const branchId = token?.branchId as string | undefined || null;
 

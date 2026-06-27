@@ -157,7 +157,7 @@ export default function SalesManagementPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3">
             <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
               <input
                 type="text"
                 placeholder={t("searchInvoices")}

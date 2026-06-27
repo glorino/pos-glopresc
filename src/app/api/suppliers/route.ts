@@ -142,13 +142,19 @@ export async function PUT(request: NextRequest) {
   if (error) return error;
   try {
     const body = await request.json();
-    const { id, ...data } = body;
+    const { id, ...rawData } = body;
 
     if (!id) {
       return NextResponse.json(
         { error: "Supplier ID is required" },
         { status: 400 }
       );
+    }
+
+    const ALLOWED_FIELDS = ["name", "contactName", "email", "phone", "address", "city", "state", "country", "isActive"] as const;
+    const data: Record<string, any> = {};
+    for (const key of ALLOWED_FIELDS) {
+      if (key in rawData) data[key] = rawData[key];
     }
 
     const supplier = await db.supplier.update({

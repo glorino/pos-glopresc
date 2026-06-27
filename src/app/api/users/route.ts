@@ -128,13 +128,19 @@ export async function PUT(request: NextRequest) {
   if (error) return error;
   try {
     const body = await request.json();
-    const { id, password, ...data } = body;
+    const { id, password, ...rawData } = body;
 
     if (!id) {
       return NextResponse.json(
         { error: "User ID is required" },
         { status: 400 }
       );
+    }
+
+    const ALLOWED_FIELDS = ["firstName", "lastName", "phone", "email", "isActive", "branchId"] as const;
+    const data: Record<string, any> = {};
+    for (const key of ALLOWED_FIELDS) {
+      if (key in rawData) data[key] = rawData[key];
     }
 
     if (password) {

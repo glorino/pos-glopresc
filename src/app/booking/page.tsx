@@ -201,7 +201,7 @@ export default function BookingPage() {
               <div>
                 <label className="mb-1 block text-sm font-medium text-[#9090a0]">Full Name *</label>
                 <div className="relative">
-                  <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
+                  <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
                   <input
                     type="text"
                     value={form.fullName}
@@ -216,7 +216,7 @@ export default function BookingPage() {
                 <div>
                   <label className="mb-1 block text-sm font-medium text-[#9090a0]">Email *</label>
                   <div className="relative">
-                    <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
+                    <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
                     <input
                       type="email"
                       value={form.email}
@@ -230,7 +230,7 @@ export default function BookingPage() {
                 <div>
                   <label className="mb-1 block text-sm font-medium text-[#9090a0]">Phone *</label>
                   <div className="relative">
-                    <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
+                    <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
                     <input
                       type="tel"
                       value={form.phone}
@@ -270,7 +270,7 @@ export default function BookingPage() {
                 <div>
                   <label className="mb-1 block text-sm font-medium text-[#9090a0]">Date *</label>
                   <div className="relative">
-                    <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
+                    <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
                     <input
                       type="date"
                       min={today}
@@ -300,7 +300,7 @@ export default function BookingPage() {
               <div>
                 <label className="mb-1 block text-sm font-medium text-[#9090a0]">Preferred Time *</label>
                 <div className="relative">
-                  <Clock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
+                  <Clock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
                   <select
                     value={form.time}
                     onChange={(e) => updateField("time", e.target.value)}
@@ -341,7 +341,7 @@ export default function BookingPage() {
               <div>
                 <label className="mb-1 block text-sm font-medium text-[#9090a0]">Notes / Description</label>
                 <div className="relative">
-                  <FileText size={16} className="absolute left-3 top-3 text-[#606070]" />
+                  <FileText size={16} className="absolute left-3 top-3 text-white" />
                   <textarea
                     value={form.description}
                     onChange={(e) => updateField("description", e.target.value)}

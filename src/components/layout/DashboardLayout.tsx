@@ -38,7 +38,7 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const sessionRole = (session?.user as any)?.role as UserRole | undefined;
-  const role: UserRole = sessionRole || roleProp || "OWNER";
+  const role: UserRole = roleProp || sessionRole || "CUSTOMER";
 
   const userName = session?.user?.name || t("user");
   const userRole = role.replace(/_/g, " ");

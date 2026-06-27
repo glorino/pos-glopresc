@@ -174,7 +174,7 @@ export default function ShopPage() {
       <div className="sticky top-16 z-40 border-b border-[#2a2a3a] bg-[#0a0a0f]/80 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           <div className="relative max-w-md flex-1">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
             <input
               type="text"
               placeholder={t("searchProducts")}

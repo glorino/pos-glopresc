@@ -3,6 +3,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { formatCurrency } from "@/lib/utils";
+
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
 import {
   Search,
   ShoppingCart,
@@ -309,7 +313,7 @@ export default function POSTerminal() {
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.sku.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory =
-      selectedCategory === "All" ||
+      selectedCategory === CATEGORIES[0] ||
       product.category?.name?.toLowerCase() === selectedCategory.toLowerCase();
     return matchesSearch && matchesCategory;
   });
@@ -336,7 +340,7 @@ export default function POSTerminal() {
         <div className="border-b border-[#2a2a3a] bg-[#111118]/80 p-4 backdrop-blur-xl">
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
+              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
               <input
                 ref={searchRef}
                 type="text"
@@ -368,7 +372,7 @@ export default function POSTerminal() {
           </div>
 
           <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-            {CATEGORIES.map((cat) => (
+            {CATEGORIES.map((cat, i) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
@@ -758,14 +762,14 @@ export default function POSTerminal() {
                         <div class="center" style="font-size: 9px; color: #999;">Tel: +234 800 SSVSHOP</div>
                         <div class="divider"></div>
                         <div style="font-size: 10px; color: #666;">
-                          <div>Invoice: ${lastReceipt.invoiceNumber}</div>
+                          <div>Invoice: ${escapeHtml(lastReceipt.invoiceNumber)}</div>
                           <div>${new Date(lastReceipt.date).toLocaleString()}</div>
-                          <div>Served by: ${lastReceipt.cashierName}</div>
+                          <div>Served by: ${escapeHtml(lastReceipt.cashierName)}</div>
                         </div>
                         <div class="divider"></div>
                         ${lastReceipt.items.map((item: any) => `
                           <div class="row">
-                            <span>${item.name} x${item.quantity}</span>
+                            <span>${escapeHtml(item.name)} x${item.quantity}</span>
                             <span>₦${item.total.toLocaleString()}</span>
                           </div>
                         `).join("")}

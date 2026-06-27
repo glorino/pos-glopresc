@@ -61,6 +61,7 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
       title: "management",
       items: [
         { icon: BarChart3, label: "reports", href: "/dashboard/owner/reports" },
+        { icon: Users, label: "customers", href: "/dashboard/sales-manager/customers" },
         { icon: Shield, label: "users", href: "/dashboard/owner/users" },
         { icon: Building2, label: "branches", href: "/dashboard/owner/branches" },
         { icon: Settings, label: "settings", href: "/dashboard/owner/settings" },
@@ -79,6 +80,7 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
       title: "operations",
       items: [
         { icon: ShoppingCart, label: "sales", href: "/dashboard/sales-manager/sales" },
+        { icon: Users, label: "customers", href: "/dashboard/sales-manager/customers" },
         { icon: Package, label: "inventory", href: "/dashboard/inventory" },
         { icon: Truck, label: "procurement", href: "/dashboard/procurement" },
         { icon: Users, label: "branchStaff", href: "/dashboard/manager/branch-staff" },

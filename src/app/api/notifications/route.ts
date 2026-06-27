@@ -97,18 +97,18 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { userId, title, message, type = "INFO", link } = body;
+    const { title, message, type = "INFO", link } = body;
 
-    if (!userId || !title || !message) {
+    if (!title || !message) {
       return NextResponse.json(
-        { error: "User ID, title, and message are required" },
+        { error: "Title and message are required" },
         { status: 400 }
       );
     }
 
     const notification = await db.notification.create({
       data: {
-        userId,
+        userId: session.user.id,
         title,
         message,
         type,

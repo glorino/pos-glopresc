@@ -343,7 +343,7 @@ export default function BranchesPage() {
           <div className="relative flex-1 sm:w-72">
             <Search
               size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-white"
             />
             <input
               type="text"
@@ -718,7 +718,7 @@ export default function BranchesPage() {
               <div className="relative mb-2">
                 <Search
                   size={14}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-white"
                 />
                 <input
                   type="text"

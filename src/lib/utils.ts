@@ -61,5 +61,5 @@ export function generateBookingNumber(): string {
   return `${prefix}-${datePart}-${random}`;
 }
 
-export const APP_URL = process.env.APP_URL || "https://pos-ssvshop.vercel.app";
+export const APP_URL = process.env.APP_URL || "https://pos-glopresc.vercel.app";
 export const APP_NAME = process.env.APP_NAME || "SSV Shop POS";

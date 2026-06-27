@@ -37,10 +37,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // In production, send email/SMS. For demo, log the reset link.
-    const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/reset-password?token=${token}`;
-    console.log(`[PASSWORD RESET] User: ${user.email}`);
-    console.log(`[PASSWORD RESET] Reset link: ${resetLink}`);
+    // In production, send email/SMS. For demo, log only the user email.
+    console.log(`[PASSWORD RESET] Request for: ${user.email}`);
 
     return NextResponse.json({
       message: successMessage,

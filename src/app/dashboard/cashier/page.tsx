@@ -69,6 +69,7 @@ export default function CashierDashboard() {
   const [registerDate, setRegisterDate] = useState(new Date().toISOString().split("T")[0]);
   const [dailySummary, setDailySummary] = useState<any>(null);
   const [closingBalance, setClosingBalance] = useState("");
+  const [actualBalance, setActualBalance] = useState("");
   const [closingDrawer, setClosingDrawer] = useState(false);
 
   useEffect(() => {
@@ -312,10 +313,24 @@ export default function CashierDashboard() {
                   className="input"
                 />
               </div>
+              <div className="flex-1">
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("actualBalance")}</label>
+                <input
+                  type="number"
+                  value={actualBalance}
+                  onChange={(e) => setActualBalance(e.target.value)}
+                  placeholder={t("enterActualBalance")}
+                  className="input"
+                />
+              </div>
               <button
                 onClick={async () => {
                   if (!closingBalance || Number(closingBalance) < 0) {
                     alert("Please enter a valid closing balance");
+                    return;
+                  }
+                  if (!actualBalance || Number(actualBalance) < 0) {
+                    alert("Please enter a valid actual balance");
                     return;
                   }
                   setClosingDrawer(true);
@@ -323,7 +338,7 @@ export default function CashierDashboard() {
                     const res = await fetch("/api/cash-drawer", {
                       method: "PUT",
                       headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ closingBalance: Number(closingBalance) }),
+                      body: JSON.stringify({ closingBalance: Number(closingBalance), actualBalance: Number(actualBalance) }),
                     });
                     if (res.ok) {
                       setData((prev) => prev ? { ...prev, drawerStatus: { ...prev.drawerStatus, isOpen: false } } : prev);
@@ -361,7 +376,7 @@ export default function CashierDashboard() {
             </div>
           </div>
           <div className="relative">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#606070]" />
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white" />
             <input
               type="text"
               placeholder={t("searchProducts")}

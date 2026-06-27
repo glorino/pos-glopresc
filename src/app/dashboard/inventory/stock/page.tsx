@@ -489,7 +489,7 @@ export default function InventoryStockPage() {
 
           <div className="mb-4 flex items-center gap-3">
             <div className="relative flex-1 sm:w-72">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
               <input
                 type="text"
                 placeholder={t("searchAdjustments")}

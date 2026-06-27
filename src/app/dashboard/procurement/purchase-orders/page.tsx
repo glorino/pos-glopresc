@@ -83,7 +83,7 @@ export default function PurchaseOrdersPage() {
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 sm:w-72">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
             <input type="text" placeholder={t("searchOrders")} value={search} onChange={(e) => setSearch(e.target.value)} className="input pl-10" />
           </div>
           <div className="flex gap-2">

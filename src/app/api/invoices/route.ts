@@ -152,13 +152,19 @@ export async function PUT(request: NextRequest) {
   if (error) return error;
   try {
     const body = await request.json();
-    const { id, ...data } = body;
+    const { id, ...rawData } = body;
 
     if (!id) {
       return NextResponse.json(
         { error: "Invoice ID is required" },
         { status: 400 }
       );
+    }
+
+    const ALLOWED_FIELDS = ["status", "dueDate", "paidDate", "customerId", "amount", "tax", "total"] as const;
+    const data: Record<string, any> = {};
+    for (const key of ALLOWED_FIELDS) {
+      if (key in rawData) data[key] = rawData[key];
     }
 
     if (data.dueDate) data.dueDate = new Date(data.dueDate);

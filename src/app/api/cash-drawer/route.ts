@@ -11,7 +11,7 @@ export async function GET() {
     }
 
     const openDrawer = await db.cashDrawer.findFirst({
-      where: { status: "OPEN" },
+      where: { status: "OPEN", userId: session.user.id },
       orderBy: { openedAt: "desc" },
       include: {
         user: { select: { firstName: true, lastName: true } },
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     }
 
     const existingOpen = await db.cashDrawer.findFirst({
-      where: { status: "OPEN" },
+      where: { status: "OPEN", userId: session.user.id },
     });
 
     if (existingOpen) {
@@ -143,7 +143,7 @@ export async function PUT(request: NextRequest) {
 
     const openDrawer = drawerId
       ? await db.cashDrawer.findUnique({ where: { id: drawerId } })
-      : await db.cashDrawer.findFirst({ where: { status: "OPEN" } });
+      : await db.cashDrawer.findFirst({ where: { status: "OPEN", userId: session.user.id } });
 
     if (!openDrawer) {
       return NextResponse.json(

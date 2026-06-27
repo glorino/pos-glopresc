@@ -138,13 +138,19 @@ export async function PUT(request: NextRequest) {
   if (error) return error;
   try {
     const body = await request.json();
-    const { id, ...data } = body;
+    const { id, ...rawData } = body;
 
     if (!id) {
       return NextResponse.json(
         { error: "Purchase order ID is required" },
         { status: 400 }
       );
+    }
+
+    const ALLOWED_FIELDS = ["status", "expectedDate", "notes"] as const;
+    const data: Record<string, any> = {};
+    for (const key of ALLOWED_FIELDS) {
+      if (key in rawData) data[key] = rawData[key];
     }
 
     if (data.expectedDate) data.expectedDate = new Date(data.expectedDate);

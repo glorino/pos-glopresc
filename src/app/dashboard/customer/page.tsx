@@ -475,7 +475,7 @@ export default function CustomerDashboard() {
                 ))}
                 {bookings.length === 0 && (
                   <div className="flex flex-col items-center py-6 text-center">
-                    <Calendar size={32} className="mb-2 text-[#606070]" />
+                    <Calendar size={32} className="mb-2 text-white" />
                     <p className="text-sm text-[#606070]">{t("noBookingsYet")}</p>
                     <Link href="/booking" className="mt-2 text-xs text-[#d4a843] hover:underline">
                       {t("makeFirstBooking")}
