@@ -14,3 +14,7 @@ export async function requireAuth(allowedRoles?: Role[]) {
   }
   return { error: null, session };
 }
+
+export async function getOptionalSession() {
+  return getServerSession(authOptions);
+}

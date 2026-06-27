@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CreditCard } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
 
 declare global {
   interface Window {
@@ -67,7 +68,7 @@ export default function FlutterwavePayment({
       window.FlutterwaveCheckout({
         public_key,
         tx_ref,
-        amount,
+        amount: amount * 100,
         currency: "NGN",
         customer: { email, name },
         customizations: {
@@ -111,7 +112,7 @@ export default function FlutterwavePayment({
       className="btn-primary flex w-full items-center justify-center gap-3 rounded-xl px-6 py-4 text-lg font-bold transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
     >
       <CreditCard size={22} />
-      {loading ? "Processing..." : `Pay ₦${(amount / 100).toLocaleString("en-NG", { minimumFractionDigits: 2 })} with Flutterwave`}
+      {loading ? "Processing..." : `Pay ${formatCurrency(amount)} with Flutterwave`}
     </button>
   );
 }

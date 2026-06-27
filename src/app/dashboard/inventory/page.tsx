@@ -165,9 +165,9 @@ export default function InventoryDashboard() {
   ];
 
   function getStockStatus(product: Product) {
-    if (product.stockQuantity === 0) return { label: "Out of Stock", className: "badge-danger" };
-    if (product.stockQuantity <= product.minStockLevel) return { label: "Low Stock", className: "badge-warning" };
-    return { label: "In Stock", className: "badge-success" };
+    if (product.stockQuantity === 0) return { label: t("outOfStock"), className: "badge-danger" };
+    if (product.stockQuantity <= product.minStockLevel) return { label: t("lowStock"), className: "badge-warning" };
+    return { label: t("inStock"), className: "badge-success" };
   }
 
   const userRole = (session?.user as any)?.role as string | undefined;
@@ -223,7 +223,7 @@ export default function InventoryDashboard() {
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
                 type="text"
-                placeholder="Search products..."
+                placeholder={t("searchProducts")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="input pl-10 w-64"
@@ -236,7 +236,7 @@ export default function InventoryDashboard() {
                 onChange={(e) => setCategoryFilter(e.target.value)}
                 className="input select pl-10 w-48"
               >
-                <option value="">All Categories</option>
+                <option value="">{t("allCategories")}</option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}
@@ -261,15 +261,15 @@ export default function InventoryDashboard() {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>SKU</th>
-                    <th>Category</th>
-                    <th>Stock Qty</th>
-                    <th>Min Level</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th>{t("image")}</th>
+                    <th>{t("name")}</th>
+                    <th>{t("sku")}</th>
+                    <th>{t("category")}</th>
+                    <th>{t("stockQty")}</th>
+                    <th>{t("minLevel")}</th>
+                    <th>{t("price")}</th>
+                    <th>{t("status")}</th>
+                    <th>{t("actions")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -316,7 +316,7 @@ export default function InventoryDashboard() {
                             href={`/dashboard/inventory/products?id=${product.id}`}
                             className="btn btn-secondary btn-sm"
                           >
-                            View
+                            {t("view")}
                           </Link>
                         </td>
                       </tr>
@@ -325,7 +325,7 @@ export default function InventoryDashboard() {
                   {allProducts.length === 0 && (
                     <tr>
                       <td colSpan={9} className="text-center text-[#606070] py-8">
-                        No products found
+                        {t("noProductsFound")}
                       </td>
                     </tr>
                   )}

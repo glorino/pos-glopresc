@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
+import { useTranslation } from "@/contexts/LanguageContext";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import {
@@ -42,6 +43,7 @@ interface Sale {
 }
 
 export default function SalesManagementPage() {
+  const { t } = useTranslation();
   const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -93,7 +95,7 @@ export default function SalesManagementPage() {
     fetchSales();
   }, [statusFilter, paymentFilter]);
 
-  const headers = ["Invoice", "Customer", "Items", "Total", "Payment", "Status", "Date"];
+  const headers = [t("invoiceNumberCol"), t("customerCol"), t("itemsCol"), t("totalLabel"), t("paymentCol"), t("statusCol"), t("dateCol")];
 
   const getExportRows = () =>
     sales.map((s) => [
@@ -121,7 +123,7 @@ export default function SalesManagementPage() {
   const handleExportPDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text("Sales Report", 14, 22);
+    doc.text(t("salesReport"), 14, 22);
     doc.setFontSize(10);
     doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 30);
     autoTable(doc, {
@@ -136,7 +138,7 @@ export default function SalesManagementPage() {
   };
 
   async function handleReturn(sale: Sale) {
-    if (!confirm(`Process return for invoice ${sale.invoiceNumber}?`)) return;
+    if (!confirm(`${t("processReturn")} ${sale.invoiceNumber}?`)) return;
     try {
       const res = await fetch("/api/sales", {
         method: "PUT",
@@ -150,7 +152,7 @@ export default function SalesManagementPage() {
   }
 
   return (
-    <DashboardLayout role="SALES_MANAGER" title="Sales Management">
+    <DashboardLayout role="SALES_MANAGER" title={t("salesManagement")}>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3">
@@ -158,7 +160,7 @@ export default function SalesManagementPage() {
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
                 type="text"
-                placeholder="Search invoices..."
+                placeholder={t("searchInvoices")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchSales()}
@@ -170,23 +172,23 @@ export default function SalesManagementPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="input select w-auto"
             >
-              <option value="">All Status</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="PENDING">Pending</option>
-              <option value="RETURNED">Returned</option>
-              <option value="CANCELLED">Cancelled</option>
+              <option value="">{t("allStatus")}</option>
+              <option value="COMPLETED">{t("completedLabel")}</option>
+              <option value="PENDING">{t("pendingLabel")}</option>
+              <option value="RETURNED">{t("returnedLabel")}</option>
+              <option value="CANCELLED">{t("cancelledLabel")}</option>
             </select>
             <select
               value={paymentFilter}
               onChange={(e) => setPaymentFilter(e.target.value)}
               className="input select w-auto"
             >
-              <option value="">All Payments</option>
-              <option value="CASH">Cash</option>
-              <option value="CARD">Card</option>
-              <option value="TRANSFER">Transfer</option>
-              <option value="USSD">USSD</option>
-              <option value="MOBILE">Mobile</option>
+              <option value="">{t("allPayments")}</option>
+              <option value="CASH">{t("cash")}</option>
+              <option value="CARD">{t("card")}</option>
+              <option value="TRANSFER">{t("transfer")}</option>
+              <option value="USSD">{t("ussd")}</option>
+              <option value="MOBILE">{t("mobile")}</option>
             </select>
             <input
               type="date"
@@ -207,7 +209,7 @@ export default function SalesManagementPage() {
           <div className="relative">
             <button onClick={() => setShowExportMenu(!showExportMenu)} className="btn btn-secondary">
               <Download size={16} />
-              Export
+              {t("export")}
               <ChevronDown size={14} />
             </button>
             {showExportMenu && (
@@ -215,10 +217,10 @@ export default function SalesManagementPage() {
                 <div className="fixed inset-0 z-40" onClick={() => setShowExportMenu(false)} />
                 <div className="absolute right-0 z-50 mt-2 w-44 rounded-xl border border-[#2a2a3a] bg-[#1c1c28] py-1 shadow-lg">
                   <button onClick={handleExportCSV} className="flex w-full items-center gap-2 px-4 py-2 text-sm text-[#f0f0f5] hover:bg-[#2a2a3a]">
-                    Export as CSV
+                    {t("exportCSV")}
                   </button>
                   <button onClick={handleExportPDF} className="flex w-full items-center gap-2 px-4 py-2 text-sm text-[#f0f0f5] hover:bg-[#2a2a3a]">
-                    Export as PDF
+                    {t("exportPDF")}
                   </button>
                 </div>
               </>
@@ -235,14 +237,14 @@ export default function SalesManagementPage() {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Invoice #</th>
-                  <th>Customer</th>
-                  <th>Items</th>
-                  <th>Total</th>
-                  <th>Payment</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                  <th>Actions</th>
+                  <th>{t("invoiceNumberCol")}</th>
+                  <th>{t("customerCol")}</th>
+                  <th>{t("itemsCol")}</th>
+                  <th>{t("totalLabel")}</th>
+                  <th>{t("paymentCol")}</th>
+                  <th>{t("statusCol")}</th>
+                  <th>{t("dateCol")}</th>
+                  <th>{t("actionsCol")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -276,7 +278,7 @@ export default function SalesManagementPage() {
                         <button
                           onClick={() => setSelectedSale(sale)}
                           className="rounded-lg p-2 text-[#9090a0] hover:bg-[#2a2a3a] hover:text-[#3b82f6]"
-                          title="View Details"
+                          title={t("viewDetails")}
                         >
                           <Eye size={14} />
                         </button>
@@ -284,7 +286,7 @@ export default function SalesManagementPage() {
                           <button
                             onClick={() => handleReturn(sale)}
                             className="rounded-lg p-2 text-[#9090a0] hover:bg-[#2a2a3a] hover:text-[#f59e0b]"
-                            title="Process Return"
+                            title={t("processReturn")}
                           >
                             <RotateCcw size={14} />
                           </button>
@@ -296,7 +298,7 @@ export default function SalesManagementPage() {
                 {sales.length === 0 && (
                   <tr>
                     <td colSpan={8} className="text-center text-[#606070]">
-                      No sales found
+                      {t("noSalesFound")}
                     </td>
                   </tr>
                 )}
@@ -311,7 +313,7 @@ export default function SalesManagementPage() {
           <div className="glass-card w-full max-w-lg p-6">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-[#f0f0f5]">
-                Sale #{selectedSale.invoiceNumber}
+                {t("saleNumber")}{selectedSale.invoiceNumber}
               </h2>
               <button onClick={() => setSelectedSale(null)} className="text-[#606070] hover:text-[#f0f0f5]">
                 <X size={20} />
@@ -321,35 +323,35 @@ export default function SalesManagementPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-[#606070]">Customer</p>
+                  <p className="text-[#606070]">{t("customerCol")}</p>
                   <p className="font-medium text-[#f0f0f5]">{selectedSale.customer}</p>
                 </div>
                 <div>
-                  <p className="text-[#606070]">Cashier</p>
+                  <p className="text-[#606070]">{t("cashierCol")}</p>
                   <p className="font-medium text-[#f0f0f5]">{selectedSale.cashier}</p>
                 </div>
                 <div>
-                  <p className="text-[#606070]">Date</p>
+                  <p className="text-[#606070]">{t("dateCol")}</p>
                   <p className="font-medium text-[#f0f0f5]">
                     {formatDateTime(selectedSale.createdAt)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[#606070]">Payment</p>
+                  <p className="text-[#606070]">{t("paymentCol")}</p>
                   <span className="badge badge-info">{selectedSale.paymentMethod}</span>
                 </div>
               </div>
 
               <div className="border-t border-[#2a2a3a] pt-4">
-                <h4 className="mb-3 text-sm font-semibold text-[#f0f0f5]">Items</h4>
+                <h4 className="mb-3 text-sm font-semibold text-[#f0f0f5]">{t("itemsCol")}</h4>
                 <div className="table-container">
                   <table className="table">
                     <thead>
                       <tr>
-                        <th>Product</th>
-                        <th>Qty</th>
-                        <th>Price</th>
-                        <th>Total</th>
+                        <th>{t("productCol")}</th>
+                        <th>{t("qtyCol")}</th>
+                        <th>{t("priceCol")}</th>
+                        <th>{t("totalLabel")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -368,30 +370,30 @@ export default function SalesManagementPage() {
 
               <div className="border-t border-[#2a2a3a] pt-4 space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-[#9090a0]">Subtotal</span>
+                  <span className="text-[#9090a0]">{t("subtotalLabel")}</span>
                   <span className="text-[#f0f0f5]">{formatCurrency(selectedSale.subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#9090a0]">Discount</span>
+                  <span className="text-[#9090a0]">{t("discountLabel")}</span>
                   <span className="text-[#f43f5e]">-{formatCurrency(selectedSale.discount)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#9090a0]">Tax</span>
+                  <span className="text-[#9090a0]">{t("taxLabel")}</span>
                   <span className="text-[#f0f0f5]">{formatCurrency(selectedSale.tax)}</span>
                 </div>
                 <div className="flex justify-between border-t border-[#2a2a3a] pt-2">
-                  <span className="font-semibold text-[#f0f0f5]">Total</span>
+                  <span className="font-semibold text-[#f0f0f5]">{t("totalLabel")}</span>
                   <span className="font-semibold text-[#d4a843]">
                     {formatCurrency(selectedSale.total)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#9090a0]">Amount Paid</span>
+                  <span className="text-[#9090a0]">{t("amountPaidCol")}</span>
                   <span className="text-[#10b981]">{formatCurrency(selectedSale.amountPaid)}</span>
                 </div>
                 {selectedSale.changeDue > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-[#9090a0]">Change Due</span>
+                    <span className="text-[#9090a0]">{t("changeDueCol")}</span>
                     <span className="text-[#f0f0f5]">{formatCurrency(selectedSale.changeDue)}</span>
                   </div>
                 )}
@@ -399,7 +401,7 @@ export default function SalesManagementPage() {
 
               {selectedSale.notes && (
                 <div className="border-t border-[#2a2a3a] pt-4">
-                  <p className="text-sm text-[#606070]">Notes</p>
+                  <p className="text-sm text-[#606070]">{t("notesLabel")}</p>
                   <p className="text-sm text-[#9090a0]">{selectedSale.notes}</p>
                 </div>
               )}

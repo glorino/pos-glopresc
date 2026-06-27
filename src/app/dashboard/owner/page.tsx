@@ -196,9 +196,9 @@ export default function OwnerDashboard() {
   ];
 
   const salesBreakdown = [
-    { name: "Products", value: 68 },
-    { name: "Services", value: 22 },
-    { name: "Bookings", value: 10 },
+    { name: t("products"), value: 68 },
+    { name: t("services"), value: 22 },
+    { name: t("bookings"), value: 10 },
   ];
 
   return (
@@ -419,8 +419,8 @@ export default function OwnerDashboard() {
                   <Store size={18} className="text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-[#f0f0f5]">Branch Performance</h3>
-                  <p className="text-sm text-[#9090a0]">Revenue ranking across all branches</p>
+                  <h3 className="text-lg font-semibold text-[#f0f0f5]">{t("branchPerformance")}</h3>
+                  <p className="text-sm text-[#9090a0]">{t("revenueRankingDesc")}</p>
                 </div>
               </div>
             </div>
@@ -428,11 +428,11 @@ export default function OwnerDashboard() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-[#2a2a3a]">
-                    <th className="pb-3 text-left text-xs font-medium text-[#9090a0]">Rank</th>
-                    <th className="pb-3 text-left text-xs font-medium text-[#9090a0]">Branch</th>
-                    <th className="pb-3 text-right text-xs font-medium text-[#9090a0]">Revenue</th>
-                    <th className="pb-3 text-right text-xs font-medium text-[#9090a0]">Sales</th>
-                    <th className="pb-3 text-right text-xs font-medium text-[#9090a0]">Performance</th>
+                    <th className="pb-3 text-left text-xs font-medium text-[#9090a0]">{t("rank")}</th>
+                    <th className="pb-3 text-left text-xs font-medium text-[#9090a0]">{t("branch")}</th>
+                    <th className="pb-3 text-right text-xs font-medium text-[#9090a0]">{t("revenue")}</th>
+                    <th className="pb-3 text-right text-xs font-medium text-[#9090a0]">{t("sales")}</th>
+                    <th className="pb-3 text-right text-xs font-medium text-[#9090a0]">{t("performance")}</th>
                   </tr>
                 </thead>
                 <tbody>

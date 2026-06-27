@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { generateInvoiceNumber } from "@/lib/utils";
 import { sendSMS } from "@/lib/sms";
 import { getToken } from "next-auth/jwt";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { requireAuth } from "@/lib/api-auth";
 
 export async function GET(request: NextRequest) {
@@ -83,18 +85,52 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const { error } = await requireAuth();
-  if (error) return error;
   try {
     const body = await request.json();
-    const { userId, customerId, items, paymentMethod, amountPaid, notes, discount = 0, tax = 0 } = body;
+    const { userId: requestedUserId, customerId, items, paymentMethod, amountPaid, notes, discount = 0, tax = 0, customerName, customerEmail } = body;
 
     const token = await getToken({ req: request as any });
+    const session = await getServerSession(authOptions);
     const branchId = token?.branchId as string | undefined || null;
 
-    if (!userId || !items || items.length === 0) {
+    let userId = requestedUserId || (session?.user as any)?.id;
+
+    if (!userId) {
+      let guestUser = await db.user.findFirst({ where: { email: "guest@system.local" } });
+      if (!guestUser) {
+        guestUser = await db.user.create({
+          data: {
+            email: "guest@system.local",
+            password: "not-a-real-password",
+            firstName: "Guest",
+            lastName: "User",
+            role: "CUSTOMER",
+          },
+        });
+      }
+      userId = guestUser.id;
+    }
+
+    let resolvedCustomerId = customerId || null;
+
+    if (!resolvedCustomerId && customerEmail) {
+      let customer = await db.customer.findUnique({ where: { email: customerEmail } });
+      if (!customer) {
+        const nameParts = (customerName || "").trim().split(" ");
+        customer = await db.customer.create({
+          data: {
+            firstName: nameParts[0] || "Guest",
+            lastName: nameParts.slice(1).join(" ") || "Customer",
+            email: customerEmail,
+          },
+        });
+      }
+      resolvedCustomerId = customer.id;
+    }
+
+    if (!items || items.length === 0) {
       return NextResponse.json(
-        { error: "User ID and at least one item are required" },
+        { error: "At least one item is required" },
         { status: 400 }
       );
     }
@@ -130,7 +166,7 @@ export async function POST(request: NextRequest) {
           invoiceNumber,
           userId,
           branchId,
-          customerId: customerId || null,
+          customerId: resolvedCustomerId,
           subtotal,
           discount: Number(discount),
           tax: Number(tax),
@@ -158,9 +194,9 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      if (customerId) {
+      if (resolvedCustomerId) {
         await tx.customer.update({
-          where: { id: customerId },
+          where: { id: resolvedCustomerId },
           data: { totalSpent: { increment: total } },
         });
       }
@@ -170,7 +206,7 @@ export async function POST(request: NextRequest) {
 
     if (sale.customer) {
       const customerPhone = await db.customer.findUnique({
-        where: { id: customerId },
+        where: { id: resolvedCustomerId },
         select: { phone: true },
       });
       if (customerPhone?.phone) {

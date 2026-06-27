@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency } from "@/lib/utils";
+import { useTranslation } from "@/contexts/LanguageContext";
 import { Plus, Trash2, ArrowLeft, ShoppingCart } from "lucide-react";
 
 interface Supplier {
@@ -29,6 +30,7 @@ interface OrderItem {
 
 export default function NewPurchaseOrderPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -124,14 +126,14 @@ export default function NewPurchaseOrderPage() {
   }
 
   return (
-    <DashboardLayout role="PROCUREMENT_MANAGER" title="New Purchase Order">
+    <DashboardLayout role="PROCUREMENT_MANAGER" title={t("createPOTitle")}>
       <div className="mx-auto max-w-3xl space-y-6">
         <button
           onClick={() => router.back()}
           className="flex items-center gap-2 text-sm text-[#9090a0] hover:text-[#f0f0f5]"
         >
           <ArrowLeft size={16} />
-          Back
+          {t("backBtn")}
         </button>
 
         <div className="glass-card p-6">
@@ -139,7 +141,7 @@ export default function NewPurchaseOrderPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843]/20 to-[#d4a843]/5">
               <ShoppingCart size={18} className="text-[#d4a843]" />
             </div>
-            <h2 className="text-xl font-semibold text-[#f0f0f5]">Create Purchase Order</h2>
+            <h2 className="text-xl font-semibold text-[#f0f0f5]">{t("createPOBtn")}</h2>
           </div>
 
           {error && (
@@ -156,14 +158,14 @@ export default function NewPurchaseOrderPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Supplier *</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("supplierLabel")}</label>
                   <select
                     required
                     value={supplierId}
                     onChange={(e) => setSupplierId(e.target.value)}
                     className="input"
                   >
-                    <option value="">Select a supplier</option>
+                    <option value="">{t("selectSupplier")}</option>
                     {suppliers.map((s) => (
                       <option key={s.id} value={s.id}>
                         {s.name}{s.avgItemCost ? ` (Avg: ₦${s.avgItemCost.toLocaleString()})` : ""}
@@ -175,7 +177,7 @@ export default function NewPurchaseOrderPage() {
                     if (selected && selected.avgItemCost && selected.avgItemCost > 0) {
                       return (
                         <div className="mt-2 flex items-center gap-2 rounded-lg border border-[#d4a843]/20 bg-[#d4a843]/5 px-3 py-2 text-xs">
-                          <span className="text-[#9090a0]">Supplier avg cost:</span>
+                          <span className="text-[#9090a0]">{t("supplierAvgCost")}</span>
                           <span className="font-semibold text-[#d4a843]">{formatCurrency(selected.avgItemCost)}</span>
                           <span className="text-[#606070]">| {selected.totalItemsSupplied ?? 0} items</span>
                         </div>
@@ -185,7 +187,7 @@ export default function NewPurchaseOrderPage() {
                   })()}
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Expected Delivery Date</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("expectedDeliveryDate")}</label>
                   <input
                     type="date"
                     value={expectedDate}
@@ -196,28 +198,28 @@ export default function NewPurchaseOrderPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Notes</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("notesLabel")}</label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   className="input"
                   rows={2}
-                  placeholder="Optional notes"
+                  placeholder={t("notesPlaceholder")}
                 />
               </div>
 
               <div>
                 <div className="mb-3 flex items-center justify-between">
-                  <h3 className="text-sm font-medium text-[#f0f0f5]">Items</h3>
+                  <h3 className="text-sm font-medium text-[#f0f0f5]">{t("itemsLabel")}</h3>
                   <button type="button" onClick={addItem} className="btn btn-secondary btn-sm">
                     <Plus size={14} />
-                    Add Item
+                    {t("addItemBtn")}
                   </button>
                 </div>
 
                 {items.length === 0 ? (
                   <div className="rounded-xl border border-dashed border-[#2a2a3a] bg-[#12121a] p-8 text-center">
-                    <p className="text-sm text-[#606070]">No items added yet. Click &quot;Add Item&quot; to begin.</p>
+                    <p className="text-sm text-[#606070]">{t("noItemsAdded")}</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -227,14 +229,14 @@ export default function NewPurchaseOrderPage() {
                         className="flex items-end gap-3 rounded-xl border border-[#2a2a3a] bg-[#12121a] p-3"
                       >
                         <div className="flex-1">
-                          <label className="mb-1 block text-xs text-[#606070]">Product *</label>
+                          <label className="mb-1 block text-xs text-[#606070]">{t("productLabel")}</label>
                           <select
                             required
                             value={item.productId}
                             onChange={(e) => updateItem(index, "productId", e.target.value)}
                             className="input text-sm"
                           >
-                            <option value="">Select product</option>
+                            <option value="">{t("selectProduct")}</option>
                             {products.map((p) => (
                               <option key={p.id} value={p.id}>
                                 {p.name} ({p.sku})
@@ -243,7 +245,7 @@ export default function NewPurchaseOrderPage() {
                           </select>
                         </div>
                         <div className="w-24">
-                          <label className="mb-1 block text-xs text-[#606070]">Qty *</label>
+                          <label className="mb-1 block text-xs text-[#606070]">{t("qtyLabel")}</label>
                           <input
                             type="number"
                             min={1}
@@ -254,7 +256,7 @@ export default function NewPurchaseOrderPage() {
                           />
                         </div>
                         <div className="w-32">
-                          <label className="mb-1 block text-xs text-[#606070]">Unit Cost *</label>
+                          <label className="mb-1 block text-xs text-[#606070]">{t("unitCost")}</label>
                           <input
                             type="number"
                             step="0.01"
@@ -284,7 +286,7 @@ export default function NewPurchaseOrderPage() {
               {items.length > 0 && (
                 <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
                   <div className="flex justify-between">
-                    <span className="font-semibold text-[#f0f0f5]">Total</span>
+                    <span className="font-semibold text-[#f0f0f5]">{t("totalLabel")}</span>
                     <span className="font-semibold text-[#d4a843]">{formatCurrency(total)}</span>
                   </div>
                 </div>
@@ -292,10 +294,10 @@ export default function NewPurchaseOrderPage() {
 
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => router.back()} className="btn btn-secondary">
-                  Cancel
+                  {t("cancelBtn")}
                 </button>
                 <button type="submit" disabled={saving || items.length === 0} className="btn btn-primary">
-                  {saving ? "Creating..." : "Create Purchase Order"}
+                  {saving ? t("creatingLabel") : t("createPOBtn")}
                 </button>
               </div>
             </form>

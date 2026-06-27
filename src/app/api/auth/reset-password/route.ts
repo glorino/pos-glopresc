@@ -21,46 +21,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Decode the token to get the email
-    let payload: { email: string; timestamp: number };
-    try {
-      const decoded = Buffer.from(token, "base64url").toString("utf-8");
-      payload = JSON.parse(decoded);
-    } catch {
-      return NextResponse.json(
-        { error: "Invalid or malformed reset token" },
-        { status: 400 }
-      );
-    }
-
-    // Check if token is expired (1 hour limit)
-    const tokenAge = Date.now() - payload.timestamp;
-    const ONE_HOUR = 60 * 60 * 1000;
-    if (tokenAge > ONE_HOUR) {
-      return NextResponse.json(
-        { error: "Reset token has expired. Please request a new one." },
-        { status: 400 }
-      );
-    }
-
-    // Find the user
-    const user = await db.user.findUnique({
-      where: { email: payload.email },
+    // Find user by reset token
+    const user = await db.user.findFirst({
+      where: {
+        resetToken: token,
+        resetTokenExpiry: { gt: new Date() },
+      },
     });
 
     if (!user) {
       return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
+        { error: "Invalid or expired reset token" },
+        { status: 400 }
       );
     }
 
-    // Hash the new password and update
+    // Hash the new password and update, then clear the token
     const hashedPassword = await hash(newPassword, 12);
 
     await db.user.update({
       where: { id: user.id },
-      data: { password: hashedPassword },
+      data: {
+        password: hashedPassword,
+        resetToken: null,
+        resetTokenExpiry: null,
+      },
     });
 
     return NextResponse.json({

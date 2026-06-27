@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency } from "@/lib/utils";
+import { useTranslation } from "@/contexts/LanguageContext";
 import {
   Truck,
   Plus,
@@ -32,6 +33,7 @@ interface Supplier {
 }
 
 export default function ProcurementSuppliersPage() {
+  const { t } = useTranslation();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -112,14 +114,14 @@ export default function ProcurementSuppliersPage() {
   }
 
   return (
-    <DashboardLayout role="PROCUREMENT_MANAGER" title="Suppliers">
+    <DashboardLayout role="PROCUREMENT_MANAGER" title={t("suppliersTitle")}>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 sm:w-72">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
-            <input type="text" placeholder="Search suppliers..." value={search} onChange={(e) => setSearch(e.target.value)} className="input pl-10" />
+            <input type="text" placeholder={t("searchSuppliersPlaceholder")} value={search} onChange={(e) => setSearch(e.target.value)} className="input pl-10" />
           </div>
-          <button onClick={openAddModal} className="btn btn-primary"><Plus size={16} /> Add Supplier</button>
+          <button onClick={openAddModal} className="btn btn-primary"><Plus size={16} /> {t("addSupplierBtn")}</button>
         </div>
 
         {loading ? (
@@ -129,8 +131,8 @@ export default function ProcurementSuppliersPage() {
         ) : suppliers.length === 0 ? (
           <div className="glass-card flex flex-col items-center justify-center p-12">
             <Truck size={48} className="mb-4 text-[#606070]" />
-            <h3 className="text-lg font-semibold text-[#f0f0f5]">No suppliers found</h3>
-            <p className="mt-1 text-sm text-[#9090a0]">Add your first supplier to get started.</p>
+            <h3 className="text-lg font-semibold text-[#f0f0f5]">{t("noSuppliersFoundMsg")}</h3>
+            <p className="mt-1 text-sm text-[#9090a0]">{t("addFirstSupplier")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -147,7 +149,7 @@ export default function ProcurementSuppliersPage() {
                     </div>
                   </div>
                   <span className={`badge ${supplier.isActive ? "badge-success" : "badge-danger"}`}>
-                    {supplier.isActive ? "Active" : "Inactive"}
+                    {supplier.isActive ? t("activeLabel") : t("inactiveLabel")}
                   </span>
                 </div>
                 <div className="space-y-1 text-sm text-[#9090a0]">
@@ -158,17 +160,17 @@ export default function ProcurementSuppliersPage() {
                 {supplier.avgItemCost !== undefined && supplier.avgItemCost > 0 && (
                   <div className="mt-3 rounded-lg border border-[#2a2a3a] bg-[#12121a] p-3">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-[#9090a0]">Avg Item Cost</span>
+                      <span className="text-[#9090a0]">{t("avgItemCost")}</span>
                       <span className="font-semibold text-[#d4a843]">{formatCurrency(supplier.avgItemCost)}</span>
                     </div>
                     <div className="mt-1 flex items-center justify-between text-xs">
-                      <span className="text-[#606070]">Items supplied: {supplier.totalItemsSupplied ?? supplier._count?.products ?? 0}</span>
-                      <span className="text-[#606070]">Orders: {supplier._count?.purchaseOrders ?? 0}</span>
+                      <span className="text-[#606070]">{t("itemsSupplied")}: {supplier.totalItemsSupplied ?? supplier._count?.products ?? 0}</span>
+                      <span className="text-[#606070]">{t("ordersCount")}: {supplier._count?.purchaseOrders ?? 0}</span>
                     </div>
                   </div>
                 )}
                 <div className="mt-3 flex gap-2">
-                  <button onClick={() => openEditModal(supplier)} className="btn btn-secondary btn-sm flex-1">Edit</button>
+                  <button onClick={() => openEditModal(supplier)} className="btn btn-secondary btn-sm flex-1">{t("editLabel")}</button>
                 </div>
               </div>
             ))}
@@ -179,37 +181,37 @@ export default function ProcurementSuppliersPage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
             <div className="glass-card w-full max-w-lg p-6">
               <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-[#f0f0f5]">{editingSupplier ? "Edit Supplier" : "Add Supplier"}</h2>
+                <h2 className="text-xl font-semibold text-[#f0f0f5]">{editingSupplier ? t("editSupplier") : t("addSupplierTitle")}</h2>
                 <button onClick={() => setShowModal(false)} className="text-[#606070] hover:text-[#f0f0f5]"><X size={20} /></button>
               </div>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Supplier Name *</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("supplierName")}</label>
                   <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="input" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="mb-1 block text-sm text-[#9090a0]">Contact Name</label>
+                    <label className="mb-1 block text-sm text-[#9090a0]">{t("contactNameLabel")}</label>
                     <input type="text" value={form.contactName} onChange={(e) => setForm({ ...form, contactName: e.target.value })} className="input" />
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm text-[#9090a0]">Email</label>
+                    <label className="mb-1 block text-sm text-[#9090a0]">{t("emailLabel")}</label>
                     <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="input" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="mb-1 block text-sm text-[#9090a0]">Phone</label>
+                    <label className="mb-1 block text-sm text-[#9090a0]">{t("phoneLabel")}</label>
                     <input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="input" />
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm text-[#9090a0]">City</label>
+                    <label className="mb-1 block text-sm text-[#9090a0]">{t("cityLabel")}</label>
                     <input type="text" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className="input" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="mb-1 block text-sm text-[#9090a0]">Address</label>
+                    <label className="mb-1 block text-sm text-[#9090a0]">{t("addressLabel")}</label>
                     <input type="text" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} className="input" />
                   </div>
                   <div>
@@ -218,8 +220,8 @@ export default function ProcurementSuppliersPage() {
                   </div>
                 </div>
                 <div className="flex justify-end gap-3 pt-2">
-                  <button type="button" onClick={() => setShowModal(false)} className="btn btn-secondary">Cancel</button>
-                  <button type="submit" disabled={saving} className="btn btn-primary">{saving ? "Saving..." : editingSupplier ? "Update" : "Create"}</button>
+                  <button type="button" onClick={() => setShowModal(false)} className="btn btn-secondary">{t("cancelBtn")}</button>
+                  <button type="submit" disabled={saving} className="btn btn-primary">{saving ? t("savingLabel") : editingSupplier ? t("updateBtn") : t("createBtn")}</button>
                 </div>
               </form>
             </div>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency } from "@/lib/utils";
+import { useTranslation } from "@/contexts/LanguageContext";
 import {
   DollarSign,
   ShoppingCart,
@@ -51,6 +52,7 @@ interface ManagerData {
 
 export default function ManagerDashboard() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [data, setData] = useState<ManagerData | null>(null);
   const [loading, setLoading] = useState(true);
   const [dateFrom, setDateFrom] = useState("");
@@ -78,7 +80,7 @@ export default function ManagerDashboard() {
 
   if (loading) {
     return (
-      <DashboardLayout role="MANAGER" title="Manager Dashboard">
+      <DashboardLayout role="MANAGER" title={t("managerDashboard")}>
         <div className="flex h-[60vh] items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4a843] border-t-transparent" />
         </div>
@@ -88,42 +90,42 @@ export default function ManagerDashboard() {
 
   const stats = [
     {
-      label: "Today's Revenue",
+      label: t("todayRevenue"),
       value: formatCurrency(data?.todayRevenue ?? 0),
       icon: DollarSign,
       color: "from-[#d4a843]/20 to-[#d4a843]/5",
       iconColor: "text-[#d4a843]",
     },
     {
-      label: "Today's Sales",
+      label: t("todaySales"),
       value: (data?.todaySales ?? 0).toLocaleString(),
       icon: ShoppingCart,
       color: "from-[#3b82f6]/20 to-[#3b82f6]/5",
       iconColor: "text-[#3b82f6]",
     },
     {
-      label: "Staff on Duty",
+      label: t("staffOnDuty"),
       value: (data?.staffOnDuty ?? 0).toLocaleString(),
       icon: Users,
       color: "from-[#8b5cf6]/20 to-[#8b5cf6]/5",
       iconColor: "text-[#8b5cf6]",
     },
     {
-      label: "Inventory Value",
-      value: (data?.inventoryValue ?? 0).toLocaleString() + " units",
+      label: t("inventoryValue"),
+      value: (data?.inventoryValue ?? 0).toLocaleString() + " " + t("units"),
       icon: Package,
       color: "from-[#10b981]/20 to-[#10b981]/5",
       iconColor: "text-[#10b981]",
     },
     {
-      label: "Pending Approvals",
+      label: t("pendingApprovals"),
       value: (data?.pendingApprovals ?? 0).toLocaleString(),
       icon: Clock,
       color: "from-[#f59e0b]/20 to-[#f59e0b]/5",
       iconColor: "text-[#f59e0b]",
     },
     {
-      label: "Customer Visits",
+      label: t("customerVisits"),
       value: (data?.customerVisits ?? 0).toLocaleString(),
       icon: UserCheck,
       color: "from-[#06b6d4]/20 to-[#06b6d4]/5",
@@ -132,13 +134,13 @@ export default function ManagerDashboard() {
   ];
 
   const quickActions = [
-    { label: "Approve Expenses", action: () => router.push('/dashboard/accounting/expenses'), icon: CheckCircle },
-    { label: "View Reports", action: () => router.push('/dashboard/owner/reports'), icon: BarChart3 },
-    { label: "Staff Management", action: () => router.push('/dashboard/owner/users'), icon: Users },
+    { label: t("approveExpenses"), action: () => router.push('/dashboard/accounting/expenses'), icon: CheckCircle },
+    { label: t("viewReports"), action: () => router.push('/dashboard/owner/reports'), icon: BarChart3 },
+    { label: t("staffManagement"), action: () => router.push('/dashboard/owner/users'), icon: Users },
   ];
 
   return (
-    <DashboardLayout role="MANAGER" title="Manager Dashboard">
+      <DashboardLayout role="MANAGER" title={t("managerDashboard")}>
       <div className="space-y-6">
         {/* Date Range Filter & Total Payments */}
         <div className="glass-card p-4">
@@ -150,7 +152,7 @@ export default function ManagerDashboard() {
                 onChange={(e) => setDateFrom(e.target.value)}
                 className="input w-40"
               />
-              <span className="text-sm text-[#606070]">to</span>
+              <span className="text-sm text-[#606070]">{t("toLabel")}</span>
               <input
                 type="date"
                 value={dateTo}
@@ -162,13 +164,13 @@ export default function ManagerDashboard() {
                   onClick={() => { setDateFrom(""); setDateTo(""); }}
                   className="btn btn-secondary btn-sm"
                 >
-                  Clear
+                  {t("clear")}
                 </button>
               )}
             </div>
             <div className="flex items-center gap-2 rounded-xl border border-[#10b981]/30 bg-[#10b981]/10 px-4 py-2">
               <DollarSign size={18} className="text-[#10b981]" />
-              <span className="text-sm font-medium text-[#9090a0]">Total Payments:</span>
+              <span className="text-sm font-medium text-[#9090a0]">{t("totalPaymentsLabel")}</span>
               <span className="text-lg font-bold text-[#10b981]">
                 {formatCurrency(data?.totalPayments ?? 0)}
               </span>
@@ -187,9 +189,9 @@ export default function ManagerDashboard() {
               </div>
               <div className="text-left">
                 <p className="text-sm font-semibold text-[#f0f0f5]">
-                  Stock Alert — {data.lowStockItems.length} product{data.lowStockItems.length !== 1 ? "s" : ""} below minimum level
+                  {t("stockAlert")} — {data.lowStockItems.length} {data.lowStockItems.length !== 1 ? t("products") : t("product")} {t("belowMinimumLevel")}
                 </p>
-                <p className="text-xs text-[#9090a0]">Click to view and manage inventory</p>
+                <p className="text-xs text-[#9090a0]">{t("clickToViewInventory")}</p>
               </div>
             </div>
             <ArrowRight size={16} className="text-[#f59e0b]" />
@@ -216,7 +218,7 @@ export default function ManagerDashboard() {
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
           <div className="glass-card xl:col-span-2 p-6">
             <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-              Sales Performance
+              {t("salesPerformance")}
             </h3>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -236,13 +238,13 @@ export default function ManagerDashboard() {
                   <Legend />
                   <Bar
                     dataKey="thisWeek"
-                    name="This Week"
+                    name={t("thisWeek")}
                     fill="#d4a843"
                     radius={[4, 4, 0, 0]}
                   />
                   <Bar
                     dataKey="lastWeek"
-                    name="Last Week"
+                    name={t("lastWeek")}
                     fill="#3b82f6"
                     radius={[4, 4, 0, 0]}
                   />
@@ -253,7 +255,7 @@ export default function ManagerDashboard() {
 
           <div className="glass-card p-6">
             <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-              Quick Actions
+              {t("quickActions")}
             </h3>
             <div className="space-y-3">
               {quickActions.map((action) => {
@@ -281,15 +283,15 @@ export default function ManagerDashboard() {
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <div className="glass-card p-6">
             <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-              Staff Performance
+              {t("staffPerformance")}
             </h3>
             <div className="table-container">
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Staff Member</th>
-                    <th>Sales</th>
-                    <th>Revenue</th>
+                    <th>{t("staffMember")}</th>
+                    <th>{t("sales")}</th>
+                    <th>{t("revenue")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -308,7 +310,7 @@ export default function ManagerDashboard() {
                     data.staffPerformance.length === 0) && (
                     <tr>
                       <td colSpan={3} className="text-center text-[#606070]">
-                        No staff data available
+                        {t("noStaffData")}
                       </td>
                     </tr>
                   )}
@@ -319,7 +321,7 @@ export default function ManagerDashboard() {
 
           <div className="glass-card p-6">
             <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-              Expense Summary
+              {t("expenseSummary")}
             </h3>
             <div className="space-y-3">
               {data?.expenseSummary?.map((expense) => (
@@ -351,7 +353,7 @@ export default function ManagerDashboard() {
               ))}
               {(!data?.expenseSummary || data.expenseSummary.length === 0) && (
                 <p className="text-center text-sm text-[#606070]">
-                  No expense data available
+                  {t("noExpenseData")}
                 </p>
               )}
             </div>
@@ -359,9 +361,9 @@ export default function ManagerDashboard() {
         </div>
 
         <div className="glass-card p-6">
-          <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-            Low Stock Alerts
-          </h3>
+            <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
+              {t("lowStockAlerts")}
+            </h3>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {data?.lowStockItems?.map((item) => (
               <div
@@ -373,17 +375,17 @@ export default function ManagerDashboard() {
                     {item.name}
                   </p>
                   <p className="text-xs text-[#606070]">
-                    Min: {item.minStockLevel}
+                    {t("minLabel")} {item.minStockLevel}
                   </p>
                 </div>
                 <span className="badge badge-danger">
-                  {item.stockQuantity} left
+                  {item.stockQuantity} {t("left")}
                 </span>
               </div>
             ))}
             {(!data?.lowStockItems || data.lowStockItems.length === 0) && (
               <p className="col-span-full text-center text-sm text-[#606070]">
-                All stock levels are healthy
+                {t("allStockLevelsHealthy")}
               </p>
             )}
           </div>

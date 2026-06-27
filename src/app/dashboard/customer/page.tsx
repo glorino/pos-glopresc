@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency, formatDateTime, formatDate } from "@/lib/utils";
+import { useTranslation } from "@/contexts/LanguageContext";
 import {
   ShoppingCart,
   DollarSign,
@@ -90,6 +91,7 @@ function getNextTier(points: number) {
 
 export default function CustomerDashboard() {
   const router = useRouter();
+  const { t } = useTranslation();
   const ordersRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<CustomerProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -157,28 +159,28 @@ export default function CustomerDashboard() {
 
   const stats = [
     {
-      label: "Total Orders",
+      label: t("totalOrders"),
       value: data?.stats?.totalOrders ?? 0,
       icon: ShoppingCart,
       color: "from-[#d4a843]/20 to-[#d4a843]/5",
       iconColor: "text-[#d4a843]",
     },
     {
-      label: "Total Spent",
+      label: t("totalSpent"),
       value: formatCurrency(data?.stats?.totalSpent ?? 0),
       icon: DollarSign,
       color: "from-[#3b82f6]/20 to-[#3b82f6]/5",
       iconColor: "text-[#3b82f6]",
     },
     {
-      label: "Loyalty Points",
+      label: t("loyaltyPointsLabel"),
       value: (data?.stats?.loyaltyPoints ?? 0).toLocaleString(),
       icon: Star,
       color: "from-[#8b5cf6]/20 to-[#8b5cf6]/5",
       iconColor: "text-[#8b5cf6]",
     },
     {
-      label: "Active Bookings",
+      label: t("activeBookingsLabel"),
       value: data?.stats?.activeBookings ?? 0,
       icon: Calendar,
       color: "from-[#10b981]/20 to-[#10b981]/5",
@@ -187,11 +189,11 @@ export default function CustomerDashboard() {
   ];
 
   const quickActions = [
-    { label: "Browse Shop", icon: Store, action: () => router.push("/shop") },
-    { label: "Track Orders", icon: Package, action: scrollToOrders },
-    { label: "Update Profile", icon: Edit3, action: () => setEditing(true) },
+    { label: t("browseShop"), icon: Store, action: () => router.push("/shop") },
+    { label: t("trackOrders"), icon: Package, action: scrollToOrders },
+    { label: t("updateProfile"), icon: Edit3, action: () => setEditing(true) },
     {
-      label: "Contact Support",
+      label: t("contactSupport"),
       icon: MessageSquare,
       action: () => window.open("mailto:support@glopresc.com?subject=Customer%20Support%20Request", "_blank"),
     },
@@ -220,16 +222,16 @@ export default function CustomerDashboard() {
     : 100;
 
   const filterTabs: { key: OrderStatus; label: string; icon: typeof Package }[] = [
-    { key: "ALL", label: "All", icon: Package },
-    { key: "COMPLETED", label: "Completed", icon: CheckCircle },
-    { key: "PENDING", label: "Pending", icon: Clock },
-    { key: "REFUNDED", label: "Refunded", icon: RotateCcw },
+    { key: "ALL", label: t("all"), icon: Package },
+    { key: "COMPLETED", label: t("completed"), icon: CheckCircle },
+    { key: "PENDING", label: t("pending"), icon: Clock },
+    { key: "REFUNDED", label: t("refunded"), icon: RotateCcw },
   ];
 
   const recentOrders = filteredOrders.slice(0, 5);
 
   return (
-    <DashboardLayout role="CUSTOMER" title="My Account">
+    <DashboardLayout role="CUSTOMER" title={t("myAccount")}>
       <div className="space-y-6">
         {/* Stats Row */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -253,7 +255,7 @@ export default function CustomerDashboard() {
 
         {/* Quick Actions */}
         <div className="glass-card p-6">
-          <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">Quick Actions</h3>
+          <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">{t("quickActions")}</h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {quickActions.map((action) => {
               const Icon = action.icon;
@@ -274,22 +276,22 @@ export default function CustomerDashboard() {
         {/* Loyalty Points Progress */}
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-[#f0f0f5]">Loyalty Status</h3>
+            <h3 className="text-lg font-semibold text-[#f0f0f5]">{t("loyaltyStatus")}</h3>
             <span className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${currentTier.bg} ${currentTier.color}`}>
               <BadgeCheck size={14} />
-              {currentTier.name} Member
+              {currentTier.name} {t("member")}
             </span>
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[#9090a0]">{loyaltyPoints.toLocaleString()} points</span>
+              <span className="text-[#9090a0]">{loyaltyPoints.toLocaleString()} {t("points")}</span>
               {nextTier && (
                 <span className="text-[#9090a0]">
-                  {nextTier.min.toLocaleString()} pts to {nextTier.name}
+                  {nextTier.min.toLocaleString()} {t("ptsTo")} {nextTier.name}
                 </span>
               )}
               {!nextTier && (
-                <span className="text-[#8b5cf6]">Maximum tier reached!</span>
+                <span className="text-[#8b5cf6]">{t("maxTierReached")}</span>
               )}
             </div>
             <div className="h-2.5 w-full overflow-hidden rounded-full bg-[#1c1c28]">
@@ -320,10 +322,10 @@ export default function CustomerDashboard() {
             {/* Order History with Filters */}
             <div ref={ordersRef} className="glass-card p-6">
               <div className="mb-4 flex items-center justify-between">
-                <h4 className="text-base font-semibold text-[#f0f0f5]">Order History</h4>
+                <h4 className="text-base font-semibold text-[#f0f0f5]">{t("orderHistory")}</h4>
                 <button onClick={fetchData} className="flex items-center gap-1 text-xs text-[#d4a843] hover:underline">
                   <RefreshCw size={12} />
-                  Refresh
+                  {t("refresh")}
                 </button>
               </div>
 
@@ -358,11 +360,11 @@ export default function CustomerDashboard() {
                 <table className="w-full text-left text-sm">
                   <thead>
                     <tr className="border-b border-[#2a2a3a] text-xs text-[#606070]">
-                      <th className="pb-3 font-medium">Order</th>
-                      <th className="pb-3 font-medium">Items</th>
-                      <th className="pb-3 font-medium">Total</th>
-                      <th className="pb-3 font-medium">Status</th>
-                      <th className="pb-3 font-medium">Date</th>
+                      <th className="pb-3 font-medium">{t("orderLabel")}</th>
+                      <th className="pb-3 font-medium">{t("itemsLabel")}</th>
+                      <th className="pb-3 font-medium">{t("total")}</th>
+                      <th className="pb-3 font-medium">{t("status")}</th>
+                      <th className="pb-3 font-medium">{t("date")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#2a2a3a]/50">
@@ -385,7 +387,7 @@ export default function CustomerDashboard() {
                             ))}
                             {order.items.length > 2 && (
                               <p className="text-[10px] text-[#606070]">
-                                +{order.items.length - 2} more
+                                +{order.items.length - 2} {t("moreItems")}
                               </p>
                             )}
                           </div>
@@ -416,7 +418,7 @@ export default function CustomerDashboard() {
                     {recentOrders.length === 0 && (
                       <tr>
                         <td colSpan={5} className="py-8 text-center text-sm text-[#606070]">
-                          No orders found for this filter
+                          {t("noOrdersForFilter")}
                         </td>
                       </tr>
                     )}
@@ -428,9 +430,9 @@ export default function CustomerDashboard() {
             {/* Bookings Section */}
             <div className="glass-card p-6">
               <div className="mb-4 flex items-center justify-between">
-                <h4 className="text-base font-semibold text-[#f0f0f5]">Booking History</h4>
+                <h4 className="text-base font-semibold text-[#f0f0f5]">{t("bookingHistory")}</h4>
                 <Link href="/booking" className="flex items-center gap-1 text-xs text-[#d4a843] hover:underline">
-                  New Booking <ChevronRight size={12} />
+                  {t("newBooking")} <ChevronRight size={12} />
                 </Link>
               </div>
               <div className="space-y-3">
@@ -474,9 +476,9 @@ export default function CustomerDashboard() {
                 {bookings.length === 0 && (
                   <div className="flex flex-col items-center py-6 text-center">
                     <Calendar size={32} className="mb-2 text-[#606070]" />
-                    <p className="text-sm text-[#606070]">No bookings yet</p>
+                    <p className="text-sm text-[#606070]">{t("noBookingsYet")}</p>
                     <Link href="/booking" className="mt-2 text-xs text-[#d4a843] hover:underline">
-                      Make your first booking
+                      {t("makeFirstBooking")}
                     </Link>
                   </div>
                 )}
@@ -488,20 +490,20 @@ export default function CustomerDashboard() {
         {/* Profile Edit Section */}
         <div className="glass-card p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h4 className="text-base font-semibold text-[#f0f0f5]">Profile Information</h4>
+            <h4 className="text-base font-semibold text-[#f0f0f5]">{t("profileInformation")}</h4>
             <button
               onClick={() => setEditing(!editing)}
               className="btn btn-secondary btn-sm"
             >
               <Edit3 size={14} />
-              {editing ? "Cancel" : "Edit"}
+              {editing ? t("cancel") : t("edit")}
             </button>
           </div>
 
           {editing ? (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs text-[#9090a0]">First Name</label>
+                <label className="mb-1 block text-xs text-[#9090a0]">{t("firstName")}</label>
                 <input
                   type="text"
                   value={profileForm.firstName}
@@ -510,7 +512,7 @@ export default function CustomerDashboard() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-[#9090a0]">Last Name</label>
+                <label className="mb-1 block text-xs text-[#9090a0]">{t("lastName")}</label>
                 <input
                   type="text"
                   value={profileForm.lastName}
@@ -519,7 +521,7 @@ export default function CustomerDashboard() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-[#9090a0]">Email</label>
+                <label className="mb-1 block text-xs text-[#9090a0]">{t("emailLabel")}</label>
                 <input
                   type="email"
                   value={profileForm.email}
@@ -528,7 +530,7 @@ export default function CustomerDashboard() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-[#9090a0]">Phone</label>
+                <label className="mb-1 block text-xs text-[#9090a0]">{t("phoneLabel")}</label>
                 <input
                   type="tel"
                   value={profileForm.phone}
@@ -537,7 +539,7 @@ export default function CustomerDashboard() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-[#9090a0]">Address</label>
+                <label className="mb-1 block text-xs text-[#9090a0]">{t("addressLabel")}</label>
                 <input
                   type="text"
                   value={profileForm.address}
@@ -546,7 +548,7 @@ export default function CustomerDashboard() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-[#9090a0]">City</label>
+                <label className="mb-1 block text-xs text-[#9090a0]">{t("city")}</label>
                 <input
                   type="text"
                   value={profileForm.city}
@@ -555,7 +557,7 @@ export default function CustomerDashboard() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-[#9090a0]">State</label>
+                <label className="mb-1 block text-xs text-[#9090a0]">{t("state")}</label>
                 <input
                   type="text"
                   value={profileForm.state}
@@ -565,28 +567,28 @@ export default function CustomerDashboard() {
               </div>
               <div className="flex items-end">
                 <button onClick={handleProfileUpdate} className="btn btn-primary">
-                  Save Changes
+                  {t("saveChanges")}
                 </button>
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <p className="text-xs text-[#606070]">Name</p>
+                <p className="text-xs text-[#606070]">{t("name")}</p>
                 <p className="font-medium text-[#f0f0f5]">
                   {data?.customer?.firstName} {data?.customer?.lastName}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-[#606070]">Email</p>
+                <p className="text-xs text-[#606070]">{t("emailLabel")}</p>
                 <p className="font-medium text-[#f0f0f5]">{data?.customer?.email ?? "—"}</p>
               </div>
               <div>
-                <p className="text-xs text-[#606070]">Phone</p>
+                <p className="text-xs text-[#606070]">{t("phoneLabel")}</p>
                 <p className="font-medium text-[#f0f0f5]">{data?.customer?.phone ?? "—"}</p>
               </div>
               <div>
-                <p className="text-xs text-[#606070]">Address</p>
+                <p className="text-xs text-[#606070]">{t("addressLabel")}</p>
                 <p className="font-medium text-[#f0f0f5]">
                   {data?.customer?.address ?? "—"}, {data?.customer?.city ?? ""}
                 </p>

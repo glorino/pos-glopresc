@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import AIChatbot from "@/components/ui/AIChatbot";
+import { useTranslation } from "@/contexts/LanguageContext";
 
 type UserRole =
   | "OWNER"
@@ -33,14 +34,15 @@ export default function DashboardLayout({
 }: DashboardLayoutProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const sessionRole = (session?.user as any)?.role as UserRole | undefined;
   const role: UserRole = sessionRole || roleProp || "OWNER";
 
-  const userName = session?.user?.name || "User";
+  const userName = session?.user?.name || t("user");
   const userRole = role.replace(/_/g, " ");
-  const userEmail = session?.user?.email || "user@ssvshop.com";
+  const userEmail = session?.user?.email || t("defaultEmail");
 
   const displayUser = {
     name: userName,

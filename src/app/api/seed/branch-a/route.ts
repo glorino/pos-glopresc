@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const secret = body.secret || request.headers.get("x-seed-secret");
     
     // Simple protection - only allow from server or with secret
-    if (secret !== "ssv-shop-seed-2024") {
+    if (secret !== process.env.SEED_SECRET) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

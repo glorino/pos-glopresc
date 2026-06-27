@@ -23,6 +23,7 @@ import {
   ScanBarcode,
 } from "lucide-react";
 import BarcodeScanner from "@/components/ui/BarcodeScanner";
+import { useTranslation } from "@/contexts/LanguageContext";
 
 interface Product {
   id: string;
@@ -61,19 +62,20 @@ interface SaleReceipt {
   cashierName: string;
 }
 
-const CATEGORIES = ["All", "Food", "Beverages", "Electronics", "Clothing", "Health", "Home", "Other"];
-
-const PAYMENT_METHODS: { value: PaymentMethod; label: string; icon: typeof Banknote }[] = [
-  { value: "CASH", label: "Cash", icon: Banknote },
-  { value: "CARD", label: "Card", icon: CreditCard },
-  { value: "TRANSFER", label: "Transfer", icon: ArrowRight },
-  { value: "USSD", label: "USSD", icon: Smartphone },
-  { value: "MOBILE", label: "Mobile", icon: Smartphone },
-];
-
 export default function POSTerminal() {
   const { data: session } = useSession();
+  const { t } = useTranslation();
   const searchRef = useRef<HTMLInputElement>(null);
+
+  const CATEGORIES = [t("categoryAll"), t("categoryFood"), t("categoryBeverages"), t("categoryElectronics"), t("categoryClothing"), t("categoryHealth"), t("categoryHome"), t("categoryOther")];
+
+  const PAYMENT_METHODS: { value: PaymentMethod; label: string; icon: typeof Banknote }[] = [
+    { value: "CASH", label: t("paymentCash"), icon: Banknote },
+    { value: "CARD", label: t("paymentCard"), icon: CreditCard },
+    { value: "TRANSFER", label: t("paymentTransfer"), icon: ArrowRight },
+    { value: "USSD", label: t("paymentUSSD"), icon: Smartphone },
+    { value: "MOBILE", label: t("paymentMobile"), icon: Smartphone },
+  ];
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -135,7 +137,7 @@ export default function POSTerminal() {
         setProducts(data.products || []);
       }
     } catch (error) {
-      showNotification("error", "Failed to load products");
+      showNotification("error", t("failedToLoadProducts"));
     } finally {
       setLoading(false);
     }
@@ -166,7 +168,7 @@ export default function POSTerminal() {
         }
       }
     } catch {
-      showNotification("error", "Failed to look up product");
+      showNotification("error", t("failedToLookUpProduct"));
     }
   }
 
@@ -179,7 +181,7 @@ export default function POSTerminal() {
       const existing = prev.find((item) => item.product.id === product.id);
       if (existing) {
         if (existing.quantity >= product.stockQuantity) {
-          showNotification("error", `No more stock for ${product.name}`);
+          showNotification("error", `${t("noMoreStock")} ${product.name}`);
           return prev;
         }
         return prev.map((item) =>
@@ -200,7 +202,7 @@ export default function POSTerminal() {
             const newQty = item.quantity + delta;
             if (newQty <= 0) return null;
             if (newQty > item.product.stockQuantity) {
-              showNotification("error", `Max stock for ${item.product.name}`);
+              showNotification("error", `${t("maxStockFor")} ${item.product.name}`);
               return item;
             }
             return { ...item, quantity: newQty };
@@ -236,11 +238,11 @@ export default function POSTerminal() {
 
   async function completeSale() {
     if (cart.length === 0) {
-      showNotification("error", "Cart is empty");
+      showNotification("error", t("cartEmpty"));
       return;
     }
     if (paymentMethod === "CASH" && cashAmount < total) {
-      showNotification("error", "Cash received is less than total");
+      showNotification("error", t("cashLessThanTotal"));
       return;
     }
     if (processing) return;
@@ -293,9 +295,9 @@ export default function POSTerminal() {
       setShowReceipt(true);
       clearCart();
       fetchProducts();
-      showNotification("success", "Sale completed successfully!");
+      showNotification("success", t("saleCompletedSuccess"));
     } catch (error: any) {
-      showNotification("error", error.message || "Failed to complete sale");
+      showNotification("error", error.message || t("failedToCompleteSale"));
     } finally {
       setProcessing(false);
     }
@@ -338,7 +340,7 @@ export default function POSTerminal() {
               <input
                 ref={searchRef}
                 type="text"
-                placeholder="Search products... (F2)"
+                placeholder={t("searchProductsPlaceholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="input pl-10"
@@ -347,10 +349,10 @@ export default function POSTerminal() {
             <button
               onClick={() => setShowScanner(true)}
               className="flex h-10 items-center gap-2 rounded-xl border border-[#2a2a3a] bg-[#1c1c28] px-3 text-[#9090a0] transition-colors hover:border-[#d4a843]/50 hover:text-[#d4a843]"
-              title="Scan barcode"
+              title={t("scanBarcode")}
             >
               <ScanBarcode size={18} />
-              <span className="hidden text-xs font-medium sm:inline">Scan</span>
+              <span className="hidden text-xs font-medium sm:inline">{t("scan")}</span>
             </button>
             <button
               onClick={() => setCartOpen(true)}
@@ -390,8 +392,8 @@ export default function POSTerminal() {
           ) : filteredProducts.length === 0 ? (
             <div className="flex h-64 flex-col items-center justify-center text-[#606070]">
               <Package size={48} className="mb-4 opacity-30" />
-              <p className="text-lg font-medium">No products found</p>
-              <p className="text-sm">Try adjusting your search or category filter</p>
+              <p className="text-lg font-medium">{t("noProductsFound")}</p>
+              <p className="text-sm">{t("tryAdjustingSearch")}</p>
             </div>
           ) : (
             <div className="product-grid">
@@ -430,8 +432,8 @@ export default function POSTerminal() {
                       }`}
                     >
                       {product.stockQuantity > 0
-                        ? `${product.stockQuantity} in stock`
-                        : "Out of stock"}
+                        ? `${product.stockQuantity} ${t("inStock")}`
+                        : t("outOfStock")}
                     </span>
                   </div>
                 </button>
@@ -441,10 +443,10 @@ export default function POSTerminal() {
         </div>
 
         <div className="hidden border-t border-[#2a2a3a] bg-[#111118]/80 px-4 py-2 text-[11px] text-[#606070] backdrop-blur-xl lg:flex lg:justify-center lg:gap-6">
-          <span><kbd className="rounded border border-[#2a2a3a] bg-[#1c1c28] px-1.5 py-0.5 text-[#9090a0]">F2</kbd> Search</span>
-          <span><kbd className="rounded border border-[#2a2a3a] bg-[#1c1c28] px-1.5 py-0.5 text-[#9090a0]">F5</kbd> Clear Cart</span>
-          <span><kbd className="rounded border border-[#2a2a3a] bg-[#1c1c28] px-1.5 py-0.5 text-[#9090a0]">F9</kbd> Complete Sale</span>
-          <span><kbd className="rounded border border-[#2a2a3a] bg-[#1c1c28] px-1.5 py-0.5 text-[#9090a0]">Esc</kbd> Remove Last</span>
+          <span><kbd className="rounded border border-[#2a2a3a] bg-[#1c1c28] px-1.5 py-0.5 text-[#9090a0]">F2</kbd> {t("keyboardHintSearch")}</span>
+          <span><kbd className="rounded border border-[#2a2a3a] bg-[#1c1c28] px-1.5 py-0.5 text-[#9090a0]">F5</kbd> {t("keyboardHintClearCart")}</span>
+          <span><kbd className="rounded border border-[#2a2a3a] bg-[#1c1c28] px-1.5 py-0.5 text-[#9090a0]">F9</kbd> {t("keyboardHintCompleteSale")}</span>
+          <span><kbd className="rounded border border-[#2a2a3a] bg-[#1c1c28] px-1.5 py-0.5 text-[#9090a0]">Esc</kbd> {t("keyboardHintRemoveLast")}</span>
         </div>
       </div>
 
@@ -462,7 +464,7 @@ export default function POSTerminal() {
           <div className="flex items-center gap-2">
             <ShoppingCart size={18} className="text-[#d4a843]" />
             <h2 className="text-sm font-semibold text-[#f0f0f5]">
-              Cart ({itemCount})
+              {t("cartCount").replace("{count}", itemCount.toString())}
             </h2>
           </div>
           <button
@@ -477,8 +479,8 @@ export default function POSTerminal() {
           {cart.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-[#606070]">
               <ShoppingCart size={40} className="mb-3 opacity-20" />
-              <p className="text-sm font-medium">Cart is empty</p>
-              <p className="mt-1 text-xs">Click products to add</p>
+              <p className="text-sm font-medium">{t("cartEmpty")}</p>
+              <p className="mt-1 text-xs">{t("clickProductsToAdd")}</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -493,7 +495,7 @@ export default function POSTerminal() {
                         {item.product.name}
                       </h4>
                       <p className="mt-0.5 text-xs text-[#9090a0]">
-                        {formatCurrency(item.product.price)} each
+                        {formatCurrency(item.product.price)} {t("each")}
                       </p>
                     </div>
                     <button
@@ -535,11 +537,11 @@ export default function POSTerminal() {
           <div className="border-t border-[#2a2a3a] px-4 py-3">
             <div className="mb-3 space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-[#9090a0]">Subtotal</span>
+                <span className="text-[#9090a0]">{t("subtotalLabel")}</span>
                 <span className="text-[#f0f0f5]">{formatCurrency(subtotal)}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-[#9090a0]">Discount</span>
+                <span className="text-[#9090a0]">{t("discountLabel")}</span>
                 <input
                   type="number"
                   min="0"
@@ -550,19 +552,19 @@ export default function POSTerminal() {
                 />
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-[#9090a0]">VAT ({taxRate}%)</span>
+                <span className="text-[#9090a0]">{t("vatLabel")} ({taxRate}%)</span>
                 <span className="text-[#f0f0f5]">{formatCurrency(tax)}</span>
               </div>
               <div className="border-t border-[#2a2a3a] pt-2">
                 <div className="flex justify-between">
-                  <span className="text-sm font-semibold text-[#f0f0f5]">Total</span>
+                  <span className="text-sm font-semibold text-[#f0f0f5]">{t("totalLabel")}</span>
                   <span className="text-lg font-bold text-[#d4a843]">{formatCurrency(total)}</span>
                 </div>
               </div>
             </div>
 
             <div className="mb-3">
-              <p className="mb-2 text-xs font-medium text-[#9090a0]">Payment Method</p>
+              <p className="mb-2 text-xs font-medium text-[#9090a0]">{t("paymentMethodLabel")}</p>
               <div className="grid grid-cols-5 gap-1">
                 {PAYMENT_METHODS.map((pm) => {
                   const Icon = pm.icon;
@@ -586,7 +588,7 @@ export default function POSTerminal() {
 
             {paymentMethod === "CASH" && (
               <div className="mb-3">
-                <p className="mb-1 text-xs font-medium text-[#9090a0]">Cash Received</p>
+                <p className="mb-1 text-xs font-medium text-[#9090a0]">{t("cashReceivedLabel")}</p>
                 <input
                   type="number"
                   min="0"
@@ -598,7 +600,7 @@ export default function POSTerminal() {
                 />
                 {cashAmount > 0 && (
                   <div className="mt-1 flex justify-between text-sm">
-                    <span className="text-[#9090a0]">Change</span>
+                    <span className="text-[#9090a0]">{t("changeLabel")}</span>
                     <span className={`font-bold ${change >= 0 ? "text-[#10b981]" : "text-[#f43f5e]"}`}>
                       {formatCurrency(Math.max(0, change))}
                     </span>
@@ -612,7 +614,7 @@ export default function POSTerminal() {
                 onClick={clearCart}
                 className="btn btn-secondary flex-1"
               >
-                Clear
+                {t("clear")}
               </button>
               <button
                 onClick={completeSale}
@@ -624,7 +626,7 @@ export default function POSTerminal() {
                 ) : (
                   <Receipt size={16} />
                 )}
-                Complete Sale — {formatCurrency(total)}
+                {t("completeSale")} — {formatCurrency(total)}
               </button>
             </div>
           </div>
@@ -642,10 +644,15 @@ export default function POSTerminal() {
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <CheckCircle size={20} className="text-[#10b981]" />
-                <h3 className="text-lg font-bold text-[#f0f0f5]">Sale Complete</h3>
+                <h3 className="text-lg font-bold text-[#f0f0f5]">{t("saleComplete")}</h3>
               </div>
               <button
-                onClick={() => setShowReceipt(false)}
+                onClick={() => {
+                  setShowReceipt(false);
+                  setPaymentMethod("CASH");
+                  setCashReceived("");
+                  setDiscount("0");
+                }}
                 className="flex h-8 w-8 items-center justify-center rounded-lg text-[#606070] hover:bg-[#1c1c28] hover:text-[#f0f0f5]"
               >
                 <X size={16} />
@@ -661,15 +668,15 @@ export default function POSTerminal() {
                     <circle cx="46" cy="46" r="3" fill="#000"/>
                   </svg>
                 </div>
-                <p className="text-lg font-bold text-[#d4a843]">SSV SHOP</p>
-                <p className="text-xs text-[#606070]">POS Receipt</p>
+                <p className="text-lg font-bold text-[#d4a843]">{t("ssvShop")}</p>
+                <p className="text-xs text-[#606070]">{t("posReceipt")}</p>
                 <p className="text-[10px] text-[#606070]">123 Commerce Street, Lagos, Nigeria</p>
                 <p className="text-[10px] text-[#606070]">Tel: +234 800 SSVSHOP</p>
               </div>
               <div className="mb-3 border-t border-dashed border-[#2a2a3a] pt-3">
-                <p className="text-xs text-[#606070]">Invoice: {lastReceipt.invoiceNumber}</p>
+                <p className="text-xs text-[#606070]">{t("invoiceLabel")}: {lastReceipt.invoiceNumber}</p>
                 <p className="text-xs text-[#606070]">{new Date(lastReceipt.date).toLocaleString()}</p>
-                <p className="text-xs text-[#9090a0]">Served by: {lastReceipt.cashierName}</p>
+                <p className="text-xs text-[#9090a0]">{t("servedBy")} {lastReceipt.cashierName}</p>
               </div>
               <div className="mb-3 space-y-1 border-t border-dashed border-[#2a2a3a] pt-3">
                 {lastReceipt.items.map((item, i) => (
@@ -683,36 +690,36 @@ export default function POSTerminal() {
               </div>
               <div className="space-y-1 border-t border-dashed border-[#2a2a3a] pt-3">
                 <div className="flex justify-between text-xs">
-                  <span className="text-[#606070]">Subtotal</span>
+                  <span className="text-[#606070]">{t("subtotalLabel")}</span>
                   <span className="text-[#9090a0]">{formatCurrency(lastReceipt.subtotal)}</span>
                 </div>
                 {lastReceipt.discount > 0 && (
                   <div className="flex justify-between text-xs">
-                    <span className="text-[#606070]">Discount</span>
+                    <span className="text-[#606070]">{t("discountLabel")}</span>
                     <span className="text-[#9090a0]">-{formatCurrency(lastReceipt.discount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-xs">
-                  <span className="text-[#606070]">VAT ({taxRate}%)</span>
+                  <span className="text-[#606070]">{t("vatLabel")} ({taxRate}%)</span>
                   <span className="text-[#9090a0]">{formatCurrency(lastReceipt.tax)}</span>
                 </div>
                 <div className="flex justify-between border-t border-[#2a2a3a] pt-1 text-sm font-bold">
-                  <span className="text-[#f0f0f5]">Total</span>
+                  <span className="text-[#f0f0f5]">{t("totalLabel")}</span>
                   <span className="text-[#d4a843]">{formatCurrency(lastReceipt.total)}</span>
                 </div>
                 <div className="flex justify-between text-xs">
-                  <span className="text-[#606070]">Paid ({lastReceipt.paymentMethod})</span>
+                  <span className="text-[#606070]">{t("paidLabel")} ({lastReceipt.paymentMethod})</span>
                   <span className="text-[#10b981]">{formatCurrency(lastReceipt.amountPaid)}</span>
                 </div>
                 {lastReceipt.changeDue > 0 && (
                   <div className="flex justify-between text-xs">
-                    <span className="text-[#606070]">Change</span>
+                    <span className="text-[#606070]">{t("changeLabel")}</span>
                     <span className="text-[#f0f0f5]">{formatCurrency(lastReceipt.changeDue)}</span>
                   </div>
                 )}
               </div>
               <div className="mt-3 border-t border-dashed border-[#2a2a3a] pt-3 text-center">
-                <p className="text-[10px] text-[#606070]">Thank you for shopping with SSV Shop!</p>
+                <p className="text-[10px] text-[#606070]">{t("thankYouShopping")}</p>
               </div>
             </div>
 
@@ -782,13 +789,18 @@ export default function POSTerminal() {
                 className="btn btn-secondary flex-1"
               >
                 <Receipt size={14} />
-                Print Receipt
+                {t("printReceipt")}
               </button>
               <button
-                onClick={() => setShowReceipt(false)}
+                onClick={() => {
+                  setShowReceipt(false);
+                  setPaymentMethod("CASH");
+                  setCashReceived("");
+                  setDiscount("0");
+                }}
                 className="btn btn-primary flex-1"
               >
-                Close
+                {t("close")}
               </button>
             </div>
           </div>

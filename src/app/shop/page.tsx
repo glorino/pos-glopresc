@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
+import { useCart } from "@/contexts/CartContext";
 import {
   Search,
   ShoppingCart,
@@ -45,13 +46,12 @@ const CATEGORY_DB_NAMES = ["Food & Snacks", "Beverages", "Electronics", "Fashion
 
 export default function ShopPage() {
   const { t } = useTranslation();
+  const { cart, addToCart: cartAddToCart, updateQuantity, removeItem, clearCart, cartOpen, setCartOpen, itemCount, subtotal } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedDbCategory, setSelectedDbCategory] = useState("");
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [shippingFee, setShippingFee] = useState(0);
   const [shippingEstimate, setShippingEstimate] = useState("");
@@ -86,43 +86,6 @@ export default function ShopPage() {
     }
   }
 
-  function addToCart(product: Product) {
-    if (product.stockQuantity <= 0) return;
-    setCart((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
-      if (existing) {
-        if (existing.quantity >= product.stockQuantity) return prev;
-        return prev.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prev, { product, quantity: 1 }];
-    });
-    setCartOpen(true);
-  }
-
-  function updateQuantity(productId: string, delta: number) {
-    setCart((prev) =>
-      prev
-        .map((item) => {
-          if (item.product.id === productId) {
-            const newQty = item.quantity + delta;
-            if (newQty <= 0) return null;
-            if (newQty > item.product.stockQuantity) return item;
-            return { ...item, quantity: newQty };
-          }
-          return item;
-        })
-        .filter(Boolean) as CartItem[]
-    );
-  }
-
-  function removeItem(productId: string) {
-    setCart((prev) => prev.filter((item) => item.product.id !== productId));
-  }
-
   function handleCheckout() {
     setCartOpen(false);
     setCheckoutOpen(true);
@@ -144,28 +107,28 @@ export default function ShopPage() {
           paymentMethod: "online",
           amountPaid: subtotal + effectiveShipping,
           txRef,
+          customerName,
+          customerEmail,
         }),
       });
 
       if (res.ok) {
         setOrderSuccess(true);
-        setCart([]);
+        clearCart();
         setCheckoutOpen(false);
         setShippingFee(0);
         setShippingEstimate("");
         setShippingAddress("");
       } else {
-        alert("Failed to record sale. Please contact support.");
+                        alert(t("failedToRecordSale"));
       }
     } catch {
-      alert("Failed to record sale. Please contact support.");
+        alert(t("failedToRecordSale"));
     }
   }
 
-  const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const effectiveShipping = freeShippingThreshold > 0 && subtotal >= freeShippingThreshold ? 0 : shippingFee;
   const total = subtotal + effectiveShipping;
-  const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
@@ -341,7 +304,7 @@ export default function ShopPage() {
                     </span>
                   </div>
                   <button
-                    onClick={() => addToCart(product)}
+                    onClick={() => cartAddToCart(product)}
                     disabled={product.stockQuantity <= 0}
                     className="btn btn-primary mt-3 w-full text-xs"
                   >
@@ -380,7 +343,7 @@ export default function ShopPage() {
               {cart.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center text-[#606070]">
                   <ShoppingCart size={40} className="mb-3 opacity-20" />
-                  <p className="font-medium">Your cart is empty</p>
+                  <p className="font-medium">{t("cartEmptyShop")}</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -487,7 +450,7 @@ export default function ShopPage() {
               {/* Customer Info */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-[#f0f0f5]">
-                  Full Name
+                  {t("fullNameLabel")}
                 </label>
                 <input
                   type="text"
@@ -499,7 +462,7 @@ export default function ShopPage() {
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium text-[#f0f0f5]">
-                  Email Address
+                  {t("emailAddressLabel")}
                 </label>
                 <input
                   type="email"
@@ -520,7 +483,7 @@ export default function ShopPage() {
                   type="text"
                   value={shippingAddress}
                   onChange={(e) => setShippingAddress(e.target.value)}
-                  placeholder="e.g., 123 Main Street, City, Country"
+                  placeholder={t("deliveryAddressPlaceholder")}
                   className="input text-sm"
                 />
               </div>
@@ -536,7 +499,7 @@ export default function ShopPage() {
 
               {shippingEstimate && (
                 <p className="text-xs text-[#9090a0]">
-                  Estimated delivery: <span className="font-medium text-[#10b981]">{shippingEstimate}</span>
+                  {t("estimatedDeliveryShop")} <span className="font-medium text-[#10b981]">{shippingEstimate}</span>
                 </p>
               )}
 
@@ -576,14 +539,14 @@ export default function ShopPage() {
               {/* Payment */}
               {!customerName || !customerEmail || !shippingAddress ? (
                 <p className="text-center text-xs text-[#f59e0b]">
-                  Please fill in your name, email, and delivery address to proceed.
+                  {t("pleaseFillDetails")}
                 </p>
               ) : (
                 <FlutterwavePayment
                   amount={total}
                   email={customerEmail}
                   name={customerName}
-                  description={`SSV Shop Order - ${cart.length} item(s)`}
+                  description={`${t("ssvShopOrder")} - ${cart.length} item(s)`}
                   onSuccess={async (response) => {
                     try {
                       const verifyRes = await fetch(
@@ -593,10 +556,10 @@ export default function ShopPage() {
                       if (verifyData.status === "success") {
                         createSale(response.tx_ref as string);
                       } else {
-                        alert("Payment verification failed. Please contact support.");
+                        alert(t("paymentVerificationFailed"));
                       }
                     } catch {
-                      alert("Could not verify payment. Please contact support.");
+                      alert(t("couldNotVerifyPayment"));
                     }
                   }}
                   onClose={() => {}}

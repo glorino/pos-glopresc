@@ -145,24 +145,24 @@ export default function SalesManagerDashboard() {
 
   const quickActions = [
     {
-      label: "View Sales Report",
+      label: t("viewSalesReport"),
       href: "/dashboard/owner/reports",
       icon: BarChart3,
     },
     {
-      label: "Process Returns",
+      label: t("processReturns"),
       href: "/dashboard/cashier/pos",
       icon: RotateCcw,
     },
     {
-      label: "View Products",
+      label: t("viewProducts"),
       href: "/dashboard/sales-manager/products",
       icon: Package,
     },
   ];
 
   return (
-    <DashboardLayout role="SALES_MANAGER" title="Sales Manager Dashboard">
+    <DashboardLayout role="SALES_MANAGER" title={t("salesManagerDashboard")}>
       <div className="space-y-6">
         {/* Date Range Filter & Total Payments */}
         <div className="glass-card p-4">
@@ -174,7 +174,7 @@ export default function SalesManagerDashboard() {
                 onChange={(e) => setDateFrom(e.target.value)}
                 className="input w-40"
               />
-              <span className="text-sm text-[#606070]">to</span>
+              <span className="text-sm text-[#606070]">{t("toLabel")}</span>
               <input
                 type="date"
                 value={dateTo}
@@ -186,13 +186,13 @@ export default function SalesManagerDashboard() {
                   onClick={() => { setDateFrom(""); setDateTo(""); }}
                   className="btn btn-secondary btn-sm"
                 >
-                  Clear
+                  {t("clear")}
                 </button>
               )}
             </div>
             <div className="flex items-center gap-2 rounded-xl border border-[#10b981]/30 bg-[#10b981]/10 px-4 py-2">
               <DollarSign size={18} className="text-[#10b981]" />
-              <span className="text-sm font-medium text-[#9090a0]">Total Payments:</span>
+              <span className="text-sm font-medium text-[#9090a0]">{t("totalPaymentsLabel")}</span>
               <span className="text-lg font-bold text-[#10b981]">
                 {formatCurrency(data?.totalPayments ?? 0)}
               </span>
@@ -237,14 +237,14 @@ export default function SalesManagerDashboard() {
                     }}
                     formatter={(value: number, name: string) => [
                       name === "revenue" ? formatCurrency(value) : value,
-                      name === "revenue" ? "Revenue" : "Transactions",
+                      name === "revenue" ? t("revenue") : t("transactionsLabel"),
                     ]}
                   />
                   <Legend />
                   <Line
                     type="monotone"
                     dataKey="revenue"
-                    name="Revenue"
+                    name={t("revenue")}
                     stroke="#d4a843"
                     strokeWidth={2}
                     dot={{ fill: "#d4a843", r: 4 }}
@@ -252,7 +252,7 @@ export default function SalesManagerDashboard() {
                   <Line
                     type="monotone"
                     dataKey="transactions"
-                    name="Transactions"
+                    name={t("transactionsLabel")}
                     stroke="#3b82f6"
                     strokeWidth={2}
                     dot={{ fill: "#3b82f6", r: 4 }}
@@ -310,9 +310,9 @@ export default function SalesManagerDashboard() {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Product</th>
-                    <th>Quantity Sold</th>
-                    <th>Revenue</th>
+                    <th>{t("product")}</th>
+                    <th>{t("quantitySold")}</th>
+                    <th>{t("revenue")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -330,7 +330,7 @@ export default function SalesManagerDashboard() {
                   {(!data?.topProducts || data.topProducts.length === 0) && (
                     <tr>
                       <td colSpan={3} className="text-center text-[#606070]">
-                        No product data available
+                        {t("noProductData")}
                       </td>
                     </tr>
                   )}
@@ -341,7 +341,7 @@ export default function SalesManagerDashboard() {
 
           <div className="glass-card p-6">
             <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-              Quick Actions
+              {t("quickActions")}
             </h3>
             <div className="space-y-3">
               {quickActions.map((action) => {
@@ -374,12 +374,12 @@ export default function SalesManagerDashboard() {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Invoice</th>
-                  <th>Customer</th>
-                  <th>Amount</th>
-                  <th>Date</th>
-                  <th>Payment</th>
-                  <th>Status</th>
+                  <th>{t("invoice")}</th>
+                  <th>{t("customer")}</th>
+                  <th>{t("amount")}</th>
+                  <th>{t("date")}</th>
+                  <th>{t("paymentMethodLabel")}</th>
+                  <th>{t("status")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -415,7 +415,7 @@ export default function SalesManagerDashboard() {
                   data.recentTransactions.length === 0) && (
                   <tr>
                     <td colSpan={6} className="text-center text-[#606070]">
-                      No recent transactions
+                      {t("noRecentTransactions")}
                     </td>
                   </tr>
                 )}

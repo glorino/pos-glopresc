@@ -12,6 +12,7 @@ import {
   Upload,
   Truck,
 } from "lucide-react";
+import { useTranslation } from "@/contexts/LanguageContext";
 
 interface Settings {
   [group: string]: Record<string, string>;
@@ -55,6 +56,7 @@ const defaultSettings: Settings = {
 };
 
 export default function BusinessSettingsPage() {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState<Settings>(defaultSettings);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState("");
@@ -102,7 +104,7 @@ export default function BusinessSettingsPage() {
         body: JSON.stringify({ settings: entries }),
       });
       if (res.ok) {
-        setSuccess(`${group.charAt(0).toUpperCase() + group.slice(1)} settings saved!`);
+        setSuccess(t("settingsSaved"));
         setTimeout(() => setSuccess(""), 3000);
       }
     } catch (error) {
@@ -121,7 +123,7 @@ export default function BusinessSettingsPage() {
 
   if (loading) {
     return (
-      <DashboardLayout role="OWNER" title="Business Settings">
+      <DashboardLayout role="OWNER" title={t("businessSettings")}>
         <div className="flex h-[60vh] items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4a843] border-t-transparent" />
         </div>
@@ -132,37 +134,37 @@ export default function BusinessSettingsPage() {
   const sections = [
     {
       key: "business",
-      title: "Business Information",
+      title: t("businessInformation"),
       icon: Building2,
       fields: [
-        { key: "name", label: "Business Name", type: "text" },
-        { key: "address", label: "Address", type: "text" },
-        { key: "phone", label: "Phone", type: "tel" },
-        { key: "email", label: "Email", type: "email" },
-        { key: "website", label: "Website", type: "url" },
+        { key: "name", label: t("businessName"), type: "text" },
+        { key: "address", label: t("addressLabel"), type: "text" },
+        { key: "phone", label: t("phoneLabel"), type: "tel" },
+        { key: "email", label: t("emailLabel"), type: "email" },
+        { key: "website", label: t("websiteLabel"), type: "url" },
       ],
     },
     {
       key: "currency",
-      title: "Currency & Tax",
+      title: t("currencyTax"),
       icon: Coins,
       fields: [
-        { key: "code", label: "Currency", type: "select", options: ["NGN"] },
-        { key: "symbol", label: "Symbol", type: "text" },
-        { key: "taxRate", label: "Tax Rate (%)", type: "number" },
+        { key: "code", label: t("currencyLabel"), type: "select", options: ["NGN"] },
+        { key: "symbol", label: t("symbolLabel"), type: "text" },
+        { key: "taxRate", label: t("taxRatePercent"), type: "number" },
       ],
-      toggles: [{ key: "taxInclusive", label: "Tax Inclusive" }],
+      toggles: [{ key: "taxInclusive", label: t("taxInclusive") }],
     },
     {
       key: "receipt",
-      title: "Receipt Settings",
+      title: t("receiptSettings"),
       icon: FileText,
       fields: [
-        { key: "header", label: "Receipt Header", type: "text" },
-        { key: "footer", label: "Receipt Footer", type: "text" },
+        { key: "header", label: t("receiptHeader"), type: "text" },
+        { key: "footer", label: t("receiptFooter"), type: "text" },
         {
           key: "paperSize",
-          label: "Paper Size",
+          label: t("paperSize"),
           type: "select",
           options: ["58mm", "80mm", "A4"],
         },
@@ -170,47 +172,47 @@ export default function BusinessSettingsPage() {
     },
     {
       key: "notifications",
-      title: "Notification Settings",
+      title: t("notificationSettings"),
       icon: Bell,
       toggles: [
-        { key: "emailNotifications", label: "Email Notifications" },
-        { key: "smsNotifications", label: "SMS Notifications" },
+        { key: "emailNotifications", label: t("emailNotifications") },
+        { key: "smsNotifications", label: t("smsNotifications") },
       ],
     },
     {
       key: "security",
-      title: "Security",
+      title: t("securityLabel"),
       icon: Shield,
       fields: [
         {
           key: "sessionTimeout",
-          label: "Session Timeout (minutes)",
+          label: t("sessionTimeout"),
           type: "number",
         },
         {
           key: "passwordPolicy",
-          label: "Password Policy",
+          label: t("passwordPolicy"),
           type: "select",
           options: ["low", "medium", "high"],
         },
       ],
-      toggles: [{ key: "twoFactorAuth", label: "Two-Factor Authentication" }],
+      toggles: [{ key: "twoFactorAuth", label: t("twoFactorAuth") }],
     },
     {
       key: "shipping",
-      title: "Shipping Settings",
+      title: t("shippingSettings"),
       icon: Truck,
       fields: [
-        { key: "originAddress", label: "Business Address (for shipping origin)", type: "text" },
-        { key: "ratePerKm", label: "Shipping Fee Per Km (₦)", type: "number" },
-        { key: "minFee", label: "Minimum Shipping Fee (₦)", type: "number" },
-        { key: "freeShippingThreshold", label: "Free Shipping Above Order Amount (₦, 0 = disabled)", type: "number" },
+        { key: "originAddress", label: t("businessAddressShipping"), type: "text" },
+        { key: "ratePerKm", label: `${t("shippingFeePerKm")} (₦)`, type: "number" },
+        { key: "minFee", label: `${t("minimumShippingFee")} (₦)`, type: "number" },
+        { key: "freeShippingThreshold", label: t("freeShippingAbove"), type: "number" },
       ],
     },
   ];
 
   return (
-    <DashboardLayout role="OWNER" title="Business Settings">
+    <DashboardLayout role="OWNER" title={t("businessSettings")}>
       <div className="space-y-6">
         {success && (
           <div className="rounded-lg border border-[#10b981]/20 bg-[#10b981]/10 p-3 text-sm text-[#10b981]">
@@ -292,13 +294,13 @@ export default function BusinessSettingsPage() {
 
                 {section.key === "business" && (
                   <div>
-                    <label className="mb-1 block text-sm text-[#9090a0]">Logo</label>
+                    <label className="mb-1 block text-sm text-[#9090a0]">{t("logoLabel")}</label>
                     <div className="flex items-center gap-3">
                       <button className="btn btn-secondary btn-sm">
                         <Upload size={14} />
-                        Upload Logo
+                        {t("uploadLogo")}
                       </button>
-                      <span className="text-xs text-[#606070]">PNG, JPG up to 2MB</span>
+                      <span className="text-xs text-[#606070]">{t("pngJpgUpTo2MB")}</span>
                     </div>
                   </div>
                 )}
@@ -310,7 +312,7 @@ export default function BusinessSettingsPage() {
                     className="btn btn-primary"
                   >
                     <Save size={14} />
-                    {saving === section.key ? "Saving..." : "Save"}
+                    {saving === section.key ? t("savingLabel") : t("saveChanges")}
                   </button>
                 </div>
               </div>

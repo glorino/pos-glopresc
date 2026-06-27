@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatDateTime } from "@/lib/utils";
+import { useTranslation } from "@/contexts/LanguageContext";
 import {
   FileText,
   Search,
@@ -25,6 +26,7 @@ interface StockRequest {
 }
 
 export default function StockRequestsPage() {
+  const { t } = useTranslation();
   const [requests, setRequests] = useState<StockRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -113,21 +115,21 @@ export default function StockRequestsPage() {
   );
 
   return (
-    <DashboardLayout role="PROCUREMENT_REP" title="Stock Requests">
+    <DashboardLayout role="PROCUREMENT_REP" title={t("stockRequestsTitle")}>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 sm:w-72">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
-            <input type="text" placeholder="Search requests..." value={search} onChange={(e) => setSearch(e.target.value)} className="input pl-10" />
+            <input type="text" placeholder={t("searchRequests")} value={search} onChange={(e) => setSearch(e.target.value)} className="input pl-10" />
           </div>
           <div className="flex gap-2">
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="input select w-40">
-              <option value="">All Status</option>
-              <option value="PENDING">Pending</option>
-              <option value="APPROVED">Approved</option>
-              <option value="ORDERED">Ordered</option>
-              <option value="RECEIVED">Received</option>
-              <option value="CANCELLED">Cancelled</option>
+              <option value="">{t("allStatus")}</option>
+              <option value="PENDING">{t("pendingLabel")}</option>
+              <option value="APPROVED">{t("approvedLabel")}</option>
+              <option value="ORDERED">{t("orderedLabel")}</option>
+              <option value="RECEIVED">{t("receivedLabel")}</option>
+              <option value="CANCELLED">{t("cancelledLabel")}</option>
             </select>
             <button onClick={fetchRequests} className="btn btn-secondary btn-sm"><RefreshCw size={14} /></button>
           </div>
@@ -140,20 +142,20 @@ export default function StockRequestsPage() {
         ) : filtered.length === 0 ? (
           <div className="glass-card flex flex-col items-center justify-center p-12">
             <FileText size={48} className="mb-4 text-[#606070]" />
-            <h3 className="text-lg font-semibold text-[#f0f0f5]">No stock requests found</h3>
-            <p className="mt-1 text-sm text-[#9090a0]">Requests from warehouse will appear here.</p>
+            <h3 className="text-lg font-semibold text-[#f0f0f5]">{t("noStockRequestsFound")}</h3>
+            <p className="mt-1 text-sm text-[#9090a0]">{t("requestsWillAppear")}</p>
           </div>
         ) : (
           <div className="table-container">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Description</th>
-                  <th>Supplier</th>
-                  <th>Urgency</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                  {canApprove && <th>Actions</th>}
+                  <th>{t("descriptionCol")}</th>
+                  <th>{t("supplierCol")}</th>
+                  <th>{t("urgencyCol")}</th>
+                  <th>{t("statusCol")}</th>
+                  <th>{t("dateCol")}</th>
+                  {canApprove && <th>{t("actionsCol")}</th>}
                 </tr>
               </thead>
               <tbody>

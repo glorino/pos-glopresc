@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
+import { useCart } from "@/contexts/CartContext";
 import {
   ArrowLeft,
   ShoppingCart,
@@ -10,8 +11,6 @@ import {
   Minus,
   Package,
   CheckCircle,
-  Store,
-  Star,
 } from "lucide-react";
 
 interface Product {
@@ -31,6 +30,7 @@ interface Product {
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const { id } = params;
+  const { addToCart } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,7 +71,9 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     }
   }
 
-  function addToCart() {
+  function handleAddToCart() {
+    if (!product) return;
+    addToCart(product, quantity);
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
   }
@@ -207,7 +209,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
             {/* Add to Cart */}
             <button
-              onClick={addToCart}
+              onClick={handleAddToCart}
               disabled={product.stockQuantity <= 0}
               className={`btn mt-6 w-full gap-2 py-3 text-base font-bold ${
                 addedToCart

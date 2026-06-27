@@ -45,6 +45,8 @@ export async function PUT(request: NextRequest) {
     const updates: Promise<any>[] = [];
 
     for (const [key, value] of Object.entries(settings)) {
+      const dotIndex = key.indexOf(".");
+      const group = dotIndex > 0 ? key.substring(0, dotIndex) : "general";
       updates.push(
         db.setting.upsert({
           where: { key },
@@ -52,7 +54,7 @@ export async function PUT(request: NextRequest) {
           create: {
             key,
             value: String(value),
-            group: "general",
+            group,
           },
         })
       );

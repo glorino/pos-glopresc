@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { useTranslation } from "@/contexts/LanguageContext";
 import {
   ClipboardList,
   Plus,
@@ -29,6 +30,7 @@ interface PurchaseOrder {
 }
 
 export default function PurchaseOrdersPage() {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState<PurchaseOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -77,20 +79,20 @@ export default function PurchaseOrdersPage() {
   );
 
   return (
-    <DashboardLayout role="PROCUREMENT_MANAGER" title="Purchase Orders">
+    <DashboardLayout role="PROCUREMENT_MANAGER" title={t("purchaseOrdersTitle")}>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 sm:w-72">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
-            <input type="text" placeholder="Search orders..." value={search} onChange={(e) => setSearch(e.target.value)} className="input pl-10" />
+            <input type="text" placeholder={t("searchOrders")} value={search} onChange={(e) => setSearch(e.target.value)} className="input pl-10" />
           </div>
           <div className="flex gap-2">
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="input select w-40">
-              <option value="">All Status</option>
-              <option value="PENDING">Pending</option>
-              <option value="APPROVED">Approved</option>
-              <option value="RECEIVED">Received</option>
-              <option value="CANCELLED">Cancelled</option>
+              <option value="">{t("allStatus")}</option>
+              <option value="PENDING">{t("pendingLabel")}</option>
+              <option value="APPROVED">{t("approvedLabel")}</option>
+              <option value="RECEIVED">{t("receivedLabel")}</option>
+              <option value="CANCELLED">{t("cancelledLabel")}</option>
             </select>
             <button onClick={fetchOrders} className="btn btn-secondary btn-sm"><RefreshCw size={14} /></button>
           </div>
@@ -103,21 +105,21 @@ export default function PurchaseOrdersPage() {
         ) : filteredOrders.length === 0 ? (
           <div className="glass-card flex flex-col items-center justify-center p-12">
             <ClipboardList size={48} className="mb-4 text-[#606070]" />
-            <h3 className="text-lg font-semibold text-[#f0f0f5]">No purchase orders found</h3>
-            <p className="mt-1 text-sm text-[#9090a0]">Orders will appear here once created.</p>
+            <h3 className="text-lg font-semibold text-[#f0f0f5]">{t("noPurchaseOrdersFound")}</h3>
+            <p className="mt-1 text-sm text-[#9090a0]">{t("ordersWillAppear")}</p>
           </div>
         ) : (
           <div className="table-container">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Order #</th>
-                  <th>Supplier</th>
-                  <th>Items</th>
-                  <th>Total</th>
-                  <th>Expected</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+                  <th>{t("orderNumberCol")}</th>
+                  <th>{t("supplierCol")}</th>
+                  <th>{t("itemsCol")}</th>
+                  <th>{t("totalCol")}</th>
+                  <th>{t("expectedCol")}</th>
+                  <th>{t("statusCol")}</th>
+                  <th>{t("actionsCol")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -153,7 +155,7 @@ export default function PurchaseOrdersPage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
             <div className="glass-card w-full max-w-lg p-6">
               <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-[#f0f0f5]">Order {selectedOrder.orderNumber}</h2>
+                <h2 className="text-xl font-semibold text-[#f0f0f5]">{t("orderDetail")} {selectedOrder.orderNumber}</h2>
                 <button onClick={() => setSelectedOrder(null)} className="text-[#606070] hover:text-[#f0f0f5]"><X size={20} /></button>
               </div>
               <div className="space-y-3">
@@ -163,7 +165,7 @@ export default function PurchaseOrdersPage() {
                 <div className="flex justify-between text-sm"><span className="text-[#9090a0]">Created</span><span className="text-[#f0f0f5]">{formatDate(selectedOrder.createdAt)}</span></div>
                 {selectedOrder.items && selectedOrder.items.length > 0 && (
                   <div className="mt-4">
-                    <h4 className="mb-2 text-sm font-medium text-[#9090a0]">Items</h4>
+                    <h4 className="mb-2 text-sm font-medium text-[#9090a0]">{t("itemsHeading")}</h4>
                     <div className="space-y-2">
                       {selectedOrder.items.map((item) => (
                         <div key={item.id} className="flex justify-between rounded-lg bg-[#12121a] p-3 text-sm">

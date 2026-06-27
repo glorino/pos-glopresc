@@ -68,6 +68,8 @@ export default function CashierDashboard() {
   const [paymentMethods, setPaymentMethods] = useState<{ name: string; count: number; color: string }[]>([]);
   const [registerDate, setRegisterDate] = useState(new Date().toISOString().split("T")[0]);
   const [dailySummary, setDailySummary] = useState<any>(null);
+  const [closingBalance, setClosingBalance] = useState("");
+  const [closingDrawer, setClosingDrawer] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -170,7 +172,7 @@ export default function CashierDashboard() {
     },
     {
       label: t("cashDrawer"),
-      value: data?.drawerStatus.isOpen ? "Open" : "Closed",
+      value: data?.drawerStatus.isOpen ? t("open") : t("closed"),
       icon: data?.drawerStatus.isOpen ? Unlock : Lock,
       gradient: data?.drawerStatus.isOpen ? "from-[#10b981] to-[#059669]" : "from-[#f43f5e] to-[#e11d48]",
       bgGradient: data?.drawerStatus.isOpen ? "from-[#10b981]/15 via-[#10b981]/5 to-transparent" : "from-[#f43f5e]/15 via-[#f43f5e]/5 to-transparent",
@@ -187,7 +189,7 @@ export default function CashierDashboard() {
   ];
 
   return (
-    <DashboardLayout role="SALES_REP" title="Sales Rep Dashboard">
+    <DashboardLayout role="SALES_REP" title={t("salesRepDashboard")}>
       <div className="space-y-6">
         {/* Hero POS Card */}
         <div className="glass-card relative overflow-hidden p-8">
@@ -197,10 +199,10 @@ export default function CashierDashboard() {
           <div className="relative flex flex-col items-center gap-6 sm:flex-row sm:justify-between">
             <div className="text-center sm:text-left">
               <h2 className="text-2xl font-bold text-[#f0f0f5]">
-                Ready to sell?
+                {t("readyToSell")}
               </h2>
               <p className="mt-2 text-[#9090a0]">
-                Open your POS terminal to start processing transactions
+                {t("openPosTerminalDesc")}
               </p>
             </div>
             <Link
@@ -208,7 +210,7 @@ export default function CashierDashboard() {
               className="group flex items-center gap-4 rounded-2xl bg-gradient-to-r from-[#d4a843] to-[#b8942f] px-8 py-5 text-lg font-bold text-black shadow-lg shadow-[#d4a843]/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-[#d4a843]/30"
             >
               <ShoppingCart size={24} className="transition-transform group-hover:rotate-12" />
-              Open POS Terminal
+              {t("openPosTerminal")}
               <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
@@ -246,8 +248,8 @@ export default function CashierDashboard() {
                 <Clock size={18} className="text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-[#f0f0f5]">Daily Cash Register</h3>
-                <p className="text-sm text-[#9090a0]">View register summary by date</p>
+                <h3 className="text-lg font-semibold text-[#f0f0f5]">{t("dailyCashRegister")}</h3>
+                <p className="text-sm text-[#9090a0]">{t("viewRegisterSummaryByDate")}</p>
               </div>
             </div>
             <input
@@ -260,32 +262,92 @@ export default function CashierDashboard() {
           {dailySummary && (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
               <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
-                <p className="text-xs text-[#9090a0]">Opening Balance</p>
+                <p className="text-xs text-[#9090a0]">{t("openingBalance")}</p>
                 <p className="mt-1 text-lg font-bold text-[#f0f0f5]">{formatCurrency(dailySummary.drawer?.openingBalance ?? 0)}</p>
               </div>
               <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
-                <p className="text-xs text-[#9090a0]">Total Sales</p>
+                <p className="text-xs text-[#9090a0]">{t("totalSales")}</p>
                 <p className="mt-1 text-lg font-bold text-[#10b981]">{formatCurrency(dailySummary.totalSales)}</p>
               </div>
               <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
-                <p className="text-xs text-[#9090a0]">Cash Received</p>
+                <p className="text-xs text-[#9090a0]">{t("cashReceived")}</p>
                 <p className="mt-1 text-lg font-bold text-[#3b82f6]">{formatCurrency(dailySummary.totalCashReceived ?? 0)}</p>
               </div>
               <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
-                <p className="text-xs text-[#9090a0]">Change Given</p>
+                <p className="text-xs text-[#9090a0]">{t("changeGiven")}</p>
                 <p className="mt-1 text-lg font-bold text-[#f43f5e]">{formatCurrency(dailySummary.totalChangeGiven ?? 0)}</p>
               </div>
               <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
-                <p className="text-xs text-[#9090a0]">Cash in Drawer</p>
+                <p className="text-xs text-[#9090a0]">{t("cashInDrawer")}</p>
                 <p className="mt-1 text-lg font-bold text-[#d4a843]">{formatCurrency((dailySummary.drawer?.openingBalance ?? 0) + (dailySummary.totalCashReceived ?? 0) - (dailySummary.totalChangeGiven ?? 0))}</p>
               </div>
               <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
-                <p className="text-xs text-[#9090a0]">Transactions</p>
+                <p className="text-xs text-[#9090a0]">{t("transactions")}</p>
                 <p className="mt-1 text-lg font-bold text-[#8b5cf6]">{dailySummary.totalTransactions}</p>
               </div>
             </div>
           )}
         </div>
+
+        {/* Close Register */}
+        {data?.drawerStatus.isOpen && (
+          <div className="glass-card border border-[#f43f5e]/20 p-6">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#f43f5e] to-[#e11d48]">
+                <Lock size={18} className="text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-[#f0f0f5]">{t("closeRegister")}</h3>
+                <p className="text-sm text-[#9090a0]">{t("closeRegisterDesc")}</p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+              <div className="flex-1">
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("closingBalance")}</label>
+                <input
+                  type="number"
+                  value={closingBalance}
+                  onChange={(e) => setClosingBalance(e.target.value)}
+                  placeholder={t("enterClosingBalance")}
+                  className="input"
+                />
+              </div>
+              <button
+                onClick={async () => {
+                  if (!closingBalance || Number(closingBalance) < 0) {
+                    alert("Please enter a valid closing balance");
+                    return;
+                  }
+                  setClosingDrawer(true);
+                  try {
+                    const res = await fetch("/api/cash-drawer", {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ closingBalance: Number(closingBalance) }),
+                    });
+                    if (res.ok) {
+                      setData((prev) => prev ? { ...prev, drawerStatus: { ...prev.drawerStatus, isOpen: false } } : prev);
+                      setClosingBalance("");
+                      alert(t("registerClosedSuccess"));
+                    } else {
+                      const err = await res.json();
+                      alert(err.error || "Failed to close register");
+                    }
+                  } catch (error) {
+                    alert("Failed to close register");
+                  } finally {
+                    setClosingDrawer(false);
+                  }
+                }}
+                disabled={closingDrawer}
+                className="btn btn-danger"
+              >
+                <Lock size={16} />
+                {closingDrawer ? t("closing") : t("closeRegister")}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Quick Product Search */}
         <div className="glass-card p-6">
@@ -294,15 +356,15 @@ export default function CashierDashboard() {
               <Search size={18} className="text-white" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-[#f0f0f5]">Quick Search</h3>
-              <p className="text-sm text-[#9090a0]">Find products by name, barcode, or SKU</p>
+              <h3 className="text-lg font-semibold text-[#f0f0f5]">{t("quickSearch")}</h3>
+              <p className="text-sm text-[#9090a0]">{t("findProductsDesc")}</p>
             </div>
           </div>
           <div className="relative">
             <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#606070]" />
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder={t("searchProducts")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full rounded-xl border border-[#2a2a3a] bg-[#1c1c28] py-3 pl-12 pr-4 text-[#f0f0f5] placeholder-[#606070] outline-none transition-all focus:border-[#d4a843]/50 focus:ring-1 focus:ring-[#d4a843]/30"
@@ -322,18 +384,18 @@ export default function CashierDashboard() {
                 href="/dashboard/sales-manager/sales"
                 className="flex items-center gap-1 text-sm text-[#d4a843] transition-colors hover:text-[#b8942f]"
               >
-                View All <ArrowRight size={14} />
+                {t("viewAll")} <ArrowRight size={14} />
               </Link>
             </div>
             <div className="table-container">
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Invoice</th>
-                    <th>Amount</th>
-                    <th>Payment</th>
-                    <th>Time</th>
-                    <th>Status</th>
+                    <th>{t("invoice")}</th>
+                    <th>{t("amount")}</th>
+                    <th>{t("payment")}</th>
+                    <th>{t("time")}</th>
+                    <th>{t("status")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -375,7 +437,7 @@ export default function CashierDashboard() {
                   {(!data?.recentSales || data.recentSales.length === 0) && (
                     <tr>
                       <td colSpan={5} className="text-center text-[#606070]">
-                        No transactions yet today
+                        {t("noTransactionsToday")}
                       </td>
                     </tr>
                   )}
@@ -389,7 +451,7 @@ export default function CashierDashboard() {
             <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
               {t("paymentMethods")}
             </h3>
-            <p className="mb-4 text-sm text-[#9090a0]">Today&apos;s breakdown</p>
+            <p className="mb-4 text-sm text-[#9090a0]">{t("todaysBreakdown")}</p>
             <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={paymentMethods} layout="vertical" barCategoryGap="20%">
@@ -435,7 +497,7 @@ export default function CashierDashboard() {
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#d4a843] to-[#b8942f] shadow-lg">
               <ShoppingCart size={22} className="text-white" />
             </div>
-            <span className="text-sm font-medium text-[#f0f0f5]">POS Terminal</span>
+            <span className="text-sm font-medium text-[#f0f0f5]">{t("posTerminal")}</span>
           </Link>
           <Link
             href="/dashboard/sales-manager/sales"
@@ -444,7 +506,7 @@ export default function CashierDashboard() {
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#3b82f6] to-[#2563eb] shadow-lg">
               <BarChart3 size={22} className="text-white" />
             </div>
-            <span className="text-sm font-medium text-[#f0f0f5]">My Sales</span>
+            <span className="text-sm font-medium text-[#f0f0f5]">{t("mySales")}</span>
           </Link>
           <Link
             href="/dashboard/sales-manager/products"
@@ -453,7 +515,7 @@ export default function CashierDashboard() {
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#8b5cf6] to-[#7c3aed] shadow-lg">
               <Package size={22} className="text-white" />
             </div>
-            <span className="text-sm font-medium text-[#f0f0f5]">Products</span>
+            <span className="text-sm font-medium text-[#f0f0f5]">{t("products")}</span>
           </Link>
           <Link
             href="/dashboard/sales-manager/customers"
@@ -462,7 +524,7 @@ export default function CashierDashboard() {
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#10b981] to-[#059669] shadow-lg">
               <Receipt size={22} className="text-white" />
             </div>
-            <span className="text-sm font-medium text-[#f0f0f5]">Customers</span>
+            <span className="text-sm font-medium text-[#f0f0f5]">{t("customers")}</span>
           </Link>
         </div>
       </div>

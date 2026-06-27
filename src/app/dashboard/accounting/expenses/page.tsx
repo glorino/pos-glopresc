@@ -126,7 +126,6 @@ export default function ExpenseManagementPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: "current",
           categoryId: formData.categoryId,
           description: formData.description,
           amount: parseFloat(formData.amount),
@@ -185,7 +184,7 @@ export default function ExpenseManagementPage() {
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
                 type="text"
-                placeholder="Search expenses..."
+                placeholder={t("searchExpenses")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchExpenses()}
@@ -197,11 +196,11 @@ export default function ExpenseManagementPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="input select w-auto"
             >
-              <option value="">All Status</option>
-              <option value="PENDING">Pending</option>
-              <option value="APPROVED">Approved</option>
-              <option value="REJECTED">Rejected</option>
-              <option value="PAID">Paid</option>
+              <option value="">{t("allStatusFilter")}</option>
+              <option value="PENDING">{t("pendingLabel")}</option>
+              <option value="APPROVED">{t("approvedLabel")}</option>
+              <option value="REJECTED">{t("rejectedLabel")}</option>
+              <option value="PAID">{t("paidLabelFilter")}</option>
             </select>
             <input
               type="date"
@@ -218,7 +217,7 @@ export default function ExpenseManagementPage() {
           </div>
           <button onClick={() => setShowModal(true)} className="btn btn-primary">
             <Plus size={16} />
-            Add Expense
+            {t("addExpenseBtn")}
           </button>
         </div>
 
@@ -231,13 +230,13 @@ export default function ExpenseManagementPage() {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Category</th>
-                  <th>Description</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                  <th>Submitted By</th>
-                  <th>Actions</th>
+                  <th>{t("dateColExp")}</th>
+                  <th>{t("categoryColExp")}</th>
+                  <th>{t("descriptionColExp")}</th>
+                  <th>{t("amountCol")}</th>
+                  <th>{t("statusColExp")}</th>
+                  <th>{t("submittedByCol")}</th>
+                  <th>{t("actionsCol")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -286,7 +285,7 @@ export default function ExpenseManagementPage() {
                 {expenses.length === 0 && (
                   <tr>
                     <td colSpan={7} className="text-center text-[#606070]">
-                      No expenses found
+                      {t("noExpensesFound")}
                     </td>
                   </tr>
                 )}
@@ -300,7 +299,7 @@ export default function ExpenseManagementPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="glass-card w-full max-w-lg p-6">
             <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-[#f0f0f5]">Add Expense</h2>
+              <h2 className="text-xl font-semibold text-[#f0f0f5]">{t("addExpenseTitle")}</h2>
               <button onClick={() => setShowModal(false)} className="text-[#606070] hover:text-[#f0f0f5]">
                 <X size={20} />
               </button>
@@ -314,14 +313,14 @@ export default function ExpenseManagementPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Category</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("categoryLabel")}</label>
                 <select
                   required
                   value={formData.categoryId}
                   onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                   className="input select"
                 >
-                  <option value="">Select category</option>
+                  <option value="">{t("selectCategory")}</option>
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
@@ -331,20 +330,20 @@ export default function ExpenseManagementPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Description</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("descriptionLabelExp")}</label>
                 <input
                   type="text"
                   required
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="input"
-                  placeholder="Enter expense description"
+                  placeholder={t("descriptionPlaceholderExp")}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Amount (₦)</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("amountNaira")}</label>
                   <input
                     type="number"
                     step="0.01"
@@ -355,7 +354,7 @@ export default function ExpenseManagementPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Date</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("dateLabel")}</label>
                   <input
                     type="date"
                     required
@@ -367,29 +366,29 @@ export default function ExpenseManagementPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Receipt</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("receiptLabel")}</label>
                 <button type="button" className="btn btn-secondary btn-sm">
                   <Upload size={14} />
-                  Upload Receipt
+                  {t("uploadReceipt")}
                 </button>
               </div>
 
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Notes</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("notesLabel")}</label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   className="input min-h-[80px]"
-                  placeholder="Additional notes..."
+                  placeholder={t("notesPlaceholder")}
                 />
               </div>
 
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => setShowModal(false)} className="btn btn-secondary">
-                  Cancel
+                  {t("cancelBtn")}
                 </button>
                 <button type="submit" disabled={saving} className="btn btn-primary">
-                  {saving ? "Saving..." : "Create Expense"}
+                  {saving ? t("savingText") : t("createExpenseBtn")}
                 </button>
               </div>
             </form>

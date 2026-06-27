@@ -179,10 +179,10 @@ export default function ProcurementDashboard() {
   ];
 
   const quickActions = [
-    { label: "Add Supplier", href: "/dashboard/procurement/suppliers", icon: Plus },
-    { label: "Create Order", href: "/dashboard/procurement/purchase-orders/new", icon: ShoppingCart },
-    { label: "View Suppliers", href: "/dashboard/procurement/suppliers", icon: Eye },
-    { label: "Stock Requests", href: "/dashboard/procurement/stock-requests", icon: FileText },
+    { label: t("addSupplier"), href: "/dashboard/procurement/suppliers", icon: Plus },
+    { label: t("createOrder"), href: "/dashboard/procurement/purchase-orders/new", icon: ShoppingCart },
+    { label: t("viewSuppliers"), href: "/dashboard/procurement/suppliers", icon: Eye },
+    { label: t("stockRequestsLabel"), href: "/dashboard/procurement/stock-requests", icon: FileText },
   ];
 
   function getOrderStatusBadge(status: string) {
@@ -242,7 +242,7 @@ export default function ProcurementDashboard() {
 
         {/* Quick Actions */}
         <div className="glass-card p-6">
-          <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">Quick Actions</h3>
+          <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">{t("quickActions")}</h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {quickActions.map((action) => {
               const Icon = action.icon;
@@ -268,7 +268,7 @@ export default function ProcurementDashboard() {
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
                 type="text"
-                placeholder="Search suppliers..."
+                placeholder={t("searchSuppliers")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="input pl-10 w-56"
@@ -279,11 +279,11 @@ export default function ProcurementDashboard() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="input select w-40"
             >
-              <option value="">All Status</option>
-              <option value="PENDING">Pending</option>
-              <option value="APPROVED">Approved</option>
-              <option value="ORDERED">Ordered</option>
-              <option value="RECEIVED">Received</option>
+              <option value="">{t("allStatus")}</option>
+              <option value="PENDING">{t("pending")}</option>
+              <option value="APPROVED">{t("approved")}</option>
+              <option value="ORDERED">{t("ordered")}</option>
+              <option value="RECEIVED">{t("received")}</option>
             </select>
             <button onClick={fetchData} className="btn btn-secondary btn-sm">
               <RefreshCw size={14} />
@@ -300,20 +300,20 @@ export default function ProcurementDashboard() {
             {/* Suppliers Table */}
             <div className="glass-card p-6">
               <div className="mb-4 flex items-center justify-between">
-                <h4 className="text-base font-semibold text-[#f0f0f5]">Suppliers</h4>
+                <h4 className="text-base font-semibold text-[#f0f0f5]">{t("suppliers")}</h4>
                 <Link href="/dashboard/procurement" className="text-xs text-[#d4a843] hover:underline">
-                  View All
+                  {t("viewAll")}
                 </Link>
               </div>
               <div className="table-container">
                 <table className="table">
                   <thead>
                     <tr>
-                      <th>Name</th>
-                      <th>Contact</th>
-                      <th>Avg Cost</th>
-                      <th>Items</th>
-                      <th>Status</th>
+                      <th>{t("name")}</th>
+                      <th>{t("contact")}</th>
+                      <th>{t("avgCost")}</th>
+                      <th>{t("itemsLabel")}</th>
+                      <th>{t("status")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -335,7 +335,7 @@ export default function ProcurementDashboard() {
                     {suppliers.length === 0 && (
                       <tr>
                         <td colSpan={5} className="text-center text-[#606070] py-6">
-                          No suppliers found
+                          {t("noSuppliersFound")}
                         </td>
                       </tr>
                     )}
@@ -348,20 +348,20 @@ export default function ProcurementDashboard() {
             {/* Purchase Orders Table */}
             <div className="glass-card p-6">
               <div className="mb-4 flex items-center justify-between">
-                <h4 className="text-base font-semibold text-[#f0f0f5]">Purchase Orders</h4>
+                <h4 className="text-base font-semibold text-[#f0f0f5]">{t("purchaseOrders")}</h4>
                 <Link href="/dashboard/procurement" className="text-xs text-[#d4a843] hover:underline">
-                  View All
+                  {t("viewAll")}
                 </Link>
               </div>
               <div className="table-container">
                 <table className="table">
                   <thead>
                     <tr>
-                      <th>Order#</th>
-                      <th>Supplier</th>
-                      <th>Total</th>
-                      <th>Status</th>
-                      <th>Date</th>
+                      <th>{t("orderNumber")}</th>
+                      <th>{t("supplier")}</th>
+                      <th>{t("total")}</th>
+                      <th>{t("status")}</th>
+                      <th>{t("date")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -387,7 +387,7 @@ export default function ProcurementDashboard() {
                     {orders.length === 0 && (
                       <tr>
                         <td colSpan={5} className="text-center text-[#606070] py-6">
-                          No purchase orders found
+                          {t("noPurchaseOrdersFound")}
                         </td>
                       </tr>
                     )}
@@ -403,20 +403,20 @@ export default function ProcurementDashboard() {
         {!loading && supplyRequests.length > 0 && (
           <div className="glass-card p-6">
             <div className="mb-4 flex items-center justify-between">
-              <h4 className="text-base font-semibold text-[#f0f0f5]">Supply Requests</h4>
+              <h4 className="text-base font-semibold text-[#f0f0f5]">{t("supplyRequests")}</h4>
                 <Link href="/dashboard/procurement" className="text-xs text-[#d4a843] hover:underline">
-                View All
+                {t("viewAll")}
               </Link>
             </div>
             <div className="table-container">
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Description</th>
-                    <th>Supplier</th>
-                    <th>Urgency</th>
-                    <th>Status</th>
-                    <th>Date</th>
+                    <th>{t("description")}</th>
+                    <th>{t("supplier")}</th>
+                    <th>{t("urgency")}</th>
+                    <th>{t("status")}</th>
+                    <th>{t("date")}</th>
                   </tr>
                 </thead>
                 <tbody>

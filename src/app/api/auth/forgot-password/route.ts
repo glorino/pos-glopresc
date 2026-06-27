@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import crypto from "crypto";
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,9 +24,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: successMessage });
     }
 
-    // Generate a simple reset token (base64 encode email + timestamp)
-    const payload = JSON.stringify({ email, timestamp: Date.now() });
-    const token = Buffer.from(payload).toString("base64url");
+    // Generate a cryptographically secure token
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    // Store token in the database
+    await db.user.update({
+      where: { id: user.id },
+      data: {
+        resetToken: token,
+        resetTokenExpiry: expiresAt,
+      },
+    });
 
     // In production, send email/SMS. For demo, log the reset link.
     const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/reset-password?token=${token}`;
@@ -34,8 +44,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       message: successMessage,
-      // For demo purposes, include the link in the response
-      resetLink,
     });
   } catch (error) {
     console.error("Forgot password error:", error);

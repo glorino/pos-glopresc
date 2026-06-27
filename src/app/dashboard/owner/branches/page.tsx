@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { useTranslation } from "@/contexts/LanguageContext";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import {
   Building2,
@@ -58,6 +59,7 @@ const emptyForm: BranchFormData = {
 };
 
 export default function BranchesPage() {
+  const { t } = useTranslation();
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -278,7 +280,7 @@ export default function BranchesPage() {
   const totalUsers = branches.reduce((sum, b) => sum + b.userCount, 0);
 
   return (
-    <DashboardLayout role="OWNER" title="Branch Management">
+    <DashboardLayout role="OWNER" title={t("branchManagement")}>
       <div className="space-y-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -291,7 +293,7 @@ export default function BranchesPage() {
                 <p className="text-2xl font-bold text-[#f0f0f5]">
                   {branches.length}
                 </p>
-                <p className="text-sm text-[#9090a0]">Total Branches</p>
+                <p className="text-sm text-[#9090a0]">{t("totalBranches")}</p>
               </div>
             </div>
           </div>
@@ -304,7 +306,7 @@ export default function BranchesPage() {
                 <p className="text-2xl font-bold text-[#f0f0f5]">
                   {totalUsers}
                 </p>
-                <p className="text-sm text-[#9090a0]">Total Staff</p>
+                <p className="text-sm text-[#9090a0]">{t("totalStaff")}</p>
               </div>
             </div>
           </div>
@@ -317,7 +319,7 @@ export default function BranchesPage() {
                 <p className="text-2xl font-bold text-[#f0f0f5]">
                   {branches.reduce((sum, b) => sum + b.saleCount, 0)}
                 </p>
-                <p className="text-sm text-[#9090a0]">Total Sales</p>
+                <p className="text-sm text-[#9090a0]">{t("totalSales")}</p>
               </div>
             </div>
           </div>
@@ -330,7 +332,7 @@ export default function BranchesPage() {
                 <p className="text-2xl font-bold text-[#f0f0f5]">
                   {formatCurrency(totalRevenue)}
                 </p>
-                <p className="text-sm text-[#9090a0]">Total Revenue</p>
+                <p className="text-sm text-[#9090a0]">{t("totalRevenue")}</p>
               </div>
             </div>
           </div>
@@ -345,7 +347,7 @@ export default function BranchesPage() {
             />
             <input
               type="text"
-              placeholder="Search branches..."
+              placeholder={t("searchBranches")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="input pl-10"
@@ -353,7 +355,7 @@ export default function BranchesPage() {
           </div>
           <button onClick={openAddModal} className="btn btn-primary">
             <Plus size={16} />
-            Add Branch
+            {t("addBranchBtn")}
           </button>
         </div>
 
@@ -366,17 +368,17 @@ export default function BranchesPage() {
           <div className="glass-card flex flex-col items-center justify-center p-12">
             <Building2 size={48} className="mb-4 text-[#606070]" />
             <h3 className="text-lg font-semibold text-[#f0f0f5]">
-              No branches found
+              {t("noBranchesFound")}
             </h3>
             <p className="mt-1 text-sm text-[#9090a0]">
               {search
-                ? "No branches match your search criteria."
-                : "Get started by adding your first branch."}
+                ? t("noBranchesMatch")
+                : t("getStartedAdding")}
             </p>
             {!search && (
               <button onClick={openAddModal} className="btn btn-primary mt-4">
                 <Plus size={16} />
-                Add Branch
+                {t("addBranchBtn")}
               </button>
             )}
           </div>
@@ -385,15 +387,15 @@ export default function BranchesPage() {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Branch</th>
-                  <th>Code</th>
-                  <th>Location</th>
-                  <th>Contact</th>
-                  <th>Staff</th>
-                  <th>Sales</th>
-                  <th>Revenue</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+                  <th>{t("branchCol")}</th>
+                  <th>{t("codeCol")}</th>
+                  <th>{t("location")}</th>
+                  <th>{t("contactCol")}</th>
+                  <th>{t("staffCol")}</th>
+                  <th>{t("salesCol")}</th>
+                  <th>{t("revenueCol")}</th>
+                  <th>{t("statusCol")}</th>
+                  <th>{t("actionsCol")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -411,7 +413,7 @@ export default function BranchesPage() {
                           {branch.isDefault && (
                             <span className="inline-flex items-center gap-1 text-xs text-[#d4a843]">
                               <Star size={10} />
-                              Default
+                              {t("defaultBranch")}
                             </span>
                           )}
                         </div>
@@ -464,7 +466,7 @@ export default function BranchesPage() {
                           branch.isActive ? "badge-success" : "badge-danger"
                         }`}
                       >
-                        {branch.isActive ? "Active" : "Inactive"}
+                        {branch.isActive ? t("activeLabel") : t("inactiveLabel")}
                       </span>
                     </td>
                     <td>
@@ -472,7 +474,7 @@ export default function BranchesPage() {
                         <button
                           onClick={() => openStaffModal(branch)}
                           className="rounded-lg p-2 text-[#9090a0] hover:bg-[#2a2a3a] hover:text-[#10b981]"
-                          title="Manage Staff"
+                          title={t("manageStaff")}
                         >
                           <UserPlus size={14} />
                         </button>
@@ -507,7 +509,7 @@ export default function BranchesPage() {
           <div className="glass-card w-full max-w-lg p-6">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-[#f0f0f5]">
-                {editingBranch ? "Edit Branch" : "Add Branch"}
+                {editingBranch ? t("editBranch") : t("addBranchBtn")}
               </h2>
               <button
                 onClick={() => setShowModal(false)}
@@ -527,7 +529,7 @@ export default function BranchesPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1 block text-sm text-[#9090a0]">
-                    Branch Name *
+                    {t("branchName")}
                   </label>
                   <input
                     type="text"
@@ -537,12 +539,12 @@ export default function BranchesPage() {
                       setFormData({ ...formData, name: e.target.value })
                     }
                     className="input"
-                    placeholder="e.g. Main Branch"
+                    placeholder={t("branchNamePlaceholder")}
                   />
                 </div>
                 <div>
                   <label className="mb-1 block text-sm text-[#9090a0]">
-                    Branch Code *
+                    {t("branchCode")}
                   </label>
                   <input
                     type="text"
@@ -555,14 +557,14 @@ export default function BranchesPage() {
                       })
                     }
                     className="input"
-                    placeholder="e.g. MB001"
+                    placeholder={t("branchCodePlaceholder")}
                   />
                 </div>
               </div>
 
               <div>
                 <label className="mb-1 block text-sm text-[#9090a0]">
-                  Address
+                  {t("addressLabel")}
                 </label>
                 <input
                   type="text"
@@ -571,14 +573,14 @@ export default function BranchesPage() {
                     setFormData({ ...formData, address: e.target.value })
                   }
                   className="input"
-                  placeholder="Street address, city, state"
+                  placeholder={t("addressPlaceholder")}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1 block text-sm text-[#9090a0]">
-                    Phone
+                    {t("phoneLabel")}
                   </label>
                   <input
                     type="tel"
@@ -592,7 +594,7 @@ export default function BranchesPage() {
                 </div>
                 <div>
                   <label className="mb-1 block text-sm text-[#9090a0]">
-                    Email
+                    {t("emailLabel")}
                   </label>
                   <input
                     type="email"
@@ -615,7 +617,7 @@ export default function BranchesPage() {
                   }
                   className="h-4 w-4 rounded border-[#2a2a3a] bg-[#16161f] text-[#d4a843] focus:ring-[#d4a843]"
                 />
-                Set as default branch
+                {t("setAsDefault")}
               </label>
 
               <div className="flex justify-end gap-3 pt-2">
@@ -624,7 +626,7 @@ export default function BranchesPage() {
                   onClick={() => setShowModal(false)}
                   className="btn btn-secondary"
                 >
-                  Cancel
+                  {t("cancelBtn")}
                 </button>
                 <button
                   type="submit"
@@ -632,10 +634,10 @@ export default function BranchesPage() {
                   className="btn btn-primary"
                 >
                   {saving
-                    ? "Saving..."
+                    ? t("savingLabel")
                     : editingBranch
-                    ? "Update"
-                    : "Create"}
+                    ? t("updateBtn")
+                    : t("createBtn")}
                 </button>
               </div>
             </form>
@@ -650,10 +652,10 @@ export default function BranchesPage() {
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-[#f0f0f5]">
-                  Manage Staff — {selectedBranch.name}
+                  {t("manageStaffTitle")} — {selectedBranch.name}
                 </h2>
                 <p className="mt-1 text-sm text-[#9090a0]">
-                  Assign users to this branch or remove them
+                  {t("assignUsersDesc")}
                 </p>
               </div>
               <button
@@ -667,12 +669,12 @@ export default function BranchesPage() {
             {/* Assigned Staff */}
             <div className="mb-4">
               <h3 className="mb-2 text-sm font-medium text-[#9090a0]">
-                Assigned Staff ({branchUsers.length})
+                {t("assignedStaff")} ({branchUsers.length})
               </h3>
               <div className="max-h-40 space-y-1 overflow-y-auto rounded-lg border border-[#2a2a3a] bg-[#12121a] p-2">
                 {branchUsers.length === 0 ? (
-                  <p className="p-2 text-sm text-[#606070]">
-                    No users assigned yet
+                    <p className="p-2 text-sm text-[#606070]">
+                    {t("noUsersAssigned")}
                   </p>
                 ) : (
                   branchUsers.map((user) => (
@@ -698,7 +700,7 @@ export default function BranchesPage() {
                         onClick={() => removeUserFromBranch(user.id)}
                         disabled={assigning === user.id}
                         className="rounded-lg p-1.5 text-[#9090a0] hover:bg-[#2a2a3a] hover:text-[#f43f5e] disabled:opacity-50"
-                        title="Remove from branch"
+                        title={t("removeFromBranch")}
                       >
                         <X size={14} />
                       </button>
@@ -711,7 +713,7 @@ export default function BranchesPage() {
             {/* Assign New Users */}
             <div>
               <h3 className="mb-2 text-sm font-medium text-[#9090a0]">
-                Assign Users
+                {t("assignUsers")}
               </h3>
               <div className="relative mb-2">
                 <Search
@@ -720,7 +722,7 @@ export default function BranchesPage() {
                 />
                 <input
                   type="text"
-                  placeholder="Search users by name or email..."
+                  placeholder={t("searchUsersPlaceholder")}
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
                   className="input pl-9 text-sm"
@@ -759,7 +761,7 @@ export default function BranchesPage() {
                         </span>
                         {user.branchId && user.branchId !== selectedBranch.id && (
                           <span className="text-[10px] text-[#f59e0b]">
-                            (in another branch)
+                            {t("inAnotherBranch")}
                           </span>
                         )}
                       </div>
@@ -769,7 +771,7 @@ export default function BranchesPage() {
                         }
                         disabled={assigning === user.id}
                         className="rounded-lg p-1.5 text-[#9090a0] hover:bg-[#2a2a3a] hover:text-[#10b981] disabled:opacity-50"
-                        title="Assign to branch"
+                        title={t("assignToBranch")}
                       >
                         <Check size={14} />
                       </button>

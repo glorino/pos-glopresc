@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatDateTime, formatCurrency } from "@/lib/utils";
+import { useTranslation } from "@/contexts/LanguageContext";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import {
@@ -103,6 +104,7 @@ interface AuditData {
 }
 
 export default function AuditorDashboard() {
+  const { t } = useTranslation();
   const [data, setData] = useState<AuditData | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -149,21 +151,21 @@ export default function AuditorDashboard() {
 
   const stats = [
     {
-      label: "Total Audit Logs",
+      label: t("totalAuditLogs"),
       value: data?.stats?.totalLogs ?? 0,
       icon: Shield,
       color: "from-[#d4a843]/20 to-[#d4a843]/5",
       iconColor: "text-[#d4a843]",
     },
     {
-      label: "Sales Transactions",
+      label: t("salesTransactions"),
       value: data?.stats?.totalSales ?? 0,
       icon: ShoppingCart,
       color: "from-[#3b82f6]/20 to-[#3b82f6]/5",
       iconColor: "text-[#3b82f6]",
     },
     {
-      label: "Revenue Audited",
+      label: t("revenueAudited"),
       value: data?.stats?.salesRevenue ?? 0,
       icon: DollarSign,
       color: "from-[#10b981]/20 to-[#10b981]/5",
@@ -171,7 +173,7 @@ export default function AuditorDashboard() {
       isCurrency: true,
     },
     {
-      label: "Expenses Tracked",
+      label: t("expensesTracked"),
       value: data?.stats?.totalExpenses ?? 0,
       icon: ClipboardList,
       color: "from-[#f59e0b]/20 to-[#f59e0b]/5",
@@ -179,28 +181,28 @@ export default function AuditorDashboard() {
       isCurrency: true,
     },
     {
-      label: "Inventory Items",
+      label: t("inventoryItems"),
       value: data?.stats?.totalProducts ?? 0,
       icon: Package,
       color: "from-[#8b5cf6]/20 to-[#8b5cf6]/5",
       iconColor: "text-[#8b5cf6]",
     },
     {
-      label: "Stock Movements",
+      label: t("stockMovementsLabel"),
       value: data?.stats?.totalStockMovements ?? 0,
       icon: TrendingUp,
       color: "from-[#06b6d4]/20 to-[#06b6d4]/5",
       iconColor: "text-[#06b6d4]",
     },
     {
-      label: "Pending Approvals",
+      label: t("pendingApprovals"),
       value: (data?.stats?.pendingExpenses ?? 0) + (data?.stats?.pendingInvoices ?? 0),
       icon: Clock,
       color: "from-[#f43f5e]/20 to-[#f43f5e]/5",
       iconColor: "text-[#f43f5e]",
     },
     {
-      label: "Active Users",
+      label: t("activeUsers"),
       value: data?.stats?.activeUsers ?? 0,
       icon: Users,
       color: "from-[#22c55e]/20 to-[#22c55e]/5",
@@ -210,22 +212,22 @@ export default function AuditorDashboard() {
 
   const quickActions = [
     {
-      label: "Export Logs (PDF)",
+      label: t("exportLogsPdf"),
       icon: Download,
       onClick: () => handleExportPDF(),
     },
     {
-      label: "Sales Report",
+      label: t("salesReport"),
       icon: ShoppingCart,
       href: "/dashboard/sales-manager/sales",
     },
     {
-      label: "Inventory Report",
+      label: t("inventoryReport"),
       icon: Package,
       href: "/dashboard/inventory",
     },
     {
-      label: "Financial Report",
+      label: t("financialReport"),
       icon: DollarSign,
       href: "/dashboard/accounting",
     },
@@ -233,7 +235,7 @@ export default function AuditorDashboard() {
 
   function handleExportCSV() {
     const logs = data?.auditLogs ?? [];
-    const headers = ["Timestamp", "User", "Action", "Resource", "Details", "IP Address"];
+    const headers = [t("timestamp"), t("user"), t("action"), t("resource"), t("details"), t("ipAddress")];
     const rows = logs.map((log) => [
       formatDateTime(log.createdAt),
       `${log.user.firstName} ${log.user.lastName}`,
@@ -262,16 +264,16 @@ export default function AuditorDashboard() {
     const logs = data?.auditLogs ?? [];
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text("Audit Logs Report", 14, 22);
+    doc.text(t("auditLogsReport"), 14, 22);
     doc.setFontSize(10);
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 30);
+    doc.text(`${t("generated")}: ${new Date().toLocaleDateString()}`, 14, 30);
     const headers = [
-      "Timestamp",
-      "User",
-      "Action",
-      "Resource",
-      "Details",
-      "IP Address",
+      t("timestamp"),
+      t("user"),
+      t("action"),
+      t("resource"),
+      t("details"),
+      t("ipAddress"),
     ];
     const rows = logs.map((log) => [
       formatDateTime(log.createdAt),
@@ -315,11 +317,11 @@ export default function AuditorDashboard() {
       icon: ShoppingCart,
       color: "#3b82f6",
       fields: [
-        { label: "Total Transactions", key: "totalTransactions" },
-        { label: "Completed", key: "completed" },
-        { label: "Refunded", key: "refunded" },
-        { label: "Cancelled", key: "cancelled" },
-        { label: "Revenue", key: "revenue", currency: true },
+        { label: t("totalTransactions"), key: "totalTransactions" },
+        { label: t("completed"), key: "completed" },
+        { label: t("refunded"), key: "refunded" },
+        { label: t("cancelled"), key: "cancelled" },
+        { label: t("revenue"), key: "revenue", currency: true },
       ],
     },
     {
@@ -327,10 +329,10 @@ export default function AuditorDashboard() {
       icon: Package,
       color: "#8b5cf6",
       fields: [
-        { label: "Total Products", key: "totalProducts" },
-        { label: "Low Stock", key: "lowStock" },
-        { label: "Out of Stock", key: "outOfStock" },
-        { label: "Stock Movements", key: "stockMovements" },
+        { label: t("totalProducts"), key: "totalProducts" },
+        { label: t("lowStock"), key: "lowStock" },
+        { label: t("outOfStock"), key: "outOfStock" },
+        { label: t("stockMovementsLabel"), key: "stockMovements" },
       ],
     },
     {
@@ -338,12 +340,12 @@ export default function AuditorDashboard() {
       icon: DollarSign,
       color: "#10b981",
       fields: [
-        { label: "Total Expenses", key: "totalExpenses", currency: true },
-        { label: "Approved Expenses", key: "approvedExpenses", currency: true },
-        { label: "Pending Expenses", key: "pendingExpenses" },
-        { label: "Total Invoices", key: "totalInvoices" },
-        { label: "Pending Invoices", key: "pendingInvoices" },
-        { label: "Paid Invoices Value", key: "paidInvoicesValue", currency: true },
+        { label: t("totalExpenses"), key: "totalExpenses", currency: true },
+        { label: t("approvedExpenses"), key: "approvedExpenses", currency: true },
+        { label: t("pendingExpenses"), key: "pendingExpenses" },
+        { label: t("totalInvoices"), key: "totalInvoices" },
+        { label: t("pendingInvoices"), key: "pendingInvoices" },
+        { label: t("paidInvoicesValue"), key: "paidInvoicesValue", currency: true },
       ],
     },
     {
@@ -351,9 +353,9 @@ export default function AuditorDashboard() {
       icon: ClipboardList,
       color: "#f59e0b",
       fields: [
-        { label: "Total Suppliers", key: "totalSuppliers" },
-        { label: "Pending Orders", key: "pendingOrders" },
-        { label: "Total Order Value", key: "totalOrderValue", currency: true },
+        { label: t("totalSuppliers"), key: "totalSuppliers" },
+        { label: t("pendingOrders"), key: "pendingOrders" },
+        { label: t("totalOrderValue"), key: "totalOrderValue", currency: true },
       ],
     },
     {
@@ -361,15 +363,15 @@ export default function AuditorDashboard() {
       icon: Users,
       color: "#22c55e",
       fields: [
-        { label: "Active Users", key: "activeUsers" },
-        { label: "Logins Today", key: "loginsToday" },
-        { label: "New Users This Month", key: "newUsersThisMonth" },
+        { label: t("activeUsers"), key: "activeUsers" },
+        { label: t("loginsToday"), key: "loginsToday" },
+        { label: t("newUsersThisMonth"), key: "newUsersThisMonth" },
       ],
     },
   ];
 
   return (
-    <DashboardLayout role="AUDITOR" title="Audit & Compliance">
+    <DashboardLayout role="AUDITOR" title={t("auditorDashboard")}>
       <div className="space-y-6">
         {/* Stat Cards */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
@@ -396,7 +398,7 @@ export default function AuditorDashboard() {
         {/* Quick Actions */}
         <div className="glass-card p-6">
           <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-            Quick Actions
+            {t("quickActions")}
           </h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="relative">
@@ -406,7 +408,7 @@ export default function AuditorDashboard() {
               >
                 <Download size={18} className="text-[#d4a843]" />
                 <span className="text-sm font-medium text-[#f0f0f5]">
-                  Export Logs
+                  {t("exportLogs")}
                 </span>
                 <ChevronDown size={14} className="ml-auto text-[#9090a0]" />
               </button>
@@ -421,13 +423,13 @@ export default function AuditorDashboard() {
                       onClick={handleExportCSV}
                       className="flex w-full items-center gap-2 px-4 py-2 text-sm text-[#f0f0f5] hover:bg-[#2a2a3a]"
                     >
-                      Export as CSV
+                      {t("exportAsCsv")}
                     </button>
                     <button
                       onClick={handleExportPDF}
                       className="flex w-full items-center gap-2 px-4 py-2 text-sm text-[#f0f0f5] hover:bg-[#2a2a3a]"
                     >
-                      Export as PDF
+                      {t("exportAsPdf")}
                     </button>
                   </div>
                 </>
@@ -454,7 +456,7 @@ export default function AuditorDashboard() {
         {/* Department Audit Section */}
         <div className="glass-card p-6">
           <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-            Department Audit Overview
+            {t("departmentAuditOverview")}
           </h3>
           <div className="space-y-3">
             {deptConfigs.map((dept) => {
@@ -513,7 +515,7 @@ export default function AuditorDashboard() {
         {!loading && data?.dailyDepartmentActivity && (
           <div className="glass-card p-6">
             <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-              Daily Activity by Department (Past 7 Days)
+              {t("dailyActivityByDepartment")}
             </h3>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -534,35 +536,35 @@ export default function AuditorDashboard() {
                   />
                   <Bar
                     dataKey="sales"
-                    name="Sales"
+                    name={t("sales")}
                     stackId="a"
                     fill="#3b82f6"
                     radius={[0, 0, 0, 0]}
                   />
                   <Bar
                     dataKey="inventory"
-                    name="Inventory"
+                    name={t("inventory")}
                     stackId="a"
                     fill="#8b5cf6"
                     radius={[0, 0, 0, 0]}
                   />
                   <Bar
                     dataKey="finance"
-                    name="Finance"
+                    name={t("finance")}
                     stackId="a"
                     fill="#10b981"
                     radius={[0, 0, 0, 0]}
                   />
                   <Bar
                     dataKey="procurement"
-                    name="Procurement"
+                    name={t("procurement")}
                     stackId="a"
                     fill="#f59e0b"
                     radius={[0, 0, 0, 0]}
                   />
                   <Bar
                     dataKey="users"
-                    name="Users"
+                    name={t("users")}
                     stackId="a"
                     fill="#22c55e"
                     radius={[4, 4, 0, 0]}
@@ -575,7 +577,7 @@ export default function AuditorDashboard() {
 
         {/* Audit Log Filters */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h3 className="text-lg font-semibold text-[#f0f0f5]">Audit Logs</h3>
+          <h3 className="text-lg font-semibold text-[#f0f0f5]">{t("auditLogsSection")}</h3>
           <div className="flex flex-col gap-3 sm:flex-row">
             <div className="relative">
               <Search
@@ -584,7 +586,7 @@ export default function AuditorDashboard() {
               />
               <input
                 type="text"
-                placeholder="Search logs..."
+                placeholder={t("searchLogs")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="input pl-10 w-52"
@@ -595,12 +597,12 @@ export default function AuditorDashboard() {
               onChange={(e) => setActionFilter(e.target.value)}
               className="input select w-40"
             >
-              <option value="">All Actions</option>
-              <option value="LOGIN">Login</option>
-              <option value="CREATE">Create</option>
-              <option value="UPDATE">Update</option>
-              <option value="DELETE">Delete</option>
-              <option value="LOGOUT">Logout</option>
+              <option value="">{t("allActions")}</option>
+              <option value="LOGIN">{t("login")}</option>
+              <option value="CREATE">{t("create")}</option>
+              <option value="UPDATE">{t("update")}</option>
+              <option value="DELETE">{t("delete")}</option>
+              <option value="LOGOUT">{t("logout")}</option>
             </select>
             <input
               type="date"
@@ -632,12 +634,12 @@ export default function AuditorDashboard() {
                 <table className="table">
                   <thead>
                     <tr>
-                      <th>Timestamp</th>
-                      <th>User</th>
-                      <th>Action</th>
-                      <th>Resource</th>
-                      <th>Details</th>
-                      <th>IP Address</th>
+                      <th>{t("timestamp")}</th>
+                      <th>{t("user")}</th>
+                      <th>{t("action")}</th>
+                      <th>{t("resource")}</th>
+                      <th>{t("details")}</th>
+                      <th>{t("ipAddress")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -682,7 +684,7 @@ export default function AuditorDashboard() {
                           colSpan={6}
                           className="text-center text-[#606070] py-8"
                         >
-                          No audit logs found
+                          {t("noAuditLogsFound")}
                         </td>
                       </tr>
                     )}
@@ -694,8 +696,7 @@ export default function AuditorDashboard() {
               {data && data.totalPages > 1 && (
                 <div className="mt-4 flex items-center justify-between">
                   <p className="text-sm text-[#606070]">
-                    Page {data.page} of {data.totalPages} ({data.total} total
-                    logs)
+                    {t("page")} {data.page} {t("of")} {data.totalPages} ({data.total} {t("totalLogs")})
                   </p>
                   <div className="flex gap-2">
                     <button
@@ -703,14 +704,14 @@ export default function AuditorDashboard() {
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       className="btn btn-secondary btn-sm disabled:opacity-40"
                     >
-                      Previous
+                      {t("previous")}
                     </button>
                     <button
                       disabled={data.page >= data.totalPages}
                       onClick={() => setCurrentPage((p) => p + 1)}
                       className="btn btn-secondary btn-sm disabled:opacity-40"
                     >
-                      Next
+                      {t("next")}
                     </button>
                   </div>
                 </div>

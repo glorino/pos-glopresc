@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
+import { useTranslation } from "@/contexts/LanguageContext";
 import {
   DollarSign,
   TrendingDown,
@@ -62,6 +63,7 @@ interface AccountingSummary {
 const PIE_COLORS = ["#d4a843", "#3b82f6", "#8b5cf6", "#10b981", "#f43f5e", "#06b6d4", "#f59e0b"];
 
 export default function AccountingDashboard() {
+  const { t } = useTranslation();
   const [data, setData] = useState<AccountingSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [dateFrom, setDateFrom] = useState("");
@@ -91,49 +93,49 @@ export default function AccountingDashboard() {
 
   const stats = [
     {
-      label: "Total Revenue",
+      label: t("totalRevenue"),
       value: formatCurrency(data?.totalRevenue ?? 0),
       icon: DollarSign,
       color: "from-[#10b981]/20 to-[#10b981]/5",
       iconColor: "text-[#10b981]",
     },
     {
-      label: "Total Expenses",
+      label: t("totalExpenses"),
       value: formatCurrency(data?.totalExpenses ?? 0),
       icon: TrendingDown,
       color: "from-[#f43f5e]/20 to-[#f43f5e]/5",
       iconColor: "text-[#f43f5e]",
     },
     {
-      label: "Net Profit",
+      label: t("netProfit"),
       value: formatCurrency(data?.netProfit ?? 0),
       icon: TrendingUp,
       color: "from-[#d4a843]/20 to-[#d4a843]/5",
       iconColor: "text-[#d4a843]",
     },
     {
-      label: "Pending Invoices",
+      label: t("invoices"),
       value: (data?.pendingInvoices ?? 0).toLocaleString(),
       icon: FileText,
       color: "from-[#f59e0b]/20 to-[#f59e0b]/5",
       iconColor: "text-[#f59e0b]",
     },
     {
-      label: "Pending Expenses",
+      label: t("pendingExpenses"),
       value: (data?.pendingExpenses ?? 0).toLocaleString(),
       icon: Clock,
       color: "from-[#8b5cf6]/20 to-[#8b5cf6]/5",
       iconColor: "text-[#8b5cf6]",
     },
     {
-      label: "Overdue Invoices",
+      label: t("overdueInvoices"),
       value: (data?.overdueInvoices ?? 0).toLocaleString(),
       icon: AlertTriangle,
       color: "from-[#f43f5e]/20 to-[#f43f5e]/5",
       iconColor: "text-[#f43f5e]",
     },
     {
-      label: "Monthly Cash Flow",
+      label: t("monthlyCashFlow"),
       value: formatCurrency(
         (data?.monthlyCashFlow ?? []).reduce((s, m) => s + m.income - m.expenses, 0)
       ),
@@ -144,17 +146,17 @@ export default function AccountingDashboard() {
   ];
 
   const quickActions = [
-    { label: "Add Expense", href: "/dashboard/accounting/expenses", icon: Plus },
-    { label: "View Invoices", href: "/dashboard/accounting/invoices", icon: Eye },
-    { label: "Generate Report", href: "/dashboard/owner/reports", icon: BarChart3 },
-    { label: "Expense Report", href: "/dashboard/accounting/expenses", icon: FileText },
+    { label: t("addExpense"), href: "/dashboard/accounting/expenses", icon: Plus },
+    { label: t("viewInvoices"), href: "/dashboard/accounting/invoices", icon: Eye },
+    { label: t("generateReport"), href: "/dashboard/owner/reports", icon: BarChart3 },
+    { label: t("expenseReport"), href: "/dashboard/accounting/expenses", icon: FileText },
   ];
 
   const transactions = data?.recentTransactions ?? [];
   const pendingApprovals = data?.pendingExpenseApprovals ?? [];
 
   return (
-    <DashboardLayout role="ACCOUNTANT" title="Accounting & Finance">
+    <DashboardLayout role="ACCOUNTANT" title={t("accountingDashboard")}>
       <div className="space-y-6">
         {/* Date Range Filter & Total Payments */}
         <div className="glass-card p-4">
@@ -166,7 +168,7 @@ export default function AccountingDashboard() {
                 onChange={(e) => setDateFrom(e.target.value)}
                 className="input w-40"
               />
-              <span className="text-sm text-[#606070]">to</span>
+              <span className="text-sm text-[#606070]">{t("toLabel")}</span>
               <input
                 type="date"
                 value={dateTo}
@@ -178,13 +180,13 @@ export default function AccountingDashboard() {
                   onClick={() => { setDateFrom(""); setDateTo(""); }}
                   className="btn btn-secondary btn-sm"
                 >
-                  Clear
+                  {t("clear")}
                 </button>
               )}
             </div>
             <div className="flex items-center gap-2 rounded-xl border border-[#10b981]/30 bg-[#10b981]/10 px-4 py-2">
               <DollarSign size={18} className="text-[#10b981]" />
-              <span className="text-sm font-medium text-[#9090a0]">Total Payments:</span>
+              <span className="text-sm font-medium text-[#9090a0]">{t("totalPaymentsLabel")}</span>
               <span className="text-lg font-bold text-[#10b981]">
                 {formatCurrency(data?.totalPayments ?? 0)}
               </span>
@@ -214,7 +216,7 @@ export default function AccountingDashboard() {
 
         {/* Quick Actions */}
         <div className="glass-card p-6">
-          <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">Quick Actions</h3>
+          <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">{t("quickActions")}</h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {quickActions.map((action) => {
               const Icon = action.icon;
@@ -243,7 +245,7 @@ export default function AccountingDashboard() {
               {/* Revenue vs Expenses */}
               <div className="glass-card p-6 xl:col-span-2">
                 <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-                  Revenue vs Expenses
+                  {t("revenueVsExpenses")}
                 </h3>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
@@ -264,7 +266,7 @@ export default function AccountingDashboard() {
                         }}
                         formatter={(value: number, name: string) => [
                           formatCurrency(value),
-                          name === "income" ? "Revenue" : "Expenses",
+                          name === "income" ? t("revenue") : t("totalExpenses"),
                         ]}
                       />
                       <Legend
@@ -280,7 +282,7 @@ export default function AccountingDashboard() {
               {/* Expense Breakdown */}
               <div className="glass-card p-6">
                 <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
-                  Expense Breakdown
+                  {t("expenseBreakdown")}
                 </h3>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
@@ -309,7 +311,7 @@ export default function AccountingDashboard() {
                           borderRadius: "8px",
                           color: "#f0f0f5",
                         }}
-                        formatter={(value: number) => [formatCurrency(value), "Amount"]}
+                        formatter={(value: number) => [formatCurrency(value), t("amount")]}
                       />
                       <Legend
                         wrapperStyle={{ color: "#9090a0", fontSize: 11 }}
@@ -326,20 +328,20 @@ export default function AccountingDashboard() {
               {/* Recent Transactions */}
               <div className="glass-card p-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <h4 className="text-base font-semibold text-[#f0f0f5]">Recent Transactions</h4>
+                  <h4 className="text-base font-semibold text-[#f0f0f5]">{t("recentTransactions")}</h4>
                   <Link href="/dashboard/accounting/expenses" className="text-xs text-[#d4a843] hover:underline">
-                    View All
+                    {t("viewAll")}
                   </Link>
                 </div>
                 <div className="table-container">
                   <table className="table">
                     <thead>
                       <tr>
-                        <th>Description</th>
-                        <th>Amount</th>
-                        <th>Type</th>
-                        <th>Date</th>
-                        <th>Status</th>
+                        <th>{t("description")}</th>
+                        <th>{t("amount")}</th>
+                        <th>{t("type")}</th>
+                        <th>{t("date")}</th>
+                        <th>{t("status")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -371,7 +373,7 @@ export default function AccountingDashboard() {
                       {transactions.length === 0 && (
                         <tr>
                           <td colSpan={5} className="text-center text-[#606070] py-6">
-                            No recent transactions
+                            {t("noRecentTransactions")}
                           </td>
                         </tr>
                       )}
@@ -384,21 +386,21 @@ export default function AccountingDashboard() {
               <div className="glass-card p-6">
                 <div className="mb-4 flex items-center justify-between">
                   <h4 className="text-base font-semibold text-[#f0f0f5]">
-                    Pending Expense Approvals
+                    {t("pendingExpenseApprovals")}
                   </h4>
                   <Link href="/dashboard/accounting/expenses" className="text-xs text-[#d4a843] hover:underline">
-                    View All
+                    {t("viewAll")}
                   </Link>
                 </div>
                 <div className="table-container">
                   <table className="table">
                     <thead>
                       <tr>
-                        <th>Description</th>
-                        <th>Amount</th>
-                        <th>User</th>
-                        <th>Date</th>
-                        <th>Status</th>
+                        <th>{t("description")}</th>
+                        <th>{t("amount")}</th>
+                        <th>{t("userLabel")}</th>
+                        <th>{t("date")}</th>
+                        <th>{t("status")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -418,7 +420,7 @@ export default function AccountingDashboard() {
                       {pendingApprovals.length === 0 && (
                         <tr>
                           <td colSpan={5} className="text-center text-[#606070] py-6">
-                            No pending approvals
+                            {t("noPendingApprovals")}
                           </td>
                         </tr>
                       )}

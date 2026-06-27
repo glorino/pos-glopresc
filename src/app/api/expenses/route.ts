@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getBranchFilter } from "@/lib/branch-filter";
 import { getToken } from "next-auth/jwt";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { requireAuth } from "@/lib/api-auth";
 
 export async function GET(request: NextRequest) {
@@ -75,7 +77,10 @@ export async function POST(request: NextRequest) {
   if (error) return error;
   try {
     const body = await request.json();
-    const { userId, categoryId, description, amount, date, receipt, notes } = body;
+    const { categoryId, description, amount, date, receipt, notes } = body;
+
+    const session = await getServerSession(authOptions);
+    const userId = (session?.user as any)?.id;
 
     if (!userId || !categoryId || !description || amount === undefined) {
       return NextResponse.json(

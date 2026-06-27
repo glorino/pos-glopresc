@@ -40,16 +40,17 @@ interface Product {
   stockQuantity: number;
 }
 
-const adjustmentTypes = [
-  { value: "ADDITION", label: "Add Stock", icon: ArrowUp, color: "text-[#10b981]" },
-  { value: "SUBTRACTION", label: "Subtract Stock", icon: ArrowDown, color: "text-[#f43f5e]" },
-  { value: "DAMAGE", label: "Damage", icon: AlertTriangle, color: "text-[#f59e0b]" },
-  { value: "EXPIRED", label: "Expired", icon: AlertTriangle, color: "text-[#f59e0b]" },
-  { value: "RETURN", label: "Return", icon: RefreshCw, color: "text-[#3b82f6]" },
-];
-
 export default function InventoryStockPage() {
   const { t } = useTranslation();
+
+  const adjustmentTypes = [
+    { value: "ADDITION", label: t("addStockLabel"), icon: ArrowUp, color: "text-[#10b981]" },
+    { value: "SUBTRACTION", label: t("subtractStock"), icon: ArrowDown, color: "text-[#f43f5e]" },
+    { value: "DAMAGE", label: t("damageLabel"), icon: AlertTriangle, color: "text-[#f59e0b]" },
+    { value: "EXPIRED", label: t("expiredLabel"), icon: AlertTriangle, color: "text-[#f59e0b]" },
+    { value: "RETURN", label: t("returnLabel"), icon: RefreshCw, color: "text-[#3b82f6]" },
+  ];
+
   const [adjustments, setAdjustments] = useState<StockAdjustment[]>([]);
   const [pendingAdjustments, setPendingAdjustments] = useState<StockAdjustment[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -269,19 +270,19 @@ export default function InventoryStockPage() {
           <div className="glass-card p-6">
             <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-[#f0f0f5]">
               <Clock size={18} className="text-[#f59e0b]" />
-              Pending Approvals ({pendingAdjustments.length})
+              {t("pendingApprovals")} ({pendingAdjustments.length})
             </h3>
             <div className="table-container">
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Product</th>
-                    <th>Type</th>
-                    <th>Qty</th>
-                    <th>Reason</th>
-                    <th>Requested By</th>
-                    <th>Date</th>
-                    <th>Actions</th>
+                    <th>{t("productCol")}</th>
+                    <th>{t("typeCol")}</th>
+                    <th>{t("qtyLabel")}</th>
+                    <th>{t("reasonLabel")}</th>
+                    <th>{t("requestedByCol")}</th>
+                    <th>{t("dateCol")}</th>
+                    <th>{t("actionsCol")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -346,14 +347,14 @@ export default function InventoryStockPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <div className="mb-1 flex items-center justify-between">
-                  <label className="text-sm text-[#9090a0]">Product</label>
+                  <label className="text-sm text-[#9090a0]">{t("productCol")}</label>
                   <button
                     type="button"
                     onClick={() => setShowScanner(true)}
                     className="flex items-center gap-1 text-xs font-medium text-[#d4a843] hover:text-[#c49a38]"
                   >
                     <ScanBarcode size={12} />
-                    Scan Product
+                    {t("scanProduct")}
                   </button>
                 </div>
                 <select
@@ -362,7 +363,7 @@ export default function InventoryStockPage() {
                   onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
                   className="input select"
                 >
-                  <option value="">Select product</option>
+                  <option value="">{t("selectProductPlaceholder")}</option>
                   {products.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name} ({p.sku}) - Stock: {p.stockQuantity}
@@ -372,7 +373,7 @@ export default function InventoryStockPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Type</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("typeLabel")}</label>
                 <div className="flex flex-wrap gap-2">
                   {adjustmentTypes.map((t) => (
                     <button
@@ -392,7 +393,7 @@ export default function InventoryStockPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Quantity</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("quantityLabel")}</label>
                 <input
                   type="number"
                   required
@@ -400,38 +401,38 @@ export default function InventoryStockPage() {
                   value={formData.quantity}
                   onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
                   className="input"
-                  placeholder="Enter quantity"
+                  placeholder={t("quantityPlaceholder")}
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Reason</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("reasonLabel")}</label>
                 <textarea
                   required
                   value={formData.reason}
                   onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                   className="input min-h-[80px]"
-                  placeholder="Enter reason for adjustment"
+                  placeholder={t("reasonPlaceholder")}
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Reference (Optional)</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("referenceOptional")}</label>
                 <input
                   type="text"
                   value={formData.reference}
                   onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
                   className="input"
-                  placeholder="PO number, invoice, etc."
+                  placeholder={t("referencePlaceholder")}
                 />
               </div>
 
               <button type="submit" disabled={saving} className="btn btn-primary w-full">
                 {saving
-                  ? "Processing..."
+                  ? t("processing")
                   : isManager
-                  ? "Submit Adjustment"
-                  : "Submit for Approval"}
+                  ? t("submitAdjustment")
+                  : t("submitForApproval")}
               </button>
             </form>
           </div>
@@ -442,7 +443,7 @@ export default function InventoryStockPage() {
               {t("lowStockAlerts")}
             </h3>
             {lowStockAlerts.length === 0 ? (
-              <p className="text-center text-sm text-[#606070]">No low stock alerts</p>
+              <p className="text-center text-sm text-[#606070]">{t("noLowStockAlerts")}</p>
             ) : (
               <div className="space-y-3">
                 {lowStockAlerts.slice(0, 10).map((product) => (
@@ -467,10 +468,10 @@ export default function InventoryStockPage() {
                           (product as any).stockQuantity === 0 ? "text-[#f43f5e]" : "text-[#f59e0b]"
                         }`}
                       >
-                        {product.stockQuantity} left
+                        {product.stockQuantity} {t("left")}
                       </p>
                       <p className="text-xs text-[#606070]">
-                        Min: {(product as any).minStockLevel}
+                        {t("minLabelShort")} {(product as any).minStockLevel}
                       </p>
                     </div>
                   </div>
@@ -483,7 +484,7 @@ export default function InventoryStockPage() {
         <div className="glass-card p-6">
           <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-[#f0f0f5]">
             <Package size={18} className="text-[#3b82f6]" />
-            Recent Adjustments
+            {t("recentAdjustments")}
           </h3>
 
           <div className="mb-4 flex items-center gap-3">
@@ -491,7 +492,7 @@ export default function InventoryStockPage() {
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
                 type="text"
-                placeholder="Search adjustments..."
+                placeholder={t("searchAdjustments")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchAdjustments()}
@@ -509,13 +510,13 @@ export default function InventoryStockPage() {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Product</th>
-                    <th>Type</th>
-                    <th>Qty</th>
-                    <th>Reason</th>
-                    <th>Status</th>
-                    <th>By</th>
-                    <th>Date</th>
+                    <th>{t("productCol")}</th>
+                    <th>{t("typeCol")}</th>
+                    <th>{t("qtyLabel")}</th>
+                    <th>{t("reasonLabel")}</th>
+                    <th>{t("statusCol")}</th>
+                    <th>{t("byCol")}</th>
+                    <th>{t("dateCol")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -546,7 +547,7 @@ export default function InventoryStockPage() {
                   {adjustments.length === 0 && (
                     <tr>
                       <td colSpan={7} className="text-center text-[#606070]">
-                        No adjustments found
+                        {t("noAdjustmentsFound")}
                       </td>
                     </tr>
                   )}

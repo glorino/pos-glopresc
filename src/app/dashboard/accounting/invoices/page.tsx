@@ -166,7 +166,7 @@ export default function InvoicesPage() {
   }
 
   async function markAsPaid(invoiceId: string) {
-    if (!confirm("Mark this invoice as paid?")) return;
+    if (!confirm(t("markPaidConfirm"))) return;
     try {
       const res = await fetch("/api/invoices", {
         method: "PUT",
@@ -184,7 +184,7 @@ export default function InvoicesPage() {
   }
 
   async function markSupplierAsPaid(poId: string) {
-    if (!confirm("Mark this supplier invoice as paid?")) return;
+    if (!confirm(t("markSupplierPaidConfirm"))) return;
     try {
       const res = await fetch("/api/purchase-orders", {
         method: "PUT",
@@ -258,7 +258,7 @@ export default function InvoicesPage() {
                     : "text-[#9090a0] hover:text-[#f0f0f5]"
                 }`}
               >
-                Customer Invoices
+                {t("customerInvoices")}
               </button>
               <button
                 onClick={() => setInvoiceType("supplier")}
@@ -268,14 +268,14 @@ export default function InvoicesPage() {
                     : "text-[#9090a0] hover:text-[#f0f0f5]"
                 }`}
               >
-                Supplier Invoices
+                {t("supplierInvoices")}
               </button>
             </div>
             <div className="relative">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
                 type="text"
-                placeholder="Search invoices..."
+                placeholder={t("searchInvoicesPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && (invoiceType === "customer" ? fetchInvoices() : fetchSupplierInvoices())}
@@ -287,11 +287,11 @@ export default function InvoicesPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="input select w-auto"
             >
-              <option value="">All Status</option>
-              <option value="PENDING">Pending</option>
-              <option value="PAID">Paid</option>
-              <option value="OVERDUE">Overdue</option>
-              <option value="CANCELLED">Cancelled</option>
+              <option value="">{t("allStatus")}</option>
+              <option value="PENDING">{t("pendingLabel")}</option>
+              <option value="PAID">{t("paidLabel")}</option>
+              <option value="OVERDUE">{t("overdueLabel")}</option>
+              <option value="CANCELLED">{t("cancelledLabel")}</option>
             </select>
             {invoiceType === "customer" && (
               <>
@@ -313,7 +313,7 @@ export default function InvoicesPage() {
           {invoiceType === "customer" && (
             <button onClick={() => setShowModal(true)} className="btn btn-primary">
               <Plus size={16} />
-              Create Invoice
+              {t("createInvoiceBtn")}
             </button>
           )}
         </div>
@@ -327,14 +327,14 @@ export default function InvoicesPage() {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Invoice #</th>
-                  <th>Customer</th>
-                  <th>Amount</th>
-                  <th>Tax</th>
-                  <th>Total</th>
-                  <th>Status</th>
-                  <th>Due Date</th>
-                  <th>Actions</th>
+                  <th>{t("invoiceNumberTh")}</th>
+                  <th>{t("customerCol")}</th>
+                  <th>{t("amountCol")}</th>
+                  <th>{t("taxLabel")}</th>
+                  <th>{t("totalTh")}</th>
+                  <th>{t("statusCol")}</th>
+                  <th>{t("dueDateCol")}</th>
+                  <th>{t("invoiceActions")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -365,14 +365,14 @@ export default function InvoicesPage() {
                             <button
                               onClick={() => markAsPaid(invoice.id)}
                               className="rounded-lg p-2 text-[#9090a0] hover:bg-[#10b981]/20 hover:text-[#10b981]"
-                              title="Mark as Paid"
+                              title={t("markAsPaid")}
                             >
                               <Check size={14} />
                             </button>
                             <button
                               onClick={() => sendReminder(invoice)}
                               className="rounded-lg p-2 text-[#9090a0] hover:bg-[#3b82f6]/20 hover:text-[#3b82f6]"
-                              title="Send Reminder"
+                              title={t("sendReminder")}
                             >
                               <Send size={14} />
                             </button>
@@ -385,7 +385,7 @@ export default function InvoicesPage() {
                 {invoices.length === 0 && (
                   <tr>
                     <td colSpan={8} className="text-center text-[#606070]">
-                      No invoices found
+                      {t("noInvoicesFound")}
                     </td>
                   </tr>
                 )}
@@ -397,12 +397,12 @@ export default function InvoicesPage() {
             <table className="table">
               <thead>
                 <tr>
-                  <th>PO Number</th>
-                  <th>Supplier</th>
-                  <th>Total</th>
-                  <th>Status</th>
-                  <th>Expected Date</th>
-                  <th>Actions</th>
+                  <th>{t("poNumberCol")}</th>
+                  <th>{t("supplierTh")}</th>
+                  <th>{t("totalTh")}</th>
+                  <th>{t("statusCol")}</th>
+                  <th>{t("expectedDateCol")}</th>
+                  <th>{t("invoiceActions")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -432,7 +432,7 @@ export default function InvoicesPage() {
                           <button
                             onClick={() => markSupplierAsPaid(inv.id)}
                             className="rounded-lg p-2 text-[#9090a0] hover:bg-[#10b981]/20 hover:text-[#10b981]"
-                            title="Mark as Received"
+                            title={t("markAsReceived")}
                           >
                             <Check size={14} />
                           </button>
@@ -444,7 +444,7 @@ export default function InvoicesPage() {
                 {supplierInvoices.length === 0 && (
                   <tr>
                     <td colSpan={6} className="text-center text-[#606070]">
-                      No supplier invoices found
+                      {t("noSupplierInvoices")}
                     </td>
                   </tr>
                 )}
@@ -458,7 +458,7 @@ export default function InvoicesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="glass-card w-full max-w-lg p-6">
             <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-[#f0f0f5]">Create Invoice</h2>
+              <h2 className="text-xl font-semibold text-[#f0f0f5]">{t("createInvoiceBtn")}</h2>
               <button onClick={() => setShowModal(false)} className="text-[#606070] hover:text-[#f0f0f5]">
                 <X size={20} />
               </button>
@@ -472,20 +472,20 @@ export default function InvoicesPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Customer Name</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("customerNameLabel")}</label>
                 <input
                   type="text"
                   required
                   value={formData.customerName}
                   onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
                   className="input"
-                  placeholder="Enter customer name"
+                  placeholder={t("customerNamePlaceholder")}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Amount (₦)</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("amountNaira")}</label>
                   <input
                     type="number"
                     step="0.01"
@@ -496,7 +496,7 @@ export default function InvoicesPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Tax (₦)</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("taxLabel")}</label>
                   <input
                     type="number"
                     step="0.01"
@@ -509,7 +509,7 @@ export default function InvoicesPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Due Date</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("dueDateCol")}</label>
                   <input
                     type="date"
                     required
@@ -519,13 +519,13 @@ export default function InvoicesPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Description</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("descriptionLabelInv")}</label>
                   <input
                     type="text"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="input"
-                    placeholder="Invoice description"
+                    placeholder={t("descriptionPlaceholderInv")}
                   />
                 </div>
               </div>
@@ -533,19 +533,19 @@ export default function InvoicesPage() {
               {formData.amount && (
                 <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#9090a0]">Amount</span>
+                    <span className="text-[#9090a0]">{t("amountCol")}</span>
                     <span className="text-[#f0f0f5]">
                       {formatCurrency(parseFloat(formData.amount) || 0)}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#9090a0]">Tax</span>
+                    <span className="text-[#9090a0]">{t("taxLabel")}</span>
                     <span className="text-[#f0f0f5]">
                       {formatCurrency(parseFloat(formData.tax) || 0)}
                     </span>
                   </div>
                   <div className="mt-2 flex justify-between border-t border-[#2a2a3a] pt-2">
-                    <span className="font-semibold text-[#f0f0f5]">Total</span>
+                    <span className="font-semibold text-[#f0f0f5]">{t("totalLabel")}</span>
                     <span className="font-semibold text-[#d4a843]">
                       {formatCurrency(
                         (parseFloat(formData.amount) || 0) + (parseFloat(formData.tax) || 0)
@@ -557,10 +557,10 @@ export default function InvoicesPage() {
 
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => setShowModal(false)} className="btn btn-secondary">
-                  Cancel
+                  {t("cancelBtn")}
                 </button>
                 <button type="submit" disabled={saving} className="btn btn-primary">
-                  {saving ? "Creating..." : "Create Invoice"}
+                  {saving ? t("creatingLabelBtn") : t("createInvoiceBtn")}
                 </button>
               </div>
             </form>

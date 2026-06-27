@@ -134,7 +134,8 @@ export default function Topbar({ title, user, onMenuToggle }: TopbarProps) {
     AUDITOR: "/dashboard/auditor",
     CUSTOMER: "/dashboard/customer",
   };
-  const settingsRoute = roleSettingsMap[user.role] || "/dashboard/owner/settings";
+  const profileRoute = roleSettingsMap[user.role] || "/dashboard/owner/settings";
+  const settingsRoute = user.role === "OWNER" || user.role === "MANAGER" ? "/dashboard/owner/settings" : profileRoute;
 
   const initials = user.name
     .split(" ")
@@ -301,7 +302,7 @@ export default function Topbar({ title, user, onMenuToggle }: TopbarProps) {
                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#9090a0] hover:bg-white/5 hover:text-[#f0f0f5]"
               >
                 <User size={14} />
-                Profile
+                {t("profile")}
               </button>
               <button
                 onClick={() => {
@@ -311,7 +312,7 @@ export default function Topbar({ title, user, onMenuToggle }: TopbarProps) {
                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#9090a0] hover:bg-white/5 hover:text-[#f0f0f5]"
               >
                 <Settings size={14} />
-                Settings
+                {t("settings")}
               </button>
               <hr className="my-1 border-[#2a2a3a]" />
               <button
@@ -319,7 +320,7 @@ export default function Topbar({ title, user, onMenuToggle }: TopbarProps) {
                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#f43f5e] hover:bg-[rgba(244,63,94,0.1)]"
               >
                 <LogOut size={14} />
-                Logout
+                {t("logout")}
               </button>
             </div>
           )}

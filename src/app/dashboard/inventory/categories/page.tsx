@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { useTranslation } from "@/contexts/LanguageContext";
 import {
   Plus,
   Edit2,
@@ -22,6 +23,7 @@ interface Category {
 }
 
 export default function InventoryCategoriesPage() {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -109,16 +111,16 @@ export default function InventoryCategoriesPage() {
   }
 
   return (
-    <DashboardLayout role="WAREHOUSE_MANAGER" title="Categories">
+    <DashboardLayout role="WAREHOUSE_MANAGER" title={t("categoriesTitle")}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-[#9090a0]">
             <FolderOpen size={16} />
-            <span>{categories.length} categories</span>
+            <span>{categories.length} {t("categoriesCount")}</span>
           </div>
           <button onClick={openAddModal} className="btn btn-primary">
             <Plus size={16} />
-            Add Category
+            {t("addCategory")}
           </button>
         </div>
 
@@ -147,13 +149,13 @@ export default function InventoryCategoriesPage() {
                           onClick={() => handleDelete(category.id)}
                           className="rounded-lg bg-[#f43f5e]/20 px-2 py-1 text-xs text-[#f43f5e]"
                         >
-                          Delete
+                          {t("deleteBtn")}
                         </button>
                         <button
                           onClick={() => setDeleteConfirm(null)}
                           className="rounded-lg bg-[#2a2a3a] px-2 py-1 text-xs text-[#9090a0]"
                         >
-                          Cancel
+                          {t("cancelBtn")}
                         </button>
                       </div>
                     ) : (
@@ -172,13 +174,13 @@ export default function InventoryCategoriesPage() {
                 )}
                 <div className="mt-3 flex items-center gap-1 text-sm text-[#606070]">
                   <Package size={14} />
-                  <span>{category._count?.products || 0} products</span>
+                  <span>{category._count?.products || 0} {t("productsCount")}</span>
                 </div>
               </div>
             ))}
             {categories.length === 0 && (
               <div className="col-span-full text-center text-[#606070]">
-                No categories found
+                {t("noCategoriesFound")}
               </div>
             )}
           </div>
@@ -190,7 +192,7 @@ export default function InventoryCategoriesPage() {
           <div className="glass-card w-full max-w-md p-6">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-[#f0f0f5]">
-                {editingCategory ? "Edit Category" : "Add Category"}
+                {editingCategory ? t("editCategory") : t("addCategory")}
               </h2>
               <button onClick={() => setShowModal(false)} className="text-[#606070] hover:text-[#f0f0f5]">
                 <X size={20} />
@@ -205,7 +207,7 @@ export default function InventoryCategoriesPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Name</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("nameLabel")}</label>
                 <input
                   type="text"
                   required
@@ -215,7 +217,7 @@ export default function InventoryCategoriesPage() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Description</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("descriptionLabel")}</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -225,10 +227,10 @@ export default function InventoryCategoriesPage() {
 
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => setShowModal(false)} className="btn btn-secondary">
-                  Cancel
+                  {t("cancelBtn")}
                 </button>
                 <button type="submit" disabled={saving} className="btn btn-primary">
-                  {saving ? "Saving..." : editingCategory ? "Update" : "Create"}
+                  {saving ? t("savingText") : editingCategory ? t("updateButton") : t("createButton")}
                 </button>
               </div>
             </form>

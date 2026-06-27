@@ -211,7 +211,7 @@ function InventoryProductsPage() {
       <div className="space-y-6">
         {isReadOnly && (
           <div className="rounded-lg border border-[#d4a843]/30 bg-[#d4a843]/10 p-4 text-sm text-[#d4a843]">
-            View-only access. Contact your manager for product changes.
+            {t("viewOnlyAccess")}
           </div>
         )}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -235,7 +235,7 @@ function InventoryProductsPage() {
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
                 type="text"
-                placeholder="Search products..."
+                placeholder={t("searchProducts")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchProducts()}
@@ -252,7 +252,7 @@ function InventoryProductsPage() {
               className="btn btn-primary btn-sm"
             >
               <Plus size={14} />
-              Add Product
+              {t("addProduct")}
             </button>
           )}
         </div>
@@ -266,14 +266,14 @@ function InventoryProductsPage() {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Product</th>
-                  <th>SKU</th>
-                  <th>Category</th>
-                  <th>Stock</th>
-                  <th>Min</th>
-                  <th>Status</th>
-                  <th>Value</th>
-                  {!isReadOnly && <th>Quick Adjust</th>}
+                  <th>{t("productLabel")}</th>
+                  <th>{t("skuCol")}</th>
+                  <th>{t("categoryCol")}</th>
+                  <th>{t("stockCol")}</th>
+                  <th>{t("minCol")}</th>
+                  <th>{t("statusCol")}</th>
+                  <th>{t("valueCol")}</th>
+                  {!isReadOnly && <th>{t("quickAdjustCol")}</th>}
                 </tr>
               </thead>
               <tbody>
@@ -322,15 +322,15 @@ function InventoryProductsPage() {
                             onChange={(e) => setAdjustType(e.target.value as any)}
                             className="input select w-20 py-1 text-xs"
                           >
-                            <option value="add">+ Add</option>
-                            <option value="subtract">- Sub</option>
+                            <option value="add">+ {t("addBtn")}</option>
+                            <option value="subtract">- {t("subBtn")}</option>
                           </select>
                           <input
                             type="number"
                             value={adjustValue}
                             onChange={(e) => setAdjustValue(e.target.value)}
                             className="input w-16 py-1 text-xs"
-                            placeholder="Qty"
+                            placeholder={t("qtyPlaceholder")}
                           />
                           <button
                             onClick={() => handleQuickAdjust(product.id)}
@@ -352,7 +352,7 @@ function InventoryProductsPage() {
                         <button
                           onClick={() => setQuickAdjustId(product.id)}
                           className="rounded-lg p-2 text-[#9090a0] hover:bg-[#2a2a3a] hover:text-[#d4a843]"
-                          title="Quick Stock Adjust"
+                          title={t("quickStockAdjust")}
                         >
                           <Package size={14} />
                         </button>
@@ -364,7 +364,7 @@ function InventoryProductsPage() {
                 {products.length === 0 && (
                   <tr>
                     <td colSpan={isReadOnly ? 7 : 8} className="text-center text-[#606070]">
-                      No products found
+                      {t("noProductsFound")}
                     </td>
                   </tr>
                 )}
@@ -380,7 +380,7 @@ function InventoryProductsPage() {
             <div className="mb-4 flex items-center justify-between">
               <h3 className="flex items-center gap-2 text-lg font-semibold text-[#f0f0f5]">
                 <Plus size={18} className="text-[#d4a843]" />
-                Add New Product
+                {t("addNewProduct")}
               </h3>
               <button
                 onClick={() => setShowAddModal(false)}
@@ -398,30 +398,30 @@ function InventoryProductsPage() {
 
             <form onSubmit={handleAddProduct} className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Name *</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("nameRequired")}</label>
                 <input
                   type="text"
                   required
                   value={addForm.name}
                   onChange={(e) => setAddForm({ ...addForm, name: e.target.value })}
                   className="input"
-                  placeholder="Product name"
+                  placeholder={t("namePlaceholder")}
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Description</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("productDescription")}</label>
                 <textarea
                   value={addForm.description}
                   onChange={(e) => setAddForm({ ...addForm, description: e.target.value })}
                   className="input min-h-[60px]"
-                  placeholder="Product description"
+                  placeholder={t("descriptionPlaceholder")}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Price *</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("priceRequired")}</label>
                   <input
                     type="number"
                     required
@@ -434,7 +434,7 @@ function InventoryProductsPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Cost Price</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("costPrice")}</label>
                   <input
                     type="number"
                     min="0"
@@ -449,7 +449,7 @@ function InventoryProductsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Initial Stock</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("initialStock")}</label>
                   <input
                     type="number"
                     min="0"
@@ -460,26 +460,26 @@ function InventoryProductsPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Unit</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("unitLabel")}</label>
                   <select
                     value={addForm.unit}
                     onChange={(e) => setAddForm({ ...addForm, unit: e.target.value })}
                     className="input select"
                   >
-                    <option value="piece">Piece</option>
-                    <option value="kg">Kilogram</option>
-                    <option value="g">Gram</option>
-                    <option value="l">Litre</option>
-                    <option value="ml">Millilitre</option>
-                    <option value="box">Box</option>
-                    <option value="pack">Pack</option>
+                    <option value="piece">{t("unitPiece")}</option>
+                    <option value="kg">{t("unitKilogram")}</option>
+                    <option value="g">{t("unitGram")}</option>
+                    <option value="l">{t("unitLitre")}</option>
+                    <option value="ml">{t("unitMillilitre")}</option>
+                    <option value="box">{t("unitBox")}</option>
+                    <option value="pack">{t("unitPack")}</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Min Stock Level</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("minStockLevel")}</label>
                   <input
                     type="number"
                     min="0"
@@ -489,7 +489,7 @@ function InventoryProductsPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Max Stock Level</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("maxStockLevel")}</label>
                   <input
                     type="number"
                     min="0"
@@ -502,23 +502,23 @@ function InventoryProductsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Barcode</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("barcodeLabel")}</label>
                   <input
                     type="text"
                     value={addForm.barcode}
                     onChange={(e) => setAddForm({ ...addForm, barcode: e.target.value })}
                     className="input"
-                    placeholder="Optional"
+                    placeholder={t("optionalPlaceholder")}
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Category</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("categoryCol")}</label>
                   <select
                     value={addForm.categoryId}
                     onChange={(e) => setAddForm({ ...addForm, categoryId: e.target.value })}
                     className="input select"
                   >
-                    <option value="">No Category</option>
+                    <option value="">{t("noCategoryOption")}</option>
                     {categories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.name}
@@ -534,10 +534,10 @@ function InventoryProductsPage() {
                   onClick={() => setShowAddModal(false)}
                   className="btn btn-secondary flex-1"
                 >
-                  Cancel
+                  {t("cancelBtn")}
                 </button>
                 <button type="submit" disabled={addSaving} className="btn btn-primary flex-1">
-                  {addSaving ? "Creating..." : "Create Product"}
+                  {addSaving ? t("creatingLabel") : t("createProductBtn")}
                 </button>
               </div>
             </form>

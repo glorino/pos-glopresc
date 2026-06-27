@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatDateTime } from "@/lib/utils";
+import { useTranslation } from "@/contexts/LanguageContext";
 import {
   UserPlus,
   Search,
@@ -76,6 +77,7 @@ const emptyForm: UserFormData = {
 };
 
 export default function UserManagementPage() {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -222,7 +224,7 @@ export default function UserManagementPage() {
   }
 
   return (
-    <DashboardLayout role="OWNER" title="User Management">
+    <DashboardLayout role="OWNER" title={t("userManagement")}>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3 flex-wrap">
@@ -230,7 +232,7 @@ export default function UserManagementPage() {
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
                 type="text"
-                placeholder="Search users..."
+                placeholder={t("searchUsers")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="input pl-10"
@@ -241,7 +243,7 @@ export default function UserManagementPage() {
               onChange={(e) => setRoleFilter(e.target.value)}
               className="input select w-auto"
             >
-              <option value="">All Roles</option>
+              <option value="">{t("allRoles")}</option>
               {roleOptions.map((r) => (
                 <option key={r} value={r}>
                   {r.replace("_", " ")}
@@ -253,7 +255,7 @@ export default function UserManagementPage() {
               onChange={(e) => setBranchFilter(e.target.value)}
               className="input select w-auto"
             >
-              <option value="">All Branches</option>
+              <option value="">{t("allBranches")}</option>
               {branches.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.name} ({b.code})
@@ -263,14 +265,14 @@ export default function UserManagementPage() {
           </div>
           <button onClick={openAddModal} className="btn btn-primary">
             <UserPlus size={16} />
-            Add User
+            {t("addUserBtn")}
           </button>
         </div>
 
         <div className="glass-card p-4">
           <div className="flex items-center gap-2 text-sm text-[#9090a0]">
             <Users size={16} />
-            <span>{users.length} user(s)</span>
+            <span>{users.length} {t("userCount")}</span>
           </div>
         </div>
 
@@ -283,13 +285,13 @@ export default function UserManagementPage() {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Branch</th>
-                  <th>Status</th>
-                  <th>Last Login</th>
-                  <th>Actions</th>
+                  <th>{t("nameCol")}</th>
+                  <th>{t("emailCol")}</th>
+                  <th>{t("roleCol")}</th>
+                  <th>{t("branchColLabel")}</th>
+                  <th>{t("statusColLabel")}</th>
+                  <th>{t("lastLoginCol")}</th>
+                  <th>{t("actionsCol")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -315,7 +317,7 @@ export default function UserManagementPage() {
                         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                           user.isActive ? "bg-[#10b981]" : "bg-[#3a3a4a]"
                         }`}
-                        title={user.isActive ? "Deactivate user" : "Activate user"}
+                        title={user.isActive ? t("deactivateUser") : t("activateUser")}
                       >
                         <span
                           className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -325,7 +327,7 @@ export default function UserManagementPage() {
                       </button>
                     </td>
                     <td className="text-[#9090a0]">
-                      {user.lastLoginAt ? formatDateTime(user.lastLoginAt) : "Never"}
+                      {user.lastLoginAt ? formatDateTime(user.lastLoginAt) : t("neverLabel")}
                     </td>
                     <td>
                       <div className="flex items-center gap-2">
@@ -342,7 +344,7 @@ export default function UserManagementPage() {
                 {users.length === 0 && (
                   <tr>
                     <td colSpan={7} className="text-center text-[#606070]">
-                      No users found
+                      {t("noUsersFound")}
                     </td>
                   </tr>
                 )}
@@ -357,7 +359,7 @@ export default function UserManagementPage() {
           <div className="glass-card w-full max-w-lg p-6">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-[#f0f0f5]">
-                {editingUser ? "Edit User" : "Add User"}
+                {editingUser ? t("editUser") : t("addUser")}
               </h2>
               <button onClick={() => setShowModal(false)} className="text-[#606070] hover:text-[#f0f0f5]">
                 <X size={20} />
@@ -373,7 +375,7 @@ export default function UserManagementPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">First Name</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("firstNameLabel")}</label>
                   <input
                     type="text"
                     required
@@ -383,7 +385,7 @@ export default function UserManagementPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm text-[#9090a0]">Last Name</label>
+                  <label className="mb-1 block text-sm text-[#9090a0]">{t("lastNameLabel")}</label>
                   <input
                     type="text"
                     required
@@ -395,7 +397,7 @@ export default function UserManagementPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Email</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("emailLabel")}</label>
                 <input
                   type="email"
                   required
@@ -406,7 +408,7 @@ export default function UserManagementPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Phone</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("phoneLabel")}</label>
                 <input
                   type="tel"
                   value={formData.phone}
@@ -416,7 +418,7 @@ export default function UserManagementPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Role</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("roleCol")}</label>
                 <select
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
@@ -431,13 +433,13 @@ export default function UserManagementPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm text-[#9090a0]">Branch</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("branchColLabel")}</label>
                 <select
                   value={formData.branchId}
                   onChange={(e) => setFormData({ ...formData, branchId: e.target.value })}
                   className="input select"
                 >
-                  <option value="">No Branch</option>
+                  <option value="">{t("noBranchOption")}</option>
                   {branches.map((b) => (
                     <option key={b.id} value={b.id}>
                       {b.name} ({b.code})
@@ -448,7 +450,7 @@ export default function UserManagementPage() {
 
               <div>
                 <label className="mb-1 block text-sm text-[#9090a0]">
-                  {editingUser ? "New Password (leave blank to keep)" : "Password"}
+                  {editingUser ? t("newPasswordHint") : t("password")}
                 </label>
                 <input
                   type="password"
@@ -461,10 +463,10 @@ export default function UserManagementPage() {
 
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => setShowModal(false)} className="btn btn-secondary">
-                  Cancel
+                  {t("cancelBtn")}
                 </button>
                 <button type="submit" disabled={saving} className="btn btn-primary">
-                  {saving ? "Saving..." : editingUser ? "Update" : "Create"}
+                  {saving ? t("savingLabel") : editingUser ? t("updateBtn") : t("createBtn")}
                 </button>
               </div>
             </form>
