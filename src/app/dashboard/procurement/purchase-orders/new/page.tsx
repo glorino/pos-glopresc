@@ -126,7 +126,7 @@ export default function NewPurchaseOrderPage() {
   }
 
   return (
-    <DashboardLayout role="PROCUREMENT_MANAGER" title={t("createPOTitle")}>
+    <DashboardLayout title={t("createPOTitle")}>
       <div className="mx-auto max-w-3xl space-y-6">
         <button
           onClick={() => router.back()}

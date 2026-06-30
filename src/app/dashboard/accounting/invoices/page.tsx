@@ -240,7 +240,7 @@ export default function InvoicesPage() {
   }
 
   return (
-    <DashboardLayout role="ACCOUNTANT" title={t("invoices")}>
+    <DashboardLayout title={t("invoices")}>
       <div className="space-y-6">
         {successMessage && (
           <div className="rounded-lg border border-[#10b981]/20 bg-[#10b981]/10 p-3 text-sm text-[#10b981]">

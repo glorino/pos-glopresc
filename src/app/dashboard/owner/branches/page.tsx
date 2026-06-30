@@ -280,7 +280,7 @@ export default function BranchesPage() {
   const totalUsers = branches.reduce((sum, b) => sum + b.userCount, 0);
 
   return (
-    <DashboardLayout role="OWNER" title={t("branchManagement")}>
+    <DashboardLayout title={t("branchManagement")}>
       <div className="space-y-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

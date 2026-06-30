@@ -83,7 +83,7 @@ export default function ManagerBranchStaffPage() {
   };
 
   return (
-    <DashboardLayout role="MANAGER" title="Branch Staff">
+    <DashboardLayout title="Branch Staff">
       <div className="space-y-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="glass-card p-5">

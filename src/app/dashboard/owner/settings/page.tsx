@@ -123,7 +123,7 @@ export default function BusinessSettingsPage() {
 
   if (loading) {
     return (
-      <DashboardLayout role="OWNER" title={t("businessSettings")}>
+      <DashboardLayout title={t("businessSettings")}>
         <div className="flex h-[60vh] items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4a843] border-t-transparent" />
         </div>
@@ -212,7 +212,7 @@ export default function BusinessSettingsPage() {
   ];
 
   return (
-    <DashboardLayout role="OWNER" title={t("businessSettings")}>
+    <DashboardLayout title={t("businessSettings")}>
       <div className="space-y-6">
         {success && (
           <div className="rounded-lg border border-[#10b981]/20 bg-[#10b981]/10 p-3 text-sm text-[#10b981]">

@@ -108,7 +108,7 @@ export default function OwnerDashboard() {
 
   if (loading) {
     return (
-      <DashboardLayout role="OWNER" title={t("ownerDashboard")}>
+      <DashboardLayout title={t("ownerDashboard")}>
         <div className="flex h-[60vh] items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4a843] border-t-transparent" />
         </div>
@@ -209,7 +209,7 @@ export default function OwnerDashboard() {
   ];
 
   return (
-    <DashboardLayout role="OWNER" title={t("ownerDashboard")}>
+    <DashboardLayout title={t("ownerDashboard")}>
       <div className="space-y-6">
         {(data?.lowStockItems ?? 0) > 0 && (
           <button

@@ -7,7 +7,7 @@ import CashDrawerReport from "@/components/ai/CashDrawerReport";
 export default function CashReportsPage() {
   const { t } = useTranslation();
   return (
-    <DashboardLayout role="ACCOUNTANT" title={t("cashDrawerReports")}>
+    <DashboardLayout title={t("cashDrawerReports")}>
       <CashDrawerReport />
     </DashboardLayout>
   );

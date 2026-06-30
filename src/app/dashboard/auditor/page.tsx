@@ -378,7 +378,7 @@ export default function AuditorDashboard() {
   ];
 
   return (
-    <DashboardLayout role="AUDITOR" title={t("auditorDashboard")}>
+    <DashboardLayout title={t("auditorDashboard")}>
       <div className="space-y-6">
         {/* Stat Cards */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">

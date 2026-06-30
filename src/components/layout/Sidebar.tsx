@@ -224,6 +224,7 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
         { icon: CreditCard, label: "expenses", href: "/dashboard/accounting/expenses" },
         { icon: FileText, label: "invoices", href: "/dashboard/accounting/invoices" },
         { icon: DollarSign, label: "cashDrawerReports", href: "/dashboard/accounting/cash-reports" },
+        { icon: BarChart3, label: "reports", href: "/dashboard/owner/reports" },
       ],
     },
   ],

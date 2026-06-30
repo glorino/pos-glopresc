@@ -224,7 +224,7 @@ export default function UserManagementPage() {
   }
 
   return (
-    <DashboardLayout role="OWNER" title={t("userManagement")}>
+    <DashboardLayout title={t("userManagement")}>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3 flex-wrap">

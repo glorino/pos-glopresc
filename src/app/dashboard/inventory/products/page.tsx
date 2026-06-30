@@ -207,7 +207,7 @@ function InventoryProductsPage() {
   const outOfStockCount = products.filter((p) => p.isOutOfStock).length;
 
   return (
-    <DashboardLayout role={(userRole as any) || "WAREHOUSE_MANAGER"} title={t("products")}>
+    <DashboardLayout title={t("products")}>
       <div className="space-y-6">
         {isReadOnly && (
           <div className="rounded-lg border border-[#d4a843]/30 bg-[#d4a843]/10 p-4 text-sm text-[#d4a843]">

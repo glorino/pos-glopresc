@@ -176,7 +176,7 @@ export default function ExpenseManagementPage() {
   }
 
   return (
-    <DashboardLayout role="ACCOUNTANT" title={t("expenses")}>
+    <DashboardLayout title={t("expenses")}>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3">

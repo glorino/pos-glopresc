@@ -115,7 +115,7 @@ export default function StockRequestsPage() {
   );
 
   return (
-    <DashboardLayout role="PROCUREMENT_REP" title={t("stockRequestsTitle")}>
+    <DashboardLayout title={t("stockRequestsTitle")}>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 sm:w-72">

@@ -145,7 +145,7 @@ export default function CashierDashboard() {
 
   if (loading) {
     return (
-      <DashboardLayout role="SALES_REP" title={t("salesRepDashboard")}>
+      <DashboardLayout title={t("salesRepDashboard")}>
         <div className="flex h-[60vh] items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4a843] border-t-transparent" />
         </div>
@@ -197,7 +197,7 @@ export default function CashierDashboard() {
   ];
 
   return (
-    <DashboardLayout role="SALES_REP" title={t("salesRepDashboard")}>
+    <DashboardLayout title={t("salesRepDashboard")}>
       <div className="space-y-6">
         {/* Hero POS Card */}
         <div className="glass-card relative overflow-hidden p-8">

@@ -173,7 +173,7 @@ export default function InventoryDashboard() {
   const userRole = (session?.user as any)?.role as string | undefined;
 
   return (
-    <DashboardLayout role={(userRole as any) || "WAREHOUSE_MANAGER"} title={t("inventoryDashboard")}>
+    <DashboardLayout title={t("inventoryDashboard")}>
       <div className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">

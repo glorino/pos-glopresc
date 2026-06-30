@@ -253,7 +253,7 @@ export default function InventoryStockPage() {
   }
 
   return (
-    <DashboardLayout role="WAREHOUSE_MANAGER" title={t("stock")}>
+    <DashboardLayout title={t("stock")}>
       <div className="space-y-6">
         {error && (
           <div className="rounded-lg border border-[#f43f5e]/20 bg-[#f43f5e]/10 p-3 text-sm text-[#f43f5e]">

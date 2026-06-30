@@ -104,7 +104,7 @@ export default function SalesManagerDashboard() {
 
   if (loading) {
     return (
-      <DashboardLayout role="SALES_MANAGER" title={t("salesManagerDashboard")}>
+      <DashboardLayout title={t("salesManagerDashboard")}>
         <div className="flex h-[60vh] items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4a843] border-t-transparent" />
         </div>
@@ -169,7 +169,7 @@ export default function SalesManagerDashboard() {
   ];
 
   return (
-    <DashboardLayout role="SALES_MANAGER" title={t("salesManagerDashboard")}>
+    <DashboardLayout title={t("salesManagerDashboard")}>
       <div className="space-y-6">
         {/* Date Range Filter & Total Payments */}
         <div className="glass-card p-4">

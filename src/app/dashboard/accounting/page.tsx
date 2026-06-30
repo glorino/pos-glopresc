@@ -163,7 +163,7 @@ export default function AccountingDashboard() {
   const pendingApprovals = data?.pendingExpenseApprovals ?? [];
 
   return (
-    <DashboardLayout role="ACCOUNTANT" title={t("accountingDashboard")}>
+    <DashboardLayout title={t("accountingDashboard")}>
       <div className="space-y-6">
         {/* Date Range Filter & Total Payments */}
         <div className="glass-card p-4">

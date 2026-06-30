@@ -680,7 +680,7 @@ export default function OwnerReportsPage() {
   }
 
   return (
-    <DashboardLayout role="OWNER" title="Reports & Analytics">
+    <DashboardLayout title="Reports & Analytics">
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap gap-2">

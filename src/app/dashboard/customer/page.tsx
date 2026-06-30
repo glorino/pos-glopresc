@@ -231,7 +231,7 @@ export default function CustomerDashboard() {
   const recentOrders = filteredOrders.slice(0, 5);
 
   return (
-    <DashboardLayout role="CUSTOMER" title={t("myAccount")}>
+    <DashboardLayout title={t("myAccount")}>
       <div className="space-y-6">
         {/* Stats Row */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

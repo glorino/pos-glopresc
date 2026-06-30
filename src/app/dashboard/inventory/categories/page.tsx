@@ -111,7 +111,7 @@ export default function InventoryCategoriesPage() {
   }
 
   return (
-    <DashboardLayout role="WAREHOUSE_MANAGER" title={t("categoriesTitle")}>
+    <DashboardLayout title={t("categoriesTitle")}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-[#9090a0]">
