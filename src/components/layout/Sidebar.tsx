@@ -216,6 +216,16 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
         { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/auditor" },
       ],
     },
+    {
+      title: "audit",
+      items: [
+        { icon: ShoppingCart, label: "sales", href: "/dashboard/sales-manager/sales" },
+        { icon: Package, label: "inventory", href: "/dashboard/inventory" },
+        { icon: CreditCard, label: "expenses", href: "/dashboard/accounting/expenses" },
+        { icon: FileText, label: "invoices", href: "/dashboard/accounting/invoices" },
+        { icon: DollarSign, label: "cashDrawerReports", href: "/dashboard/accounting/cash-reports" },
+      ],
+    },
   ],
   CUSTOMER: [
     {

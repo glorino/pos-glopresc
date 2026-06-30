@@ -172,6 +172,7 @@ export const en = {
   operations: "Operations",
   warehouse: "Warehouse",
   finance: "Finance",
+  audit: "Audit",
 
   // Sidebar extra labels
   stockAdjustments: "Stock Adjustments",
@@ -1379,6 +1380,7 @@ export const fr: Record<TranslationKey, string> = {
   operations: "Opérations",
   warehouse: "Entrepôt",
   finance: "Finance",
+  audit: "Audit",
 
   // Sidebar extra labels
   stockAdjustments: "Ajustements de stock",

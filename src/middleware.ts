@@ -17,16 +17,16 @@ const roleDefaultRoutes: Record<string, string> = {
 };
 
 const allowedRoutes: Record<string, string[]> = {
-  OWNER: ["owner", "manager", "inventory", "products", "categories", "stock", "procurement", "sales-manager", "sales", "cashier", "pos", "accounting", "expenses", "invoices", "auditor", "customer", "users", "reports", "settings"],
-  MANAGER: ["owner", "manager", "inventory", "products", "categories", "stock", "procurement", "sales-manager", "sales", "cashier", "pos", "accounting", "expenses", "invoices", "reports", "users", "settings"],
-  WAREHOUSE_MANAGER: ["inventory", "products", "categories", "stock"],
-  WAREHOUSE_REP: ["inventory", "products", "stock"],
-  PROCUREMENT_MANAGER: ["owner", "procurement", "reports", "suppliers", "purchase-orders", "stock-requests"],
+  OWNER: ["owner", "manager", "inventory", "products", "categories", "stock", "procurement", "sales-manager", "sales", "cashier", "pos", "accounting", "expenses", "invoices", "auditor", "customer", "users", "reports", "settings", "stock-adjustments", "suppliers", "purchase-orders", "stock-requests"],
+  MANAGER: ["owner", "manager", "inventory", "products", "categories", "stock", "procurement", "sales-manager", "sales", "cashier", "pos", "accounting", "expenses", "invoices", "reports", "users", "settings", "stock-adjustments", "suppliers", "purchase-orders", "stock-requests"],
+  WAREHOUSE_MANAGER: ["inventory", "products", "categories", "stock", "stock-adjustments"],
+  WAREHOUSE_REP: ["inventory", "products", "stock", "stock-adjustments"],
+  PROCUREMENT_MANAGER: ["procurement", "reports", "suppliers", "purchase-orders", "stock-requests"],
   PROCUREMENT_REP: ["procurement", "suppliers", "stock-requests"],
   SALES_MANAGER: ["sales-manager", "sales", "customers", "products"],
-  SALES_REP: ["cashier", "pos", "sales", "customers"],
-  ACCOUNTANT: ["accounting", "expenses", "invoices"],
-  AUDITOR: ["auditor", "sales-manager", "inventory", "accounting"],
+  SALES_REP: ["cashier", "pos", "sales-manager", "sales", "customers"],
+  ACCOUNTANT: ["accounting", "expenses", "invoices", "cash-reports"],
+  AUDITOR: ["auditor", "sales-manager", "inventory", "accounting", "expenses", "invoices", "cash-reports", "procurement", "products", "categories", "stock", "stock-adjustments", "reports"],
   CUSTOMER: ["customer"],
 };
 
