@@ -74,7 +74,7 @@ export default function ShopPage() {
   async function fetchProducts() {
     try {
       setLoading(true);
-      const res = await fetch("/api/products?limit=100&isActive=true");
+      const res = await fetch("/api/products?limit=100&isActive=true&public=true");
       if (res.ok) {
         const data = await res.json();
         setProducts(data.products || []);

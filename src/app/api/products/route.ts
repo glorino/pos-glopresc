@@ -45,9 +45,12 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    const branchFilter = await getBranchFilter(request);
-    if (branchFilter) {
-      where.AND = [branchFilter];
+    const isPublic = searchParams.get("public") === "true";
+    if (!isPublic) {
+      const branchFilter = await getBranchFilter(request);
+      if (branchFilter) {
+        where.AND = [branchFilter];
+      }
     }
 
     const skip = (page - 1) * limit;
