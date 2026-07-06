@@ -74,6 +74,7 @@ export default function InventoryDashboard() {
   const { t } = useTranslation();
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<TabKey>("all");
+  const [allData, setAllData] = useState<TabData | null>(null);
   const [rawData, setRawData] = useState<TabData | null>(null);
   const [finishedData, setFinishedData] = useState<TabData | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -86,10 +87,26 @@ export default function InventoryDashboard() {
     setPage(1);
   }, [search, categoryFilter, activeTab]);
 
-  const fetchRaw = useCallback(async () => {
+  const buildParams = useCallback(() => {
     const params = new URLSearchParams();
     if (search) params.set("search", search);
     if (categoryFilter) params.set("categoryId", categoryFilter);
+    return params;
+  }, [search, categoryFilter]);
+
+  const fetchAll = useCallback(async () => {
+    const params = buildParams();
+    params.set("page", String(page));
+    params.set("limit", "10");
+    const res = await fetch(`/api/products?${params.toString()}`);
+    if (res.ok) {
+      const json = await res.json();
+      setAllData(json);
+    }
+  }, [buildParams, page]);
+
+  const fetchRaw = useCallback(async () => {
+    const params = buildParams();
     params.set("page", String(page));
     params.set("limit", "10");
     params.set("isRawMaterial", "true");
@@ -98,12 +115,10 @@ export default function InventoryDashboard() {
       const json = await res.json();
       setRawData(json);
     }
-  }, [search, categoryFilter, page]);
+  }, [buildParams, page]);
 
   const fetchFinished = useCallback(async () => {
-    const params = new URLSearchParams();
-    if (search) params.set("search", search);
-    if (categoryFilter) params.set("categoryId", categoryFilter);
+    const params = buildParams();
     params.set("page", String(page));
     params.set("limit", "10");
     const res = await fetch(`/api/finished-products?${params.toString()}`);
@@ -111,12 +126,12 @@ export default function InventoryDashboard() {
       const json = await res.json();
       setFinishedData(json);
     }
-  }, [search, categoryFilter, page]);
+  }, [buildParams, page]);
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([fetchRaw(), fetchFinished()]).finally(() => setLoading(false));
-  }, [fetchRaw, fetchFinished]);
+    Promise.all([fetchAll(), fetchRaw(), fetchFinished()]).finally(() => setLoading(false));
+  }, [fetchAll, fetchRaw, fetchFinished]);
 
   useEffect(() => {
     fetch("/api/categories")
@@ -125,23 +140,25 @@ export default function InventoryDashboard() {
       .catch(() => {});
   }, []);
 
+  const allProducts = allData?.items ?? [];
   const rawProducts = rawData?.items ?? [];
   const finishedProducts = finishedData?.items ?? [];
+  const allTotal = allData?.total ?? 0;
   const rawTotal = rawData?.total ?? 0;
   const finishedTotal = finishedData?.total ?? 0;
-  const allTotal = rawTotal + finishedTotal;
 
   const getDisplayData = (): (Product | FinishedProduct)[] => {
     if (activeTab === "raw") return rawProducts;
     if (activeTab === "finished") return finishedProducts;
-    return [...rawProducts, ...finishedProducts];
+    return allProducts;
   };
 
   const displayItems = getDisplayData();
   const displayTotal = activeTab === "raw" ? rawTotal : activeTab === "finished" ? finishedTotal : allTotal;
-  const displayTotalPages = activeTab === "raw" ? (rawData?.totalPages ?? 1) : activeTab === "finished" ? (finishedData?.totalPages ?? 1) : Math.max(rawData?.totalPages ?? 1, finishedData?.totalPages ?? 1);
+  const displayTotalPages = activeTab === "raw" ? (rawData?.totalPages ?? 1) : activeTab === "finished" ? (finishedData?.totalPages ?? 1) : (allData?.totalPages ?? 1);
 
-  const lowStockCount = [...rawProducts, ...finishedProducts].filter(
+  const currentItems = getDisplayData();
+  const lowStockCount = currentItems.filter(
     (p) => {
       const sq = "stockQuantity" in p ? p.stockQuantity : 0;
       const ml = "minStockLevel" in p ? p.minStockLevel : 5;
@@ -149,12 +166,12 @@ export default function InventoryDashboard() {
     }
   ).length;
 
-  const outOfStockCount = [...rawProducts, ...finishedProducts].filter((p) => {
+  const outOfStockCount = currentItems.filter((p) => {
     const sq = "stockQuantity" in p ? p.stockQuantity : 0;
     return sq === 0;
   }).length;
 
-  const stockValue = [...rawProducts, ...finishedProducts].reduce((sum, p) => {
+  const stockValue = currentItems.reduce((sum, p) => {
     const price = "price" in p ? p.price : ("sellingPrice" in p ? (p as FinishedProduct).sellingPrice : 0);
     const sq = "stockQuantity" in p ? p.stockQuantity : 0;
     return sum + price * sq;
@@ -295,7 +312,7 @@ export default function InventoryDashboard() {
                 ))}
               </select>
             </div>
-            <button onClick={() => { setLoading(true); Promise.all([fetchRaw(), fetchFinished()]).finally(() => setLoading(false)); }} className="btn btn-secondary btn-sm">
+            <button onClick={() => { setLoading(true); Promise.all([fetchAll(), fetchRaw(), fetchFinished()]).finally(() => setLoading(false)); }} className="btn btn-secondary btn-sm">
               <RefreshCw size={14} />
             </button>
           </div>
