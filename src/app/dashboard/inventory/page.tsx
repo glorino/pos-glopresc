@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
@@ -19,8 +19,6 @@ import {
   Search,
   Filter,
   RefreshCw,
-  TrendingUp,
-  TrendingDown,
 } from "lucide-react";
 import Pagination from "@/components/ui/Pagination";
 
@@ -36,8 +34,25 @@ interface Product {
   unit: string;
   image: string | null;
   isActive: boolean;
+  isRawMaterial: boolean;
   category: { id: string; name: string } | null;
   supplier: { id: string; name: string } | null;
+}
+
+interface FinishedProduct {
+  id: string;
+  name: string;
+  sku: string;
+  sellingPrice: number;
+  stockQuantity: number;
+  minStockLevel: number;
+  unit: string;
+  image: string | null;
+  isActive: boolean;
+  addedToStore: boolean;
+  quantityProduced: number;
+  unitCost: number;
+  category: { id: string; name: string } | null;
 }
 
 interface Category {
@@ -46,17 +61,21 @@ interface Category {
   _count: { products: number };
 }
 
-interface ProductData {
-  products: Product[];
+interface TabData {
+  items: Product[] | FinishedProduct[];
   total: number;
   page: number;
   totalPages: number;
 }
 
+type TabKey = "all" | "raw" | "finished";
+
 export default function InventoryDashboard() {
   const { t } = useTranslation();
   const { data: session } = useSession();
-  const [data, setData] = useState<ProductData | null>(null);
+  const [activeTab, setActiveTab] = useState<TabKey>("all");
+  const [rawData, setRawData] = useState<TabData | null>(null);
+  const [finishedData, setFinishedData] = useState<TabData | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -65,85 +84,107 @@ export default function InventoryDashboard() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, categoryFilter]);
+  }, [search, categoryFilter, activeTab]);
 
-  useEffect(() => {
-    fetchProducts();
+  const fetchRaw = useCallback(async () => {
+    const params = new URLSearchParams();
+    if (search) params.set("search", search);
+    if (categoryFilter) params.set("categoryId", categoryFilter);
+    params.set("page", String(page));
+    params.set("limit", "10");
+    params.set("isRawMaterial", "true");
+    const res = await fetch(`/api/products?${params.toString()}`);
+    if (res.ok) {
+      const json = await res.json();
+      setRawData(json);
+    }
+  }, [search, categoryFilter, page]);
+
+  const fetchFinished = useCallback(async () => {
+    const params = new URLSearchParams();
+    if (search) params.set("search", search);
+    if (categoryFilter) params.set("categoryId", categoryFilter);
+    params.set("page", String(page));
+    params.set("limit", "10");
+    const res = await fetch(`/api/finished-products?${params.toString()}`);
+    if (res.ok) {
+      const json = await res.json();
+      setFinishedData(json);
+    }
   }, [search, categoryFilter, page]);
 
   useEffect(() => {
-    fetchCategories();
+    setLoading(true);
+    Promise.all([fetchRaw(), fetchFinished()]).finally(() => setLoading(false));
+  }, [fetchRaw, fetchFinished]);
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((r) => r.json())
+      .then((json) => setCategories(json.categories ?? json ?? []))
+      .catch(() => {});
   }, []);
 
-  async function fetchProducts() {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams();
-      if (search) params.set("search", search);
-      if (categoryFilter) params.set("categoryId", categoryFilter);
-      params.set("page", String(page));
-      params.set("limit", "10");
-      const res = await fetch(`/api/products?${params.toString()}`);
-      if (res.ok) {
-        const json = await res.json();
-        setData(json);
-      }
-    } catch (err) {
-      console.error("Failed to fetch products:", err);
-    } finally {
-      setLoading(false);
-    }
-  }
+  const rawProducts = rawData?.items ?? [];
+  const finishedProducts = finishedData?.items ?? [];
+  const rawTotal = rawData?.total ?? 0;
+  const finishedTotal = finishedData?.total ?? 0;
+  const allTotal = rawTotal + finishedTotal;
 
-  async function fetchCategories() {
-    try {
-      const res = await fetch("/api/categories");
-      if (res.ok) {
-        const json = await res.json();
-        setCategories(json.categories ?? json ?? []);
-      }
-    } catch (err) {
-      console.error("Failed to fetch categories:", err);
-    }
-  }
+  const getDisplayData = (): (Product | FinishedProduct)[] => {
+    if (activeTab === "raw") return rawProducts;
+    if (activeTab === "finished") return finishedProducts;
+    return [...rawProducts, ...finishedProducts];
+  };
 
-  const allProducts = data?.products ?? [];
-  const totalProducts = data?.total ?? 0;
-  const lowStockItems = allProducts.filter(
-    (p) => p.stockQuantity > 0 && p.stockQuantity <= p.minStockLevel
+  const displayItems = getDisplayData();
+  const displayTotal = activeTab === "raw" ? rawTotal : activeTab === "finished" ? finishedTotal : allTotal;
+  const displayTotalPages = activeTab === "raw" ? (rawData?.totalPages ?? 1) : activeTab === "finished" ? (finishedData?.totalPages ?? 1) : Math.max(rawData?.totalPages ?? 1, finishedData?.totalPages ?? 1);
+
+  const lowStockCount = [...rawProducts, ...finishedProducts].filter(
+    (p) => {
+      const sq = "stockQuantity" in p ? p.stockQuantity : 0;
+      const ml = "minStockLevel" in p ? p.minStockLevel : 5;
+      return sq > 0 && sq <= ml;
+    }
   ).length;
-  const outOfStock = allProducts.filter((p) => p.stockQuantity === 0).length;
-  const categoriesCount = categories.length;
-  const stockValue = allProducts.reduce(
-    (sum, p) => sum + p.price * p.stockQuantity,
-    0
-  );
+
+  const outOfStockCount = [...rawProducts, ...finishedProducts].filter((p) => {
+    const sq = "stockQuantity" in p ? p.stockQuantity : 0;
+    return sq === 0;
+  }).length;
+
+  const stockValue = [...rawProducts, ...finishedProducts].reduce((sum, p) => {
+    const price = "price" in p ? p.price : ("sellingPrice" in p ? (p as FinishedProduct).sellingPrice : 0);
+    const sq = "stockQuantity" in p ? p.stockQuantity : 0;
+    return sum + price * sq;
+  }, 0);
 
   const stats = [
     {
       label: t("totalProducts"),
-      value: totalProducts,
+      value: displayTotal,
       icon: Package,
       color: "from-[#d4a843]/20 to-[#d4a843]/5",
       iconColor: "text-[#d4a843]",
     },
     {
       label: t("lowStockItems"),
-      value: lowStockItems,
+      value: lowStockCount,
       icon: AlertTriangle,
       color: "from-[#f59e0b]/20 to-[#f59e0b]/5",
       iconColor: "text-[#f59e0b]",
     },
     {
       label: t("outOfStock"),
-      value: outOfStock,
+      value: outOfStockCount,
       icon: XCircle,
       color: "from-[#f43f5e]/20 to-[#f43f5e]/5",
       iconColor: "text-[#f43f5e]",
     },
     {
       label: t("categories"),
-      value: categoriesCount,
+      value: categories.length,
       icon: FolderOpen,
       color: "from-[#8b5cf6]/20 to-[#8b5cf6]/5",
       iconColor: "text-[#8b5cf6]",
@@ -164,13 +205,23 @@ export default function InventoryDashboard() {
     { label: t("reports"), href: "/dashboard/owner/reports", icon: BarChart3 },
   ];
 
-  function getStockStatus(product: Product) {
-    if (product.stockQuantity === 0) return { label: t("outOfStock"), className: "badge-danger" };
-    if (product.stockQuantity <= product.minStockLevel) return { label: t("lowStock"), className: "badge-warning" };
+  const tabs: { key: TabKey; label: string }[] = [
+    { key: "all", label: "All Products" },
+    { key: "raw", label: "Raw Materials" },
+    { key: "finished", label: "Finished Products" },
+  ];
+
+  function getStockStatus(item: Product | FinishedProduct) {
+    const sq = item.stockQuantity;
+    const ml = item.minStockLevel;
+    if (sq === 0) return { label: t("outOfStock"), className: "badge-danger" };
+    if (sq <= ml) return { label: t("lowStock"), className: "badge-warning" };
     return { label: t("inStock"), className: "badge-success" };
   }
 
-  const userRole = (session?.user as any)?.role as string | undefined;
+  function isFinishedProduct(item: Product | FinishedProduct): item is FinishedProduct {
+    return "quantityProduced" in item;
+  }
 
   return (
     <DashboardLayout title={t("inventoryDashboard")}>
@@ -215,7 +266,7 @@ export default function InventoryDashboard() {
           </div>
         </div>
 
-        {/* Filters */}
+        {/* Products Section */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-lg font-semibold text-[#f0f0f5]">{t("products")}</h3>
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -244,10 +295,27 @@ export default function InventoryDashboard() {
                 ))}
               </select>
             </div>
-            <button onClick={fetchProducts} className="btn btn-secondary btn-sm">
+            <button onClick={() => { setLoading(true); Promise.all([fetchRaw(), fetchFinished()]).finally(() => setLoading(false)); }} className="btn btn-secondary btn-sm">
               <RefreshCw size={14} />
             </button>
           </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-2">
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                activeTab === tab.key
+                  ? "bg-[#d4a843] text-black"
+                  : "bg-[#1c1c28] text-[#9090a0] hover:bg-[#2a2a3a] hover:text-[#f0f0f5]"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         {/* Table */}
@@ -267,21 +335,23 @@ export default function InventoryDashboard() {
                     <th>{t("category")}</th>
                     <th>{t("stockQty")}</th>
                     <th>{t("minLevel")}</th>
-                    <th>{t("price")}</th>
+                    <th>{activeTab === "finished" ? "Selling Price" : t("price")}</th>
                     <th>{t("status")}</th>
                     <th>{t("actions")}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {allProducts.map((product) => {
-                    const status = getStockStatus(product);
+                  {displayItems.map((item) => {
+                    const status = getStockStatus(item);
+                    const fp = isFinishedProduct(item);
+                    const price = fp ? item.sellingPrice : (item as Product).price;
                     return (
-                      <tr key={product.id}>
+                      <tr key={item.id}>
                         <td>
-                          {product.image ? (
+                          {item.image ? (
                             <img
-                              src={product.image}
-                              alt={product.name}
+                              src={item.image}
+                              alt={item.name}
                               className="h-10 w-10 rounded-lg object-cover"
                             />
                           ) : (
@@ -290,30 +360,30 @@ export default function InventoryDashboard() {
                             </div>
                           )}
                         </td>
-                        <td className="font-medium text-[#f0f0f5]">{product.name}</td>
-                        <td className="font-mono text-xs text-[#9090a0]">{product.sku}</td>
-                        <td className="text-[#9090a0]">{product.category?.name ?? "—"}</td>
+                        <td className="font-medium text-[#f0f0f5]">{item.name}</td>
+                        <td className="font-mono text-xs text-[#9090a0]">{item.sku}</td>
+                        <td className="text-[#9090a0]">{item.category?.name ?? "—"}</td>
                         <td>
                           <span className={`font-semibold ${
-                            product.stockQuantity === 0
+                            item.stockQuantity === 0
                               ? "text-[#f43f5e]"
-                              : product.stockQuantity <= product.minStockLevel
+                              : item.stockQuantity <= item.minStockLevel
                               ? "text-[#f59e0b]"
                               : "text-[#10b981]"
                           }`}>
-                            {product.stockQuantity} {product.unit}
+                            {item.stockQuantity} {item.unit}
                           </span>
                         </td>
-                        <td className="text-[#9090a0]">{product.minStockLevel}</td>
+                        <td className="text-[#9090a0]">{item.minStockLevel}</td>
                         <td className="font-medium text-[#d4a843]">
-                          {formatCurrency(product.price)}
+                          {formatCurrency(price)}
                         </td>
                         <td>
                           <span className={`badge ${status.className}`}>{status.label}</span>
                         </td>
                         <td>
                           <Link
-                            href={`/dashboard/inventory/products?id=${product.id}`}
+                            href={fp ? `/dashboard/inventory/products?id=${item.id}&type=finished` : `/dashboard/inventory/products?id=${item.id}`}
                             className="btn btn-secondary btn-sm"
                           >
                             {t("view")}
@@ -322,7 +392,7 @@ export default function InventoryDashboard() {
                       </tr>
                     );
                   })}
-                  {allProducts.length === 0 && (
+                  {displayItems.length === 0 && (
                     <tr>
                       <td colSpan={9} className="text-center text-[#606070] py-8">
                         {t("noProductsFound")}
@@ -331,7 +401,15 @@ export default function InventoryDashboard() {
                   )}
                 </tbody>
               </table>
-              <Pagination currentPage={data?.page ?? 1} totalPages={data?.totalPages ?? 1} onPageChange={setPage} />
+              {activeTab === "all" ? (
+                <div className="flex items-center justify-between mt-4">
+                  <p className="text-sm text-[#9090a0]">
+                    Showing {displayItems.length} of {displayTotal} products
+                  </p>
+                </div>
+              ) : (
+                <Pagination currentPage={page} totalPages={displayTotalPages} onPageChange={setPage} />
+              )}
             </div>
           )}
         </div>
