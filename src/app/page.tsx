@@ -102,7 +102,7 @@ export default function LandingPage() {
                 {t("builtForModernRetail")}
               </div>
               <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl animate-fade-in-up">
-                SSV Shop{" "}
+                FFB Food Hub{" "}
                 <span
                   key={currentPhrase}
                   className="inline-block bg-gradient-to-r from-[#d4a843] to-[#c49a38] bg-clip-text text-transparent animate-[fadeIn_0.5s_ease-in-out]"
@@ -129,7 +129,7 @@ export default function LandingPage() {
                   ))}
                 </div>
                 <p className="text-sm text-[#9090a0]">
-                  <span className="font-semibold text-[#f0f0f5]">500+</span> businesses trust SSV Shop
+                  <span className="font-semibold text-[#f0f0f5]">500+</span> businesses trust FFB Food Hub
                 </p>
               </div>
             </div>
@@ -137,7 +137,7 @@ export default function LandingPage() {
               <div className="relative overflow-hidden rounded-2xl border border-[#2a2a3a] shadow-2xl shadow-[#d4a843]/10">
                 <Image
                   src={showcaseImages[currentImage]}
-                  alt="SSV Shop Dashboard"
+                  alt="FFB Food Hub Dashboard"
                   width={800}
                   height={500}
                   className="h-[420px] w-full object-cover transition-opacity duration-1000"
@@ -289,12 +289,12 @@ export default function LandingPage() {
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
           <div className="mb-8 text-4xl text-[#d4a843]/20">&ldquo;</div>
           <p className="text-xl leading-relaxed text-[#f0f0f5] sm:text-2xl">
-            SSV Shop transformed how we manage our retail business. The real-time inventory tracking and sales analytics have saved us countless hours.
+            FFB Food Hub transformed how we manage our retail business. The real-time inventory tracking and sales analytics have saved us countless hours.
           </p>
           <div className="mt-8 flex items-center justify-center gap-4">
             <div className="h-12 w-12 rounded-full bg-gradient-to-br from-[#d4a843]/30 to-[#3b82f6]/30" />
             <div className="text-left">
-              <p className="font-semibold text-[#f0f0f5]">Adewale SSV</p>
+              <p className="font-semibold text-[#f0f0f5]">Adewale FFB</p>
               <p className="text-sm text-[#9090a0]">Founder & CEO</p>
             </div>
           </div>

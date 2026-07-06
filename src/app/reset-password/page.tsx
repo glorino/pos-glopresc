@@ -92,7 +92,7 @@ function ResetPasswordForm() {
                 </svg>
               </div>
               <span className="text-xl font-bold text-[#f0f0f5]">
-                SSV Shop
+                FFB Food Hub
               </span>
             </Link>
             <h1 className="mt-4 text-xl font-semibold text-[#f0f0f5]">
@@ -136,7 +136,7 @@ function ResetPasswordForm() {
                 <circle cx="46" cy="46" r="3" fill="#000"/>
               </svg>
             </div>
-            <span className="text-xl font-bold text-[#f0f0f5]">SSV Shop</span>
+            <span className="text-xl font-bold text-[#f0f0f5]">FFB Food Hub</span>
           </Link>
           <h1 className="mt-4 text-xl font-semibold text-[#f0f0f5]">
             Reset Password

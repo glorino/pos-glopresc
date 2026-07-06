@@ -22,8 +22,8 @@ export default function PublicHeader() {
     <nav className="sticky top-0 z-50 border-b border-[#2a2a3a] bg-[#0a0a0f]/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2.5">
-          <Image src="/favicon.svg" alt="SSV Shop" width={36} height={36} className="h-9 w-9" />
-          <span className="text-xl font-black tracking-tight text-[#f0f0f5]">SSV <span className="text-[#d4a843]">Shop</span></span>
+          <Image src="/favicon.svg" alt="FFB Food Hub" width={36} height={36} className="h-9 w-9" />
+          <span className="text-xl font-black tracking-tight text-[#f0f0f5]">FFB <span className="text-[#d4a843]">Food Hub</span></span>
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">

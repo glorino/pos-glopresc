@@ -19,24 +19,24 @@ export async function POST(request: NextRequest) {
           name: "Branch A",
           code: "BR-001",
           address: "123 Commerce Street, Lagos, Nigeria",
-          phone: "+234 800 SSVSHOP",
-          email: "brancha@ssvshop.com",
+          phone: "+234 800 FFBFHUB",
+          email: "brancha@FFBFHUB.com",
           isDefault: true,
         },
       });
     }
 
     const userEmails = [
-      "manager@ssvshop.com",
-      "warehouse-manager@ssvshop.com",
-      "warehouse-rep@ssvshop.com",
-      "procurement-manager@ssvshop.com",
-      "procurement-rep@ssvshop.com",
-      "sales-manager@ssvshop.com",
-      "sales-rep@ssvshop.com",
-      "accountant@ssvshop.com",
-      "auditor@ssvshop.com",
-      "customer@ssvshop.com",
+      "manager@FFBFHUB.com",
+      "warehouse-manager@FFBFHUB.com",
+      "warehouse-rep@FFBFHUB.com",
+      "procurement-manager@FFBFHUB.com",
+      "procurement-rep@FFBFHUB.com",
+      "sales-manager@FFBFHUB.com",
+      "sales-rep@FFBFHUB.com",
+      "accountant@FFBFHUB.com",
+      "auditor@FFBFHUB.com",
+      "customer@FFBFHUB.com",
     ];
 
     const results = [];

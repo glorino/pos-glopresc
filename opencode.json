@@ -1,0 +1,40 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "username": "Martins",
+  "instructions": ["AGENTS.md"],
+  "command": {
+    "dev": {
+      "description": "Start development server",
+      "template": "npm run dev"
+    },
+    "build": {
+      "description": "Build for production",
+      "template": "npm run build"
+    },
+    "lint": {
+      "description": "Run linter",
+      "template": "npm run lint"
+    },
+    "db:push": {
+      "description": "Push schema to database",
+      "template": "npm run db:push"
+    },
+    "db:seed": {
+      "description": "Seed database",
+      "template": "npm run db:seed"
+    },
+    "deploy": {
+      "description": "Deploy to Vercel",
+      "template": "vercel --prod"
+    }
+  },
+  "permission": {
+    "bash": {
+      "npm run *": "allow",
+      "npx prisma *": "allow",
+      "vercel *": "allow",
+      "git *": "allow",
+      "*": "ask"
+    }
+  }
+}

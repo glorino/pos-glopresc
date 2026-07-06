@@ -36,14 +36,14 @@ const valueKeys = [
 ];
 
 const team = [
-  { name: "Adewale SSV", role: "Founder & CEO", initials: "AS", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" },
+  { name: "Adewale FFB", role: "Founder & CEO", initials: "AS", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" },
   { name: "Blessing Okoro", role: "Head of Product", initials: "BO", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face" },
   { name: "Chukwu Emeka", role: "Lead Engineer", initials: "CE", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face" },
   { name: "Fatima Bello", role: "Head of Design", initials: "FB", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face" },
 ];
 
 const milestones = [
-  { year: "2020", title: "Founded", desc: "SSV Shop was born from a need for better retail tools" },
+  { year: "2020", title: "Founded", desc: "FFB Food Hub was born from a need for better retail tools" },
   { year: "2021", title: "First 100 Users", desc: "Reached our first milestone of active businesses" },
   { year: "2022", title: "Multi-Branch", desc: "Launched multi-branch support for growing businesses" },
   { year: "2023", title: "500+ Users", desc: "Expanded to serve hundreds of retailers globally" },
@@ -51,8 +51,8 @@ const milestones = [
 
 const contactInfo = [
   { icon: MapPin, label: "Address", value: "Worldwide" },
-  { icon: Phone, label: "Phone", value: "+234 800 SSVSHOP" },
-  { icon: Mail, label: "Email", value: "support@ssvshop.com" },
+  { icon: Phone, label: "Phone", value: "+234 800 FFBFHUB" },
+  { icon: Mail, label: "Email", value: "support@FFBFHUB.com" },
   { icon: Clock, label: "Hours", value: "Mon – Fri, 8 AM – 6 PM" },
 ];
 
@@ -70,7 +70,7 @@ export default function AboutPage() {
             <div>
               <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#d4a843]/20 bg-[#d4a843]/10 px-4 py-1.5 text-sm font-medium text-[#d4a843] animate-fade-in-down">
                 <Building size={14} />
-                {t("aboutSsvShop")}
+                {t("aboutFFBFHUB")}
               </div>
               <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl animate-fade-in-up">
                 {t("empoweringModernRetail")}{" "}
@@ -99,7 +99,7 @@ export default function AboutPage() {
               <div className="overflow-hidden rounded-2xl border border-[#2a2a3a] shadow-2xl shadow-[#d4a843]/10">
                 <Image
                   src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=500&fit=crop"
-                  alt="SSV Shop Team"
+                  alt="FFB Food Hub Team"
                   width={800}
                   height={500}
                   className="h-[400px] w-full object-cover"

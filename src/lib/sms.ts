@@ -13,7 +13,7 @@ export async function sendSMS(phoneNumber: string, message: string) {
       body: JSON.stringify({
         api_key: TERMII_API_KEY,
         to: phoneNumber,
-        from: "SSV Shop",
+        from: "FFB Food Hub",
         sms: message,
         type: "plain",
         channel: "generic",

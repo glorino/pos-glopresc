@@ -672,10 +672,10 @@ export default function POSTerminal() {
                     <circle cx="46" cy="46" r="3" fill="#000"/>
                   </svg>
                 </div>
-                <p className="text-lg font-bold text-[#d4a843]">{t("ssvShop")}</p>
+                <p className="text-lg font-bold text-[#d4a843]">{t("FFBFHUB")}</p>
                 <p className="text-xs text-[#606070]">{t("posReceipt")}</p>
                 <p className="text-[10px] text-[#606070]">123 Commerce Street, Lagos, Nigeria</p>
-                <p className="text-[10px] text-[#606070]">Tel: +234 800 SSVSHOP</p>
+                <p className="text-[10px] text-[#606070]">Tel: +234 800 FFBFHUB</p>
               </div>
               <div className="mb-3 border-t border-dashed border-[#2a2a3a] pt-3">
                 <p className="text-xs text-[#606070]">{t("invoiceLabel")}: {lastReceipt.invoiceNumber}</p>
@@ -756,10 +756,10 @@ export default function POSTerminal() {
                             </svg>
                           </span>
                         </div>
-                        <div class="center bold" style="font-size: 16px; margin-top: 4px;">SSV SHOP</div>
+                        <div class="center bold" style="font-size: 16px; margin-top: 4px;">FFB Food Hub</div>
                         <div class="center" style="font-size: 10px; color: #666;">POS Receipt</div>
                         <div class="center" style="font-size: 9px; color: #999;">123 Commerce Street, Lagos, Nigeria</div>
-                        <div class="center" style="font-size: 9px; color: #999;">Tel: +234 800 SSVSHOP</div>
+                        <div class="center" style="font-size: 9px; color: #999;">Tel: +234 800 FFBFHUB</div>
                         <div class="divider"></div>
                         <div style="font-size: 10px; color: #666;">
                           <div>Invoice: ${escapeHtml(lastReceipt.invoiceNumber)}</div>
@@ -782,7 +782,7 @@ export default function POSTerminal() {
                         <div class="row"><span>Paid (${lastReceipt.paymentMethod})</span><span style="color: green;">₦${lastReceipt.amountPaid.toLocaleString()}</span></div>
                         ${lastReceipt.changeDue > 0 ? `<div class="row"><span>Change</span><span>₦${lastReceipt.changeDue.toLocaleString()}</span></div>` : ""}
                         <div class="divider"></div>
-                        <div class="footer">Thank you for shopping with SSV Shop!</div>
+                        <div class="footer">Thank you for shopping with FFB Food Hub!</div>
                       </body>
                       </html>
                     `);

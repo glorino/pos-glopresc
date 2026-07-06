@@ -34,7 +34,7 @@ const defaultSettings: Settings = {
     taxInclusive: "false",
   },
   receipt: {
-    header: "SSV Shop",
+    header: "FFB Food Hub",
     footer: "Thank you for your purchase!",
     paperSize: "80mm",
   },
