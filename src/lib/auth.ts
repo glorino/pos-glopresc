@@ -42,6 +42,19 @@ export const authOptions: NextAuthOptions = {
         token.role = (user as any).role;
         token.branchId = (user as any).branchId;
       }
+      if (token.id) {
+        const dbUser = await db.user.findUnique({
+          where: { id: token.id as string },
+          select: { role: true, branchId: true, isActive: true },
+        });
+        if (dbUser) {
+          token.role = dbUser.role;
+          token.branchId = dbUser.branchId;
+        } else {
+          token.role = "CUSTOMER";
+          token.branchId = null;
+        }
+      }
       return token;
     },
     async session({ session, token }) {
