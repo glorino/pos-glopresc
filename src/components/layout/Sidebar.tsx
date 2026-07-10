@@ -250,8 +250,8 @@ export default function Sidebar({ role, currentPath }: SidebarProps) {
   return (
     <aside className="sidebar flex flex-col" id="sidebar">
       <div className="flex h-16 items-center gap-2.5 border-b border-[#2a2a3a] px-5">
-        <Image src="/favicon.svg" alt="FFB Food Hub" width={36} height={36} className="h-9 w-9" />
-        <span className="text-xl font-black tracking-tight text-[#f0f0f5]">FFB <span className="text-[#d4a843]">Food Hub</span></span>
+        <Image src="/favicon.svg" alt="Firstlady Oil" width={36} height={36} className="h-9 w-9" />
+        <span className="text-xl font-black tracking-tight text-[#f0f0f5]">Firstlady <span className="text-[#d4a843]">Oil</span></span>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4">

@@ -33,7 +33,7 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | null>(null);
 
-const CART_KEY = "ssv-shop-cart";
+const CART_KEY = "firstlady-oil-cart";
 
 function loadCart(): CartItem[] {
   if (typeof window === "undefined") return [];

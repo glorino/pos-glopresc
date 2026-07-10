@@ -43,7 +43,7 @@ function ConfirmationContent() {
                 <circle cx="46" cy="46" r="3" fill="#000"/>
               </svg>
             </div>
-            <span className="text-lg font-bold text-[#f0f0f5]">FFB Food Hub</span>
+            <span className="text-lg font-bold text-[#f0f0f5]">Firstlady Oil</span>
           </Link>
         </div>
       </nav>
@@ -135,7 +135,7 @@ function ConfirmationContent() {
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#d4a843]/10 text-[10px] font-bold text-[#d4a843]">
                 4
               </span>
-              <span>For urgent inquiries, contact us at support@FFBFHUB.com.</span>
+              <span>For urgent inquiries, contact us at support@firstladyoil.com.</span>
             </li>
           </ol>
         </div>
@@ -155,7 +155,7 @@ function ConfirmationContent() {
       <footer className="border-t border-[#2a2a3a] bg-[#111118] py-8">
         <div className="mx-auto max-w-7xl px-4 text-center">
           <p className="text-xs text-[#606070]">
-            &copy; {new Date().getFullYear()} FFB Food Hub. All rights reserved.
+            &copy; {new Date().getFullYear()} Firstlady Oil. All rights reserved.
           </p>
         </div>
       </footer>

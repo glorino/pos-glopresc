@@ -19,24 +19,24 @@ export async function POST(request: NextRequest) {
           name: "Branch A",
           code: "BR-001",
           address: "123 Commerce Street, Lagos, Nigeria",
-          phone: "+234 800 FFBFHUB",
-          email: "brancha@FFBFHUB.com",
+          phone: "+234 800 FIRSTLADYOIL",
+          email: "brancha@firstladyoil.com",
           isDefault: true,
         },
       });
     }
 
     const userEmails = [
-      "manager@FFBFHUB.com",
-      "warehouse-manager@FFBFHUB.com",
-      "warehouse-rep@FFBFHUB.com",
-      "procurement-manager@FFBFHUB.com",
-      "procurement-rep@FFBFHUB.com",
-      "sales-manager@FFBFHUB.com",
-      "sales-rep@FFBFHUB.com",
-      "accountant@FFBFHUB.com",
-      "auditor@FFBFHUB.com",
-      "customer@FFBFHUB.com",
+      "manager@firstladyoil.com",
+      "warehouse-manager@firstladyoil.com",
+      "warehouse-rep@firstladyoil.com",
+      "procurement-manager@firstladyoil.com",
+      "procurement-rep@firstladyoil.com",
+      "sales-manager@firstladyoil.com",
+      "sales-rep@firstladyoil.com",
+      "accountant@firstladyoil.com",
+      "auditor@firstladyoil.com",
+      "customer@firstladyoil.com",
     ];
 
     const results = [];

@@ -62,4 +62,4 @@ export function generateBookingNumber(): string {
 }
 
 export const APP_URL = process.env.APP_URL || "https://pos-glopresc.vercel.app";
-export const APP_NAME = process.env.APP_NAME || "FFB Food Hub";
+export const APP_NAME = process.env.APP_NAME || "Firstlady Oil POS";

@@ -11,8 +11,8 @@ async function main() {
         name: "Branch A",
         code: "BR-001",
         address: "123 Commerce Street, Lagos, Nigeria",
-        phone: "+234 800 SSVSHOP",
-        email: "brancha@ssvshop.com",
+        phone: "+234 800 FIRSTLADYOIL",
+        email: "brancha@firstladyoil.com",
         isDefault: true,
       },
     });
@@ -23,16 +23,16 @@ async function main() {
 
   // Assign all listed users to Branch A
   const userEmails = [
-    "manager@ssvshop.com",
-    "warehouse-manager@ssvshop.com",
-    "warehouse-rep@ssvshop.com",
-    "procurement-manager@ssvshop.com",
-    "procurement-rep@ssvshop.com",
-    "sales-manager@ssvshop.com",
-    "sales-rep@ssvshop.com",
-    "accountant@ssvshop.com",
-    "auditor@ssvshop.com",
-    "customer@ssvshop.com",
+    "manager@firstladyoil.com",
+    "warehouse-manager@firstladyoil.com",
+    "warehouse-rep@firstladyoil.com",
+    "procurement-manager@firstladyoil.com",
+    "procurement-rep@firstladyoil.com",
+    "sales-manager@firstladyoil.com",
+    "sales-rep@firstladyoil.com",
+    "accountant@firstladyoil.com",
+    "auditor@firstladyoil.com",
+    "customer@firstladyoil.com",
   ];
 
   for (const email of userEmails) {

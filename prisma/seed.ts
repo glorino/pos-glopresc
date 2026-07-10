@@ -13,17 +13,17 @@ async function main() {
   const hashedPassword = await hash(DEFAULT_PASSWORD, 12);
 
   const usersData = [
-    { email: "owner@ssvshop.com", firstName: "Chukwuma", lastName: "Okafor", role: UserRole.OWNER },
-    { email: "manager@ssvshop.com", firstName: "Amina", lastName: "Abdullahi", role: UserRole.MANAGER },
-    { email: "warehouse-manager@ssvshop.com", firstName: "Emeka", lastName: "Nwosu", role: UserRole.WAREHOUSE_MANAGER },
-    { email: "warehouse-rep@ssvshop.com", firstName: "Chinedu", lastName: "Okoro", role: UserRole.WAREHOUSE_REP },
-    { email: "procurement-manager@ssvshop.com", firstName: "Ngozi", lastName: "Okonkwo", role: UserRole.PROCUREMENT_MANAGER },
-    { email: "procurement-rep@ssvshop.com", firstName: "Damilola", lastName: "Oyewole", role: UserRole.PROCUREMENT_REP },
-    { email: "sales-manager@ssvshop.com", firstName: "Tunde", lastName: "Adeyemi", role: UserRole.SALES_MANAGER },
-    { email: "sales-rep@ssvshop.com", firstName: "Fatima", lastName: "Bello", role: UserRole.SALES_REP },
-    { email: "accountant@ssvshop.com", firstName: "Yusuf", lastName: "Lawal", role: UserRole.ACCOUNTANT },
-    { email: "auditor@ssvshop.com", firstName: "Aisha", lastName: "Mohammed", role: UserRole.AUDITOR },
-    { email: "customer@ssvshop.com", firstName: "Chidera", lastName: "Eze", role: UserRole.CUSTOMER },
+    { email: "owner@firstladyoil.com", firstName: "Chukwuma", lastName: "Okafor", role: UserRole.OWNER },
+    { email: "manager@firstladyoil.com", firstName: "Amina", lastName: "Abdullahi", role: UserRole.MANAGER },
+    { email: "warehouse-manager@firstladyoil.com", firstName: "Emeka", lastName: "Nwosu", role: UserRole.WAREHOUSE_MANAGER },
+    { email: "warehouse-rep@firstladyoil.com", firstName: "Chinedu", lastName: "Okoro", role: UserRole.WAREHOUSE_REP },
+    { email: "procurement-manager@firstladyoil.com", firstName: "Ngozi", lastName: "Okonkwo", role: UserRole.PROCUREMENT_MANAGER },
+    { email: "procurement-rep@firstladyoil.com", firstName: "Damilola", lastName: "Oyewole", role: UserRole.PROCUREMENT_REP },
+    { email: "sales-manager@firstladyoil.com", firstName: "Tunde", lastName: "Adeyemi", role: UserRole.SALES_MANAGER },
+    { email: "sales-rep@firstladyoil.com", firstName: "Fatima", lastName: "Bello", role: UserRole.SALES_REP },
+    { email: "accountant@firstladyoil.com", firstName: "Yusuf", lastName: "Lawal", role: UserRole.ACCOUNTANT },
+    { email: "auditor@firstladyoil.com", firstName: "Aisha", lastName: "Mohammed", role: UserRole.AUDITOR },
+    { email: "customer@firstladyoil.com", firstName: "Chidera", lastName: "Eze", role: UserRole.CUSTOMER },
   ];
 
   const users: Record<string, string> = {};
@@ -268,7 +268,7 @@ async function main() {
     const sale = await prisma.sale.create({
       data: {
         invoiceNumber: invoiceNum,
-        userId: users["sales-rep@ssvshop.com"],
+        userId: users["sales-rep@firstladyoil.com"],
         customerId,
         subtotal,
         discount,
@@ -330,7 +330,7 @@ async function main() {
 
     await prisma.expense.create({
       data: {
-        userId: users["accountant@ssvshop.com"],
+        userId: users["accountant@firstladyoil.com"],
         categoryId: expenseCategories[catName],
         description,
         amount,
@@ -382,7 +382,7 @@ async function main() {
         status,
         expectedDate: new Date(orderDate.getTime() + 14 * 24 * 60 * 60 * 1000),
         notes: `Order from ${supplierName}`,
-        createdBy: users["procurement-manager@ssvshop.com"],
+        createdBy: users["procurement-manager@firstladyoil.com"],
         createdAt: orderDate,
         items: {
           create: poItems,
@@ -396,7 +396,7 @@ async function main() {
   console.log("\n🏧 Seeding cash drawers...");
   await prisma.cashDrawer.create({
     data: {
-        userId: users["sales-rep@ssvshop.com"],
+        userId: users["sales-rep@firstladyoil.com"],
       openingBalance: 50000,
       closingBalance: 87500,
       actualBalance: 87500,
@@ -409,7 +409,7 @@ async function main() {
 
   await prisma.cashDrawer.create({
     data: {
-        userId: users["sales-rep@ssvshop.com"],
+        userId: users["sales-rep@firstladyoil.com"],
       openingBalance: 50000,
       status: DrawerStatus.OPEN,
       openedAt: new Date(),
@@ -506,14 +506,14 @@ async function main() {
   // ── Settings ───────────────────────────────────────────
   console.log("\n⚙️ Seeding settings...");
   const settingsData = [
-    { key: "business_name", value: "SSV Shop", group: "business" },
+    { key: "business_name", value: "Firstlady Oil", group: "business" },
     { key: "business_address", value: "15 Broad Street, Lagos Island, Lagos, Nigeria", group: "business" },
     { key: "business_phone", value: "+2348012345678", group: "business" },
-    { key: "business_email", value: "info@ssvshop.com", group: "business" },
+    { key: "business_email", value: "info@firstladyoil.com", group: "business" },
     { key: "currency", value: "NGN", group: "business" },
     { key: "currency_symbol", value: "₦", group: "business" },
     { key: "tax_rate", value: "7.5", group: "finance" },
-    { key: "receipt_footer", value: "Thank you for shopping with SSV Shop!", group: "receipt" },
+    { key: "receipt_footer", value: "Thank you for shopping with Firstlady Oil!", group: "receipt" },
     { key: "low_stock_threshold", value: "10", group: "inventory" },
     { key: "loyalty_points_rate", value: "1", group: "loyalty" },
     { key: "default_payment_method", value: "CASH", group: "payment" },
@@ -577,7 +577,7 @@ async function main() {
     await prisma.stockAdjustment.create({
       data: {
         productId: products[sku],
-        userId: users["warehouse-manager@ssvshop.com"],
+        userId: users["warehouse-manager@firstladyoil.com"],
         type: adjTypes[Math.floor(Math.random() * adjTypes.length)],
         quantity: 1 + Math.floor(Math.random() * 20),
         reason: adjReasons[Math.floor(Math.random() * adjReasons.length)],
@@ -666,7 +666,7 @@ async function main() {
     await prisma.supplyRequest.create({
       data: {
         supplierId: suppliers[supplierName],
-        requestedBy: users["procurement-manager@ssvshop.com"],
+        requestedBy: users["procurement-manager@firstladyoil.com"],
         description: `Urgent supply request for ${supplierName} - batch ${i + 1}`,
         status: supplyRequestStatuses[i % supplyRequestStatuses.length] as any,
         urgency: urgencyLevels[i % urgencyLevels.length] as any,

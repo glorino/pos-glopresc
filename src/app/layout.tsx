@@ -3,9 +3,9 @@ import Providers from "@/components/providers/Providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "FFB Food Hub — Point of Sale System",
+  title: "Firstlady Oil POS — Point of Sale System",
   description:
-    "FFB Food Hub is a complete point-of-sale system. Manage sales, inventory, customers, and finances — all in one place.",
+    "Firstlady Oil POS is a complete point-of-sale system. Manage sales, inventory, customers, and finances — all in one place.",
   keywords: [
     "POS system",
     "point of sale",
@@ -13,13 +13,13 @@ export const metadata: Metadata = {
     "sales tracking",
     "business management",
     "global POS",
-    "FFB Food Hub",
+    "Firstlady Oil",
   ],
   openGraph: {
-    title: "FFB Food Hub — Point of Sale System",
+    title: "Firstlady Oil POS — Point of Sale System",
     description:
       "The all-in-one POS platform. Sales, inventory, customers, and financial reporting.",
-    siteName: "FFB Food Hub",
+    siteName: "Firstlady Oil POS",
     type: "website",
   },
 };

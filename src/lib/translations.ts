@@ -203,7 +203,7 @@ export const en = {
   financialReporting: "Financial Reporting",
   financialReportingDesc: "Generate comprehensive reports on sales, expenses, profits, and cash flow. Export to PDF or Excel.",
   readyToTransform: "Ready to Transform Your Business?",
-  joinHundreds: "Join hundreds of businesses using FFB Food Hub to streamline their operations and boost profitability.",
+  joinHundreds: "Join hundreds of businesses using Firstlady Oil to streamline their operations and boost profitability.",
   getStartedFree: "Get Started Free",
   requestQuote: "Request a Quote",
   realTimeTracking: "Real-time inventory tracking",
@@ -224,7 +224,7 @@ export const en = {
 
   // Features page
   powerfulFeatures: "Powerful Features",
-  featuresHeroDesc: "From point of sale to financial reporting, FFB Food Hub gives you the tools to manage every aspect of your retail operations.",
+  featuresHeroDesc: "From point of sale to financial reporting, Firstlady Oil gives you the tools to manage every aspect of your retail operations.",
   featuresPosTitle: "Point of Sale",
   featuresPosDesc: "Fast, reliable transaction processing for every checkout.",
   featuresPosQuickCheckout: "Quick Checkout",
@@ -315,14 +315,14 @@ export const en = {
   featuresMultiSupport247Desc: "Reach our support team anytime via chat, email, or phone.",
 
   // About page
-  aboutFFBFHUB: "About FFB Food Hub",
+  aboutSsvShop: "About Firstlady Oil",
   empoweringModernRetail: "Empowering",
   modernRetail: "Modern Retail",
   aboutHeroDesc: "We believe every business — from a small shop to a growing chain — deserves access to modern, affordable point-of-sale technology.",
   ourStory: "Our Story",
-  storyP1: "FFB Food Hub was born from a simple observation: businesses deserve better tools. Too many shops still rely on paper ledgers or outdated software that doesn't understand modern payment methods, currencies, or business practices.",
+  storyP1: "Firstlady Oil was born from a simple observation: businesses deserve better tools. Too many shops still rely on paper ledgers or outdated software that doesn't understand modern payment methods, currencies, or business practices.",
   storyP2: "Founded in 2024, we set out to build a point-of-sale system designed from the ground up for modern retail. We support multiple currencies, local payment providers, and multi-branch operations — all wrapped in a modern, easy-to-use interface.",
-  storyP3: "Today, FFB Food Hub powers thousands of daily transactions worldwide. From single-store retailers to multi-location chains, our platform scales to meet the needs of businesses at every stage of growth.",
+  storyP3: "Today, Firstlady Oil powers thousands of daily transactions worldwide. From single-store retailers to multi-location chains, our platform scales to meet the needs of businesses at every stage of growth.",
   whatWeStandFor: "What We Stand For",
   ourMission: "Our Mission",
   missionDesc: "To provide affordable, reliable, and easy-to-use point-of-sale technology that empowers businesses to compete and grow in the modern economy.",
@@ -401,10 +401,10 @@ export const en = {
   addProductsDesc: "Import your inventory or add products manually",
   startSelling: "Start Selling",
   startSellingDesc: "Process sales, track inventory, and grow your business",
-  testimonial: "FFB Food Hub transformed how we manage our retail business. The real-time inventory tracking and sales analytics have saved us countless hours.",
-  testimonialAuthor: "Adewale FFB",
+  testimonial: "Firstlady Oil transformed how we manage our retail business. The real-time inventory tracking and sales analytics have saved us countless hours.",
+  testimonialAuthor: "Adewale Firstlady",
   testimonialRole: "Founder & CEO",
-  businessesTrust: "businesses trust FFB Food Hub",
+  businessesTrust: "businesses trust Firstlady Oil",
   revenueGrowth: "Revenue growth",
 
   // Auth
@@ -428,7 +428,7 @@ export const en = {
   about: "About",
 
   // Footer
-  footerDesc: "The complete POS system for FFB Food Hub. Manage sales, inventory, customers, and finances with confidence.",
+  footerDesc: "The complete POS system for Firstlady Oil. Manage sales, inventory, customers, and finances with confidence.",
   productLabel: "Product",
   companyLabel: "Company",
   contactLabel: "Contact",
@@ -457,7 +457,7 @@ export const en = {
   posReceipt: "POS Receipt",
   servedBy: "Served by:",
   printReceipt: "Print Receipt",
-  thankYouForShopping: "Thank you for shopping with FFB Food Hub!",
+  thankYouForShopping: "Thank you for shopping with Firstlady Oil!",
   failedToLoadProducts: "Failed to load products",
   cashReceivedLessThanTotal: "Cash received is less than total",
   saleCompletedSuccess: "Sale completed successfully!",
@@ -595,7 +595,7 @@ export const en = {
   // About extras
   ourJourney: "Our Journey",
   founded: "Founded",
-  foundedDesc: "FFB Food Hub was born from a need for better retail tools",
+  foundedDesc: "Firstlady Oil was born from a need for better retail tools",
   first100Users: "First 100 Users",
   first100UsersDesc: "Reached our first milestone of active businesses",
   multiBranchLaunch: "Multi-Branch",
@@ -856,7 +856,7 @@ export const en = {
   performance: "Performance",
 
   // DashboardLayout
-  defaultEmail: "user@FFBFHUB.com",
+  defaultEmail: "user@firstladyoil.com",
 
   // POSTerminal (new keys only)
   posTerminalLabel: "POS Terminal",
@@ -864,8 +864,8 @@ export const en = {
   openRegister: "Open Register",
   noItemsInCart: "No items in cart",
   completeSaleBtn: "Complete Sale",
-  FFBFHUB: "FFB Food Hub",
-  thankYouShopping: "Thank you for shopping with FFB Food Hub!",
+  ssvShop: "FIRSTLADY OIL",
+  thankYouShopping: "Thank you for shopping with Firstlady Oil!",
   searchProductsPlaceholder: "Search products... (F2)",
   cartCount: "Cart ({count})",
   subtotalLabel: "Subtotal",
@@ -1191,7 +1191,7 @@ export const en = {
   deliveryAddressPlaceholder: "e.g., 123 Main Street, City, Country",
   estimatedDeliveryShop: "Estimated delivery:",
   pleaseFillDetails: "Please fill in your name, email, and delivery address to proceed.",
-  FFBFHUBOrder: "FFB Food Hub Order",
+  ssvShopOrder: "Firstlady Oil Order",
   itemSingular: "item",
   itemsPlural: "items",
 
@@ -1411,7 +1411,7 @@ export const fr: Record<TranslationKey, string> = {
   financialReporting: "Rapports financiers",
   financialReportingDesc: "Générez des rapports complets sur les ventes, les dépenses, les bénéfices et la trésorerie. Exportez en PDF ou Excel.",
   readyToTransform: "Prêt à transformer votre entreprise ?",
-  joinHundreds: "Rejoignez des centaines d'entreprises qui utilisent FFB Food Hub pour rationaliser leurs opérations et augmenter leur rentabilité.",
+  joinHundreds: "Rejoignez des centaines d'entreprises qui utilisent Firstlady Oil pour rationaliser leurs opérations et augmenter leur rentabilité.",
   getStartedFree: "Commencer gratuitement",
   requestQuote: "Demander un devis",
   realTimeTracking: "Suivi des stocks en temps réel",
@@ -1432,7 +1432,7 @@ export const fr: Record<TranslationKey, string> = {
 
   // Features page
   powerfulFeatures: "Fonctionnalités puissantes",
-  featuresHeroDesc: "Du point de vente aux rapports financiers, FFB Food Hub vous donne les outils pour gérer chaque aspect de vos opérations commerciales.",
+  featuresHeroDesc: "Du point de vente aux rapports financiers, Firstlady Oil vous donne les outils pour gérer chaque aspect de vos opérations commerciales.",
   featuresPosTitle: "Point de vente",
   featuresPosDesc: "Traitement rapide et fiable des transactions pour chaque caisse.",
   featuresPosQuickCheckout: "Caisse rapide",
@@ -1523,14 +1523,14 @@ export const fr: Record<TranslationKey, string> = {
   featuresMultiSupport247Desc: "Contactez notre équipe de support à tout moment par chat, email ou téléphone.",
 
   // About page
-  aboutFFBFHUB: "À propos de FFB Food Hub",
+  aboutSsvShop: "À propos de Firstlady Oil",
   empoweringModernRetail: "Donner le pouvoir au",
   modernRetail: "Commerce moderne",
   aboutHeroDesc: "Nous croyons que chaque entreprise — d'un petit magasin à une chaîne en croissance — mérite accès à une technologie de point de vente moderne et abordable.",
   ourStory: "Notre histoire",
-  storyP1: "FFB Food Hub est née d'une observation simple : les entreprises méritent de meilleurs outils. Trop de magasins comptent encore sur des registres papier ou des logiciels obsolètes qui ne comprennent pas les méthodes de paiement modernes, les devises ou les pratiques commerciales.",
+  storyP1: "Firstlady Oil est née d'une observation simple : les entreprises méritent de meilleurs outils. Trop de magasins comptent encore sur des registres papier ou des logiciels obsolètes qui ne comprennent pas les méthodes de paiement modernes, les devises ou les pratiques commerciales.",
   storyP2: "Fondée en 2024, nous avons entrepris de construire un système de point de vente conçu dès le départ pour le commerce moderne. Nous prenons en charge plusieurs devises, des fournisseurs de paiement locaux et des opérations multi-succursales — le tout dans une interface moderne et facile à utiliser.",
-  storyP3: "Aujourd'hui, FFB Food Hub traite des milliers de transactions quotidiennes dans le monde. Des détaillants mono-boutique aux chaînes multi-emplacements, notre plateforme s'adapte aux besoins des entreprises à chaque étape de leur croissance.",
+  storyP3: "Aujourd'hui, Firstlady Oil traite des milliers de transactions quotidiennes dans le monde. Des détaillants mono-boutique aux chaînes multi-emplacements, notre plateforme s'adapte aux besoins des entreprises à chaque étape de leur croissance.",
   whatWeStandFor: "Nos valeurs",
   ourMission: "Notre mission",
   missionDesc: "Fournir une technologie de point de vente abordable, fiable et facile à utiliser qui permet aux entreprises de rivaliser et de croître dans l'économie moderne.",
@@ -1609,10 +1609,10 @@ export const fr: Record<TranslationKey, string> = {
   addProductsDesc: "Importez votre inventaire ou ajoutez des produits manuellement",
   startSelling: "Commencer à vendre",
   startSellingDesc: "Traitez les ventes, suivez l'inventaire et développez votre entreprise",
-  testimonial: "FFB Food Hub a transformé la gestion de notre activité de vente au détail. Le suivi des stocks en temps réel et les analyses de ventes nous ont fait gagner un temps considérable.",
-  testimonialAuthor: "Adewale FFB",
+  testimonial: "Firstlady Oil a transformé la gestion de notre activité de vente au détail. Le suivi des stocks en temps réel et les analyses de ventes nous ont fait gagner un temps considérable.",
+  testimonialAuthor: "Adewale Firstlady",
   testimonialRole: "Fondateur & PDG",
-  businessesTrust: "entreprises font confiance à FFB Food Hub",
+  businessesTrust: "entreprises font confiance à Firstlady Oil",
   revenueGrowth: "Croissance du revenu",
 
   // Auth
@@ -1636,7 +1636,7 @@ export const fr: Record<TranslationKey, string> = {
   about: "À propos",
 
   // Footer
-  footerDesc: "Le système de caisse complet pour FFB Food Hub. Gérez les ventes, l'inventaire, les clients et les finances en toute confiance.",
+  footerDesc: "Le système de caisse complet pour Firstlady Oil. Gérez les ventes, l'inventaire, les clients et les finances en toute confiance.",
   productLabel: "Produit",
   companyLabel: "Entreprise",
   contactLabel: "Contact",
@@ -1665,7 +1665,7 @@ export const fr: Record<TranslationKey, string> = {
   posReceipt: "Reçu de caisse",
   servedBy: "Servi par :",
   printReceipt: "Imprimer le reçu",
-  thankYouForShopping: "Merci d'avoir acheté chez FFB Food Hub !",
+  thankYouForShopping: "Merci d'avoir acheté chez Firstlady Oil !",
   failedToLoadProducts: "Échec du chargement des produits",
   cashReceivedLessThanTotal: "Les espèces reçues sont inférieures au total",
   saleCompletedSuccess: "Vente terminée avec succès !",
@@ -1803,7 +1803,7 @@ export const fr: Record<TranslationKey, string> = {
   // About extras
   ourJourney: "Notre parcours",
   founded: "Fondée",
-  foundedDesc: "FFB Food Hub est née d'un besoin de meilleurs outils de vente",
+  foundedDesc: "Firstlady Oil est née d'un besoin de meilleurs outils de vente",
   first100Users: "Premiers 100 utilisateurs",
   first100UsersDesc: "Atteint notre premier jalon d'entreprises actives",
   multiBranchLaunch: "Multi-succursales",
@@ -2064,7 +2064,7 @@ export const fr: Record<TranslationKey, string> = {
   performance: "Performance",
 
   // Agencement du tableau de bord
-  defaultEmail: "user@FFBFHUB.com",
+  defaultEmail: "user@firstladyoil.com",
 
   // Terminal de caisse (new FR keys)
   posTerminalLabel: "Terminal de caisse",
@@ -2072,8 +2072,8 @@ export const fr: Record<TranslationKey, string> = {
   openRegister: "Ouvrir la caisse",
   noItemsInCart: "Aucun article dans le panier",
   completeSaleBtn: "Finaliser la vente",
-  FFBFHUB: "FFB Food Hub",
-  thankYouShopping: "Merci d'avoir acheté chez FFB Food Hub !",
+  ssvShop: "FIRSTLADY OIL",
+  thankYouShopping: "Merci d'avoir acheté chez Firstlady Oil !",
   searchProductsPlaceholder: "Rechercher des produits... (F2)",
   cartCount: "Panier ({count})",
   subtotalLabel: "Sous-total",
@@ -2399,7 +2399,7 @@ export const fr: Record<TranslationKey, string> = {
   deliveryAddressPlaceholder: "ex., 123 Rue Principale, Ville, Pays",
   estimatedDeliveryShop: "Livraison estimée :",
   pleaseFillDetails: "Veuillez remplir votre nom, email et adresse de livraison pour continuer.",
-  FFBFHUBOrder: "Commande FFB Food Hub",
+  ssvShopOrder: "Commande Firstlady Oil",
   itemSingular: "article",
   itemsPlural: "articles",
 

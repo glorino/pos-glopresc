@@ -8,13 +8,13 @@ export default function PublicFooter() {
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <Link href="/" className="flex items-center gap-2.5">
-              <Image src="/favicon.svg" alt="FFB Food Hub" width={32} height={32} className="h-8 w-8" />
+              <Image src="/favicon.svg" alt="Firstlady Oil" width={32} height={32} className="h-8 w-8" />
               <span className="text-lg font-bold text-[#f0f0f5]">
-                FFB Food Hub
+                Firstlady Oil
               </span>
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-[#9090a0]">
-              The complete POS system for FFB Food Hub. Manage sales, inventory,
+              The complete POS system for Firstlady Oil. Manage sales, inventory,
               customers, and finances with confidence.
             </p>
           </div>
@@ -57,13 +57,13 @@ export default function PublicFooter() {
               Contact
             </h4>
             <ul className="space-y-2 text-sm text-[#9090a0]">
-              <li>support@FFBFHUB.com</li>
+              <li>support@firstladyoil.com</li>
               <li>Worldwide</li>
             </ul>
           </div>
         </div>
         <div className="mt-12 border-t border-[#2a2a3a] pt-8 text-center text-xs text-[#606070]">
-          &copy; {new Date().getFullYear()} FFB Food Hub. All rights reserved.
+          &copy; {new Date().getFullYear()} Firstlady Oil. All rights reserved.
         </div>
       </div>
     </footer>

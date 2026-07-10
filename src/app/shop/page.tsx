@@ -203,7 +203,7 @@ export default function ShopPage() {
           <h1 className="text-3xl font-bold text-[#f0f0f5] sm:text-5xl">
             {t("welcomeTo")}{" "}
             <span className="bg-gradient-to-r from-[#d4a843] to-[#c49a38] bg-clip-text text-transparent">
-              FFB Food Hub
+              Firstlady Oil
             </span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-[#9090a0]">
@@ -546,7 +546,7 @@ export default function ShopPage() {
                   amount={total}
                   email={customerEmail}
                   name={customerName}
-                  description={`${t("FFBFHUBOrder")} - ${cart.length} item(s)`}
+                  description={`${t("ssvShopOrder")} - ${cart.length} item(s)`}
                   onSuccess={async (response) => {
                     try {
                       const verifyRes = await fetch(

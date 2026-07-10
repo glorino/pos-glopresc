@@ -212,7 +212,7 @@ export async function POST(request: NextRequest) {
         select: { phone: true },
       });
       if (customerPhone?.phone) {
-        const message = `FFB Food Hub Receipt: Invoice ${sale.invoiceNumber}, Total: \u20A6${Number(sale.total).toLocaleString("en-NG", { minimumFractionDigits: 2 })}. Thank you for your purchase!`;
+        const message = `Firstlady Oil Receipt: Invoice ${sale.invoiceNumber}, Total: \u20A6${Number(sale.total).toLocaleString("en-NG", { minimumFractionDigits: 2 })}. Thank you for your purchase!`;
         sendSMS(customerPhone.phone, message);
       }
     }

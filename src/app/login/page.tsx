@@ -75,7 +75,7 @@ export default function LoginPage() {
                 <circle cx="46" cy="46" r="3" fill="#000"/>
               </svg>
             </div>
-            <span className="text-xl font-bold text-[#f0f0f5]">FFB Food Hub</span>
+            <span className="text-xl font-bold text-[#f0f0f5]">Firstlady Oil</span>
           </Link>
           <h1 className="mt-4 text-xl font-semibold text-[#f0f0f5]">
             Welcome back
@@ -196,7 +196,7 @@ export default function LoginPage() {
         <p className="mt-6 text-center text-sm text-[#606070]">
           Don&apos;t have an account?{" "}
           <Link
-            href="mailto:sales@FFBFHUB.com"
+            href="mailto:sales@firstladyoil.com"
             className="font-medium text-[#d4a843] hover:text-[#c49a38]"
           >
             Contact Sales

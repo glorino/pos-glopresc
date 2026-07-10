@@ -72,7 +72,7 @@ export default function FlutterwavePayment({
         currency: "NGN",
         customer: { email, name },
         customizations: {
-          title: "FFB Food Hub",
+          title: "Firstlady Oil",
           description,
           logo: "",
         },

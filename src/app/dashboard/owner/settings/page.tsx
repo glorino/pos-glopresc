@@ -34,7 +34,7 @@ const defaultSettings: Settings = {
     taxInclusive: "false",
   },
   receipt: {
-    header: "FFB Food Hub",
+    header: "Firstlady Oil",
     footer: "Thank you for your purchase!",
     paperSize: "80mm",
   },
