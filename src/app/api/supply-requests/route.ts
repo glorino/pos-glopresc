@@ -60,8 +60,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userRole = (session.user as any).role as string;
-    const userId = (session.user as any).id as string;
+    const userRole = session.user.role;
+    const userId = session.user.id;
 
     const allowedRoles = ["WAREHOUSE_REP", "WAREHOUSE_MANAGER", "PROCUREMENT_REP", "PROCUREMENT_MANAGER"];
     if (!allowedRoles.includes(userRole)) {
@@ -115,10 +115,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(supplyRequest, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Supply Requests POST error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to create supply request" },
+      { error: error instanceof Error ? error.message : "Failed to create supply request" },
       { status: 500 }
     );
   }
@@ -131,8 +131,8 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userRole = (session.user as any).role as string;
-    const userId = (session.user as any).id as string;
+    const userRole = session.user.role;
+    const userId = session.user.id;
 
     const body = await request.json();
     const { id, status } = body;

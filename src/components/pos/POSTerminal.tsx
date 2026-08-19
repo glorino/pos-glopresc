@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, APP_NAME, APP_CURRENCY } from "@/lib/utils";
 
 function escapeHtml(str: string): string {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -25,6 +25,7 @@ import {
   Menu,
   Receipt,
   ScanBarcode,
+  Globe,
 } from "lucide-react";
 import BarcodeScanner from "@/components/ui/BarcodeScanner";
 import { useTranslation } from "@/contexts/LanguageContext";
@@ -45,7 +46,7 @@ interface CartItem {
   quantity: number;
 }
 
-type PaymentMethod = "CASH" | "CARD" | "TRANSFER" | "USSD" | "MOBILE";
+type PaymentMethod = "CASH" | "CARD" | "TRANSFER" | "USSD" | "MOBILE" | "ONLINE";
 
 interface Notification {
   type: "success" | "error";
@@ -79,6 +80,7 @@ export default function POSTerminal() {
     { value: "TRANSFER", label: t("paymentTransfer"), icon: ArrowRight },
     { value: "USSD", label: t("paymentUSSD"), icon: Smartphone },
     { value: "MOBILE", label: t("paymentMobile"), icon: Smartphone },
+    { value: "ONLINE", label: t("paymentOnline"), icon: Globe },
   ];
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -96,6 +98,10 @@ export default function POSTerminal() {
   const [cartOpen, setCartOpen] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [taxRate, setTaxRate] = useState(7.5);
+  const [businessName, setBusinessName] = useState("");
+  const [businessAddress, setBusinessAddress] = useState("");
+  const [businessPhone, setBusinessPhone] = useState("");
+  const [currency, setCurrency] = useState(APP_CURRENCY);
 
   useEffect(() => {
     fetchProducts();
@@ -108,8 +114,15 @@ export default function POSTerminal() {
         if (data.settings?.currency?.taxRate) {
           setTaxRate(Number(data.settings.currency.taxRate));
         }
+        if (data.settings?.currency?.code) {
+          setCurrency(data.settings.currency.code);
+        }
+        const b = data.settings?.business;
+        if (b?.name) setBusinessName(b.name);
+        if (b?.address) setBusinessAddress(b.address);
+        if (b?.phone) setBusinessPhone(b.phone);
       })
-      .catch(() => {});
+      .catch(() => { /* Settings fetch failed - use defaults */ });
   }, []);
 
   useEffect(() => {
@@ -161,7 +174,7 @@ export default function POSTerminal() {
         const found = data.products?.find(
           (p: Product & { barcode?: string }) =>
             p.sku.toLowerCase() === barcode.toLowerCase() ||
-            (p as any).barcode?.toLowerCase() === barcode.toLowerCase() ||
+            ("barcode" in p && typeof (p as { barcode?: string }).barcode === "string" && (p as { barcode: string }).barcode.toLowerCase() === barcode.toLowerCase()) ||
             p.name.toLowerCase().includes(barcode.toLowerCase())
         );
         if (found) {
@@ -257,7 +270,7 @@ export default function POSTerminal() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: (session?.user as any)?.id || "",
+          userId: session?.user?.id || "",
           items: cart.map((item) => ({
             productId: item.product.id,
             quantity: item.quantity,
@@ -278,7 +291,7 @@ export default function POSTerminal() {
       const sale = await res.json();
       const receipt: SaleReceipt = {
         invoiceNumber: sale.invoiceNumber,
-        items: sale.items.map((i: any) => ({
+        items: sale.items.map((i: { product: { name: string }; quantity: number; unitPrice: string | number; total: string | number }) => ({
           name: i.product.name,
           quantity: i.quantity,
           unitPrice: Number(i.unitPrice),
@@ -292,7 +305,7 @@ export default function POSTerminal() {
         amountPaid: Number(sale.amountPaid),
         changeDue: Number(sale.changeDue),
         date: new Date().toISOString(),
-        cashierName: (session?.user as any)?.name || "Cashier",
+        cashierName: session?.user?.name || "Cashier",
       };
 
       setLastReceipt(receipt);
@@ -300,8 +313,8 @@ export default function POSTerminal() {
       clearCart();
       fetchProducts();
       showNotification("success", t("saleCompletedSuccess"));
-    } catch (error: any) {
-      showNotification("error", error.message || t("failedToCompleteSale"));
+    } catch (error: unknown) {
+      showNotification("error", error instanceof Error ? error.message : t("failedToCompleteSale"));
     } finally {
       setProcessing(false);
     }
@@ -340,7 +353,7 @@ export default function POSTerminal() {
         <div className="border-b border-[#2a2a3a] bg-[#111118]/80 p-4 backdrop-blur-xl">
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
+              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
                 ref={searchRef}
                 type="text"
@@ -569,7 +582,7 @@ export default function POSTerminal() {
 
             <div className="mb-3">
               <p className="mb-2 text-xs font-medium text-[#9090a0]">{t("paymentMethodLabel")}</p>
-              <div className="grid grid-cols-5 gap-1">
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-1">
                 {PAYMENT_METHODS.map((pm) => {
                   const Icon = pm.icon;
                   return (
@@ -672,10 +685,10 @@ export default function POSTerminal() {
                     <circle cx="46" cy="46" r="3" fill="#000"/>
                   </svg>
                 </div>
-                <p className="text-lg font-bold text-[#d4a843]">{t("ssvShop")}</p>
+                <p className="text-lg font-bold text-[#d4a843]">{businessName}</p>
                 <p className="text-xs text-[#606070]">{t("posReceipt")}</p>
-                <p className="text-[10px] text-[#606070]">123 Commerce Street, Lagos, Nigeria</p>
-                <p className="text-[10px] text-[#606070]">Tel: +234 800 FIRSTLADYOIL</p>
+                <p className="text-[10px] text-[#606070]">{businessAddress}</p>
+                <p className="text-[10px] text-[#606070]">Tel: {businessPhone}</p>
               </div>
               <div className="mb-3 border-t border-dashed border-[#2a2a3a] pt-3">
                 <p className="text-xs text-[#606070]">{t("invoiceLabel")}: {lastReceipt.invoiceNumber}</p>
@@ -756,10 +769,10 @@ export default function POSTerminal() {
                             </svg>
                           </span>
                         </div>
-                        <div class="center bold" style="font-size: 16px; margin-top: 4px;">FIRSTLADY OIL</div>
+                        <div class="center bold" style="font-size: 16px; margin-top: 4px;">${escapeHtml(businessName)}</div>
                         <div class="center" style="font-size: 10px; color: #666;">POS Receipt</div>
-                        <div class="center" style="font-size: 9px; color: #999;">123 Commerce Street, Lagos, Nigeria</div>
-                        <div class="center" style="font-size: 9px; color: #999;">Tel: +234 800 FIRSTLADYOIL</div>
+                        <div class="center" style="font-size: 9px; color: #999;">${escapeHtml(businessAddress)}</div>
+                        <div class="center" style="font-size: 9px; color: #999;">Tel: ${escapeHtml(businessPhone)}</div>
                         <div class="divider"></div>
                         <div style="font-size: 10px; color: #666;">
                           <div>Invoice: ${escapeHtml(lastReceipt.invoiceNumber)}</div>
@@ -767,22 +780,22 @@ export default function POSTerminal() {
                           <div>Served by: ${escapeHtml(lastReceipt.cashierName)}</div>
                         </div>
                         <div class="divider"></div>
-                        ${lastReceipt.items.map((item: any) => `
+                        ${lastReceipt.items.map((item: { name: string; quantity: number; total: number }) => `
                           <div class="row">
                             <span>${escapeHtml(item.name)} x${item.quantity}</span>
-                            <span>₦${item.total.toLocaleString()}</span>
+                            <span>${currency} ${item.total.toLocaleString()}</span>
                           </div>
                         `).join("")}
                         <div class="divider"></div>
-                        <div class="row"><span>Subtotal</span><span>₦${lastReceipt.subtotal.toLocaleString()}</span></div>
-                        ${lastReceipt.discount > 0 ? `<div class="row"><span>Discount</span><span>-₦${lastReceipt.discount.toLocaleString()}</span></div>` : ""}
-                        <div class="row"><span>VAT (${taxRate}%)</span><span>₦${lastReceipt.tax.toLocaleString()}</span></div>
+                        <div class="row"><span>Subtotal</span><span>${currency} ${lastReceipt.subtotal.toLocaleString()}</span></div>
+                        ${lastReceipt.discount > 0 ? `<div class="row"><span>Discount</span><span>-${currency} ${lastReceipt.discount.toLocaleString()}</span></div>` : ""}
+                        <div class="row"><span>VAT (${taxRate}%)</span><span>${currency} ${lastReceipt.tax.toLocaleString()}</span></div>
                         <div class="divider"></div>
-                        <div class="row bold" style="font-size: 14px;"><span>TOTAL</span><span>₦${lastReceipt.total.toLocaleString()}</span></div>
-                        <div class="row"><span>Paid (${lastReceipt.paymentMethod})</span><span style="color: green;">₦${lastReceipt.amountPaid.toLocaleString()}</span></div>
-                        ${lastReceipt.changeDue > 0 ? `<div class="row"><span>Change</span><span>₦${lastReceipt.changeDue.toLocaleString()}</span></div>` : ""}
+                        <div class="row bold" style="font-size: 14px;"><span>TOTAL</span><span>${currency} ${lastReceipt.total.toLocaleString()}</span></div>
+                        <div class="row"><span>Paid (${lastReceipt.paymentMethod})</span><span style="color: green;">${currency} ${lastReceipt.amountPaid.toLocaleString()}</span></div>
+                        ${lastReceipt.changeDue > 0 ? `<div class="row"><span>Change</span><span>${currency} ${lastReceipt.changeDue.toLocaleString()}</span></div>` : ""}
                         <div class="divider"></div>
-                        <div class="footer">Thank you for shopping with Firstlady Oil!</div>
+                        <div class="footer">Thank you for shopping with ${escapeHtml(businessName)}!</div>
                       </body>
                       </html>
                     `);

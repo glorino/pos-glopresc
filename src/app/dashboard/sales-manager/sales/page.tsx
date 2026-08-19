@@ -102,7 +102,7 @@ export default function SalesManagementPage() {
       s.invoiceNumber,
       s.customer,
       String(s.items.length),
-      `₦${s.total.toLocaleString("en-NG", { minimumFractionDigits: 2 })}`,
+      formatCurrency(Number(s.total)),
       s.paymentMethod,
       s.status,
       s.createdAt,
@@ -157,14 +157,14 @@ export default function SalesManagementPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3">
             <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
                 type="text"
                 placeholder={t("searchInvoices")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchSales()}
-                className="input w-64 pl-10"
+                className="input w-full max-w-xs pl-10"
               />
             </div>
             <select
@@ -309,7 +309,7 @@ export default function SalesManagementPage() {
       </div>
 
       {selectedSale && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
           <div className="glass-card w-full max-w-lg p-6">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-[#f0f0f5]">

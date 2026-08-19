@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { formatCurrency } from "@/lib/utils";
 
 export async function GET(request: Request) {
   try {
@@ -27,6 +28,8 @@ export async function GET(request: Request) {
       topProducts,
       lowStockProducts,
       branchRanking,
+      recentExpenses,
+      categorySalesData,
     ] = await Promise.all([
       db.sale.aggregate({
         _sum: { total: true },
@@ -91,6 +94,31 @@ export async function GET(request: Request) {
         GROUP BY b."id", b."name"
         ORDER BY revenue DESC
       `,
+      db.expense.findMany({
+        take: 5,
+        orderBy: { date: "desc" },
+        select: {
+          id: true,
+          description: true,
+          amount: true,
+          status: true,
+          date: true,
+        },
+      }),
+      db.$queryRaw<
+        { category: string; total: number }[]
+      >`
+        SELECT
+          c."name" AS category,
+          COALESCE(SUM(si."total"), 0)::float AS total
+        FROM "SaleItem" si
+        JOIN "Product" p ON p."id" = si."productId"
+        JOIN "Category" c ON c."id" = p."categoryId"
+        JOIN "Sale" s ON s."id" = si."saleId"
+        WHERE s."status" = 'COMPLETED'
+        GROUP BY c."name"
+        ORDER BY total DESC
+      `,
     ]);
 
     const totalRevenue = Number(totalRevenueResult._sum.total ?? 0);
@@ -118,6 +146,36 @@ export async function GET(request: Request) {
         };
       })
     );
+
+    const recentActivityItems: { type: string; label: string; detail: string; time: string }[] = [];
+    for (const sale of recentSales.slice(0, 3)) {
+      const diffMs = Date.now() - new Date(sale.createdAt).getTime();
+      const mins = Math.floor(diffMs / 60000);
+      const timeLabel = mins < 60 ? `${mins}m ago` : mins < 1440 ? `${Math.floor(mins / 60)}h ago` : `${Math.floor(mins / 1440)}d ago`;
+      recentActivityItems.push({
+        type: "sale",
+        label: "New Sale Recorded",
+        detail: `Invoice ${sale.invoiceNumber} - ${formatCurrency(Number(sale.total))}`,
+        time: timeLabel,
+      });
+    }
+    for (const exp of recentExpenses.slice(0, 2)) {
+      const diffMs = Date.now() - new Date(exp.date).getTime();
+      const mins = Math.floor(diffMs / 60000);
+      const timeLabel = mins < 60 ? `${mins}m ago` : mins < 1440 ? `${Math.floor(mins / 60)}h ago` : `${Math.floor(mins / 1440)}d ago`;
+      recentActivityItems.push({
+        type: "expense",
+        label: exp.status === "APPROVED" ? "Expense Approved" : "Expense Submitted",
+        detail: `${exp.description} - ${formatCurrency(Number(exp.amount))}`,
+        time: timeLabel,
+      });
+    }
+
+    const totalCategoryRevenue = categorySalesData.reduce((sum, c) => sum + Number(c.total), 0);
+    const salesBreakdown = categorySalesData.map((c) => ({
+      name: c.category,
+      value: totalCategoryRevenue > 0 ? Math.round((Number(c.total) / totalCategoryRevenue) * 100) : 0,
+    }));
 
     return NextResponse.json({
       totalRevenue,
@@ -151,6 +209,8 @@ export async function GET(request: Request) {
         revenue: Number(b.revenue),
         salesCount: b.salesCount,
       })),
+      recentActivity: recentActivityItems,
+      salesBreakdown,
     });
   } catch (error) {
     console.error("Owner dashboard API error:", error);

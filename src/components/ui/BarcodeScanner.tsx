@@ -47,7 +47,7 @@ export default function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps)
           {
             inputStream: {
               type: "LiveStream",
-              target: videoRef.current as any,
+              target: videoRef.current as unknown as HTMLElement,
               constraints: {
                 facingMode: "environment",
               },
@@ -104,8 +104,8 @@ export default function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps)
     return () => {
       stopCamera();
       try {
-        import("@ericblade/quagga2").then((m) => m.default.stop());
-      } catch {}
+        import("@ericblade/quagga2").then((m) => m.default.stop()).catch(() => {});
+      } catch { /* Quagga cleanup failed - safe to ignore */ }
     };
   }, []);
 
@@ -119,8 +119,8 @@ export default function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps)
   function handleClose() {
     stopCamera();
     try {
-      import("@ericblade/quagga2").then((m) => m.default.stop());
-    } catch {}
+      import("@ericblade/quagga2").then((m) => m.default.stop()).catch(() => {});
+    } catch { /* Quagga cleanup failed - safe to ignore */ }
     onClose();
   }
 

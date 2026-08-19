@@ -128,7 +128,7 @@ body {
   height: 64px;
   position: sticky;
   top: 0;
-  z-index: 30;
+  z-index: 40;
 }
 
 /* ── Stat Cards ─────────────────────────────────────────── */
@@ -468,7 +468,7 @@ select option {
     bottom: 0;
     width: 100%;
     max-width: 400px;
-    z-index: 50;
+  z-index: 40;
     background: #111118;
     box-shadow: -4px 0 24px rgba(0,0,0,0.5);
     animation: slideInRight 0.25s ease-out;
@@ -477,7 +477,7 @@ select option {
   .cart-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 49;
+    z-index: 39;
     background: rgba(0,0,0,0.5);
     backdrop-filter: blur(4px);
     animation: fadeIn 0.2s ease-out;
@@ -579,6 +579,21 @@ select option {
 @keyframes rotate-slow {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .opacity-0 {
+    opacity: 1 !important;
+  }
 }
 
 .animate-fade-in-up {

@@ -81,6 +81,9 @@ export async function GET(request: NextRequest) {
         _count: true,
         orderBy: { _sum: { total: "desc" } },
         take: 10,
+        where: {
+          sale: { status: "COMPLETED", ...where, ...(branchFilter || {}) },
+        },
       }),
       db.$queryRaw<{ hour: number; count: number; revenue: number }[]>(Prisma.sql`
         SELECT

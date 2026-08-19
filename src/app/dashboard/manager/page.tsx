@@ -157,14 +157,14 @@ export default function ManagerDashboard() {
                 type="date"
                 value={dateFrom}
                 onChange={(e) => setDateFrom(e.target.value)}
-                className="input w-40"
+                className="input w-full max-w-[10rem]"
               />
               <span className="text-sm text-[#606070]">{t("toLabel")}</span>
               <input
                 type="date"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
-                className="input w-40"
+                className="input w-full max-w-[10rem]"
               />
               {(dateFrom || dateTo) && (
                 <button

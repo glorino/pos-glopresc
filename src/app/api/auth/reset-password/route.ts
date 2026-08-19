@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { hash } from "bcryptjs";
+import { checkRateLimit, getRateLimitKey } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
+  const rateLimitKey = getRateLimitKey(request, "reset-pw");
+  const rateLimit = checkRateLimit(rateLimitKey, 10, 300000);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again in 5 minutes." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil((rateLimit.retryAfterMs || 300000) / 1000)) } }
+    );
+  }
+
   try {
     const body = await request.json();
     const { token, newPassword } = body;
@@ -14,14 +24,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (newPassword.length < 6) {
+    if (newPassword.length < 8) {
       return NextResponse.json(
-        { error: "Password must be at least 6 characters" },
+        { error: "Password must be at least 8 characters" },
         { status: 400 }
       );
     }
 
-    // Find user by reset token
     const user = await db.user.findFirst({
       where: {
         resetToken: token,
@@ -36,7 +45,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash the new password and update, then clear the token
     const hashedPassword = await hash(newPassword, 12);
 
     await db.user.update({

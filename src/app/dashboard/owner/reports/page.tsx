@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
+import { formatCurrency, formatDate, formatDateTime, APP_CURRENCY } from "@/lib/utils";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import {
@@ -154,12 +154,22 @@ interface CustomerReport {
 export default function OwnerReportsPage() {
   const [activeTab, setActiveTab] = useState<TabKey>("sales");
   const [loading, setLoading] = useState(true);
-  const [startDate, setStartDate] = useState(
-    new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-      .toISOString()
-      .split("T")[0]
-  );
-  const [endDate, setEndDate] = useState(new Date().toISOString().split("T")[0]);
+  const [startDate, setStartDate] = useState(() => {
+    const d = new Date();
+    d.setDate(1);
+    d.setHours(0, 0, 0, 0);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  });
+  const [endDate, setEndDate] = useState(() => {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  });
 
   const [salesData, setSalesData] = useState<SalesReport | null>(null);
   const [inventoryData, setInventoryData] = useState<InventoryReport | null>(
@@ -195,7 +205,7 @@ export default function OwnerReportsPage() {
 
   useEffect(() => {
     fetchReport();
-  }, []);
+  }, [startDate, endDate]);
 
   const getExportData = (tab: string) => {
     const data =
@@ -233,11 +243,11 @@ export default function OwnerReportsPage() {
     doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 30);
 
     let startY = 35;
-    const summary = (data as any).summary;
+    const summary = (data as unknown as Record<string, unknown>).summary as Record<string, unknown> | undefined;
     if (summary) {
       const entries = Object.entries(summary).map(([k, v]) => [
         k.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()),
-        typeof v === "number" ? `₦${v.toLocaleString("en-NG", { minimumFractionDigits: 2 })}` : String(v),
+        typeof v === "number" ? `${APP_CURRENCY} ${v.toLocaleString("en-NG", { minimumFractionDigits: 2 })}` : String(v),
       ]);
       autoTable(doc, {
         startY,
@@ -246,13 +256,14 @@ export default function OwnerReportsPage() {
         theme: "grid",
         headStyles: { fillColor: [212, 168, 67] },
       });
-      startY = (doc as any).lastAutoTable.finalY + 10;
+      startY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
     }
 
-    const detailData = (data as any).salesByPeriod || (data as any).products || (data as any).cashFlow || (data as any).topProducts || (data as any).topCustomers || (data as any).expensesByCategory;
+    const dataRecord = data as unknown as Record<string, unknown>;
+    const detailData = (dataRecord.salesByPeriod || dataRecord.products || dataRecord.cashFlow || dataRecord.topProducts || dataRecord.topCustomers || dataRecord.expensesByCategory) as Array<Record<string, unknown>> | undefined;
     if (detailData && Array.isArray(detailData) && detailData.length > 0) {
       const keys = Object.keys(detailData[0]);
-      const rows = detailData.map((item: any) => keys.map((k) => String(item[k])));
+      const rows = detailData.map((item) => keys.map((k) => String(item[k])));
       autoTable(doc, {
         startY,
         head: [keys.map((k) => k.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()))],
@@ -304,7 +315,7 @@ export default function OwnerReportsPage() {
               <LineChart data={salesData.salesByPeriod}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3a" />
                 <XAxis dataKey="period" stroke="#606070" fontSize={12} />
-                <YAxis stroke="#606070" fontSize={12} tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`} />
+                <YAxis stroke="#606070" fontSize={12} tickFormatter={(v) => `${APP_CURRENCY} ${(v / 1000).toFixed(0)}k`} />
                 <Tooltip {...chartTooltipStyle} formatter={(value: number) => [formatCurrency(value), "Revenue"]} />
                 <Line type="monotone" dataKey="revenue" stroke="#d4a843" strokeWidth={2} dot={{ fill: "#d4a843" }} />
               </LineChart>
@@ -561,7 +572,7 @@ export default function OwnerReportsPage() {
               <BarChart data={financialData.cashFlow}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3a" />
                 <XAxis dataKey="name" stroke="#606070" fontSize={12} />
-                <YAxis stroke="#606070" fontSize={12} tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`} />
+                <YAxis stroke="#606070" fontSize={12} tickFormatter={(v) => `${APP_CURRENCY} ${(v / 1000).toFixed(0)}k`} />
                 <Tooltip {...chartTooltipStyle} formatter={(value: number) => formatCurrency(value)} />
                 <Legend wrapperStyle={{ color: "#9090a0" }} />
                 <Bar dataKey="revenue" fill="#d4a843" radius={[4, 4, 0, 0]} />
@@ -584,7 +595,7 @@ export default function OwnerReportsPage() {
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3a" />
                 <XAxis dataKey="name" stroke="#606070" fontSize={12} />
-                <YAxis stroke="#606070" fontSize={12} tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`} />
+                <YAxis stroke="#606070" fontSize={12} tickFormatter={(v) => `${APP_CURRENCY} ${(v / 1000).toFixed(0)}k`} />
                 <Tooltip {...chartTooltipStyle} formatter={(value: number) => formatCurrency(value)} />
                 <Area type="monotone" dataKey="net" stroke="#10b981" strokeWidth={2} fill="url(#netGradient)" />
               </AreaChart>

@@ -80,7 +80,7 @@ function InventoryProductsPage() {
   const [addSaving, setAddSaving] = useState(false);
   const [addError, setAddError] = useState("");
 
-  const userRole = (session?.user as any)?.role as string | undefined;
+  const userRole = session?.user?.role as string | undefined;
   const isReadOnly = userRole === "WAREHOUSE_REP";
 
   useEffect(() => {
@@ -232,14 +232,14 @@ function InventoryProductsPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
                 type="text"
                 placeholder={t("searchProducts")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchProducts()}
-                className="input w-64 pl-10"
+                className="input w-full max-w-xs pl-10"
               />
             </div>
             <button onClick={fetchProducts} className="btn btn-secondary btn-sm">
@@ -319,7 +319,7 @@ function InventoryProductsPage() {
                         <div className="flex items-center gap-1">
                           <select
                             value={adjustType}
-                            onChange={(e) => setAdjustType(e.target.value as any)}
+                            onChange={(e) => setAdjustType(e.target.value as "add" | "subtract")}
                             className="input select w-20 py-1 text-xs"
                           >
                             <option value="add">+ {t("addBtn")}</option>
@@ -375,7 +375,7 @@ function InventoryProductsPage() {
       </div>
 
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="glass-card mx-4 max-h-[90vh] w-full max-w-lg overflow-y-auto p-6">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="flex items-center gap-2 text-lg font-semibold text-[#f0f0f5]">

@@ -3,7 +3,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, APP_NAME } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
 import {
   ArrowLeft,
@@ -112,7 +112,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 <circle cx="46" cy="46" r="3" fill="#000"/>
               </svg>
             </div>
-            <span className="text-lg font-bold text-[#f0f0f5]">Firstlady Oil</span>
+            <span className="text-lg font-bold text-[#f0f0f5]">{APP_NAME}</span>
           </Link>
           <Link href="/booking" className="text-sm font-medium text-[#9090a0] hover:text-[#d4a843]">
             Book a Service
@@ -266,7 +266,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       <footer className="border-t border-[#2a2a3a] bg-[#111118] py-8">
         <div className="mx-auto max-w-7xl px-4 text-center">
           <p className="text-xs text-[#606070]">
-            &copy; {new Date().getFullYear()} Firstlady Oil. All rights reserved.
+            &copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.
           </p>
         </div>
       </footer>

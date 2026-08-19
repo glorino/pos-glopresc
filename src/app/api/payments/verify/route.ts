@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth } from "@/lib/api-auth";
+import { db } from "@/lib/db";
 
 export async function GET(request: NextRequest) {
-  const { error } = await requireAuth();
-  if (error) return error;
   const { searchParams } = new URL(request.url);
   const transactionId = searchParams.get("transaction_id");
 
@@ -37,6 +35,29 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
 
     if (data.status === "success" && data.data) {
+      const txRef = data.data.tx_ref;
+
+      await db.payment.updateMany({
+        where: { reference: txRef },
+        data: { status: "COMPLETED" },
+      });
+
+      const payment = await db.payment.findUnique({
+        where: { reference: txRef },
+        select: { saleId: true },
+      });
+
+      if (payment?.saleId) {
+        await db.sale.update({
+          where: { id: payment.saleId },
+          data: {
+            paymentMethod: "ONLINE",
+            amountPaid: Number(data.data.amount),
+            status: "COMPLETED",
+          },
+        });
+      }
+
       return NextResponse.json({
         status: "success",
         transaction: {

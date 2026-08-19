@@ -15,7 +15,10 @@ export async function GET() {
       if (!grouped[setting.group]) {
         grouped[setting.group] = {};
       }
-      grouped[setting.group][setting.key] = setting.value;
+      const shortKey = setting.key.includes(".")
+        ? setting.key.substring(setting.key.indexOf(".") + 1)
+        : setting.key;
+      grouped[setting.group][shortKey] = setting.value;
     }
 
     return NextResponse.json({ settings: grouped, flat: settings });
@@ -71,7 +74,10 @@ export async function PUT(request: NextRequest) {
       if (!grouped[setting.group]) {
         grouped[setting.group] = {};
       }
-      grouped[setting.group][setting.key] = setting.value;
+      const shortKey = setting.key.includes(".")
+        ? setting.key.substring(setting.key.indexOf(".") + 1)
+        : setting.key;
+      grouped[setting.group][shortKey] = setting.value;
     }
 
     return NextResponse.json({ settings: grouped, flat: allSettings });

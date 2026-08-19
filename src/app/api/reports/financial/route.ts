@@ -19,6 +19,24 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
 
+    const dateWhere = startDate || endDate
+      ? {
+          createdAt: {
+            ...(startDate ? { gte: new Date(startDate) } : {}),
+            ...(endDate ? { lte: new Date(endDate + "T23:59:59") } : {}),
+          },
+        }
+      : {};
+
+    const expenseDateWhere = startDate || endDate
+      ? {
+          date: {
+            ...(startDate ? { gte: new Date(startDate) } : {}),
+            ...(endDate ? { lte: new Date(endDate + "T23:59:59") } : {}),
+          },
+        }
+      : {};
+
     const saleDateFilter = startDate || endDate
       ? Prisma.sql`
           AND "createdAt" >= ${startDate ? new Date(startDate) : new Date("2000-01-01")}
@@ -57,12 +75,12 @@ export async function GET(request: NextRequest) {
       db.sale.aggregate({
         _sum: { total: true, discount: true, tax: true },
         _count: true,
-        where: { status: "COMPLETED", ...(branchFilter || {}) },
+        where: { status: "COMPLETED", ...(branchFilter || {}), ...(dateWhere || {}) },
       }),
       db.expense.aggregate({
         _sum: { amount: true },
         _count: true,
-        where: { ...(branchFilter || {}) },
+        where: { ...(branchFilter || {}), ...(expenseDateWhere || {}) },
       }),
       db.$queryRaw<{ category: string; total: number; count: number }[]>(Prisma.sql`
         SELECT

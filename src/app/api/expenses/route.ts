@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getBranchFilter } from "@/lib/branch-filter";
-import { getToken } from "next-auth/jwt";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { requireAuth } from "@/lib/api-auth";
@@ -80,7 +79,7 @@ export async function POST(request: NextRequest) {
     const { categoryId, description, amount, date, receipt, notes } = body;
 
     const session = await getServerSession(authOptions);
-    const userId = (session?.user as any)?.id;
+    const userId = session?.user?.id;
 
     if (!userId || !categoryId || !description || amount === undefined) {
       return NextResponse.json(
@@ -96,8 +95,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const token = await getToken({ req: request as any });
-    const branchId = token?.branchId as string | undefined || null;
+    const branchId = session?.user?.branchId || null;
 
     const expense = await db.expense.create({
       data: {

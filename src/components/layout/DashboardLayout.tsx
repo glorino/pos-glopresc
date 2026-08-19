@@ -19,25 +19,33 @@ type UserRole =
   | "SALES_REP"
   | "ACCOUNTANT"
   | "AUDITOR"
-  | "CUSTOMER";
+  | "CUSTOMER"
+  | "CASHIER"
+  | "CFO"
+  | "HR_MANAGER"
+  | "CHIEF_CHEF"
+  | "BUSINESS_CONTINUITY_MANAGER"
+  | "BUSINESS_EFFICIENCY_MANAGER";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
   title: string;
   role?: UserRole;
+  noPadding?: boolean;
 }
 
 export default function DashboardLayout({
   children,
   title,
   role: roleProp,
+  noPadding = false,
 }: DashboardLayoutProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const sessionRole = (session?.user as any)?.role as UserRole | undefined;
+  const sessionRole = session?.user?.role as UserRole | undefined;
   const role: UserRole = roleProp || sessionRole || "CUSTOMER";
 
   const userName = session?.user?.name || t("user");
@@ -64,7 +72,7 @@ export default function DashboardLayout({
       />
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-[260px] lg:sticky lg:top-0 lg:z-30 ${
+        className={`fixed inset-y-0 left-0 z-50 w-[260px] lg:sticky lg:top-0 lg:z-30 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform lg:translate-x-0`}
       >
@@ -73,7 +81,7 @@ export default function DashboardLayout({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar title={title} user={displayUser} onMenuToggle={() => setSidebarOpen((p) => !p)} />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
+        <main className={`flex-1 overflow-y-auto ${noPadding ? "" : "p-4 sm:p-6"}`}>{children}</main>
       </div>
 
       <AIChatbot />

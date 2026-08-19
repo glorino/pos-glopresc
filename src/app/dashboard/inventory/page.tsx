@@ -62,7 +62,8 @@ interface Category {
 }
 
 interface TabData {
-  items: Product[] | FinishedProduct[];
+  items?: Product[] | FinishedProduct[];
+  products?: Product[];
   total: number;
   page: number;
   totalPages: number;
@@ -140,9 +141,9 @@ export default function InventoryDashboard() {
       .catch(() => {});
   }, []);
 
-  const allProducts = allData?.items ?? [];
-  const rawProducts = rawData?.items ?? [];
-  const finishedProducts = finishedData?.items ?? [];
+  const allProducts = allData?.products ?? allData?.items ?? [];
+  const rawProducts = rawData?.products ?? rawData?.items ?? [];
+  const finishedProducts = finishedData?.items ?? finishedData?.products ?? [];
   const allTotal = allData?.total ?? 0;
   const rawTotal = rawData?.total ?? 0;
   const finishedTotal = finishedData?.total ?? 0;
@@ -294,7 +295,7 @@ export default function InventoryDashboard() {
                 placeholder={t("searchProducts")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="input pl-10 w-64"
+                className="input pl-10 w-full max-w-xs"
               />
             </div>
             <div className="relative">
@@ -302,7 +303,7 @@ export default function InventoryDashboard() {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="input select pl-10 w-48"
+                className="input select pl-10 w-full max-w-[12rem]"
               >
                 <option value="">{t("allCategories")}</option>
                 {categories.map((cat) => (

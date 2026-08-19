@@ -63,18 +63,18 @@ export default function NewPurchaseOrderPage() {
     setItems(items.filter((_, i) => i !== index));
   }
 
-  function updateItem(index: number, field: keyof OrderItem, value: any) {
+  function updateItem(index: number, field: keyof OrderItem, value: string | number) {
     const updated = [...items];
     if (field === "productId") {
       const product = products.find((p) => p.id === value);
       updated[index] = {
         ...updated[index],
-        productId: value,
+        productId: value as string,
         productName: product?.name || "",
         unitCost: product?.costPrice || 0,
       };
     } else {
-      (updated[index] as any)[field] = value;
+      updated[index] = { ...updated[index], [field]: value };
     }
     setItems(updated);
   }
@@ -155,7 +155,7 @@ export default function NewPurchaseOrderPage() {
               <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4a843] border-t-transparent" />
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-sm text-[#9090a0]">{t("supplierLabel")}</label>
@@ -168,7 +168,7 @@ export default function NewPurchaseOrderPage() {
                     <option value="">{t("selectSupplier")}</option>
                     {suppliers.map((s) => (
                       <option key={s.id} value={s.id}>
-                        {s.name}{s.avgItemCost ? ` (Avg: ₦${s.avgItemCost.toLocaleString()})` : ""}
+                        {s.name}{s.avgItemCost ? ` (Avg: ${formatCurrency(s.avgItemCost)})` : ""}
                       </option>
                     ))}
                   </select>

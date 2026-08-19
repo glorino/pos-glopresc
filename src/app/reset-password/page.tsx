@@ -12,6 +12,7 @@ import {
   Loader2,
   KeyRound,
 } from "lucide-react";
+import { APP_NAME } from "@/lib/utils";
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -92,7 +93,7 @@ function ResetPasswordForm() {
                 </svg>
               </div>
               <span className="text-xl font-bold text-[#f0f0f5]">
-                Firstlady Oil
+                {APP_NAME}
               </span>
             </Link>
             <h1 className="mt-4 text-xl font-semibold text-[#f0f0f5]">
@@ -136,7 +137,7 @@ function ResetPasswordForm() {
                 <circle cx="46" cy="46" r="3" fill="#000"/>
               </svg>
             </div>
-            <span className="text-xl font-bold text-[#f0f0f5]">Firstlady Oil</span>
+            <span className="text-xl font-bold text-[#f0f0f5]">{APP_NAME}</span>
           </Link>
           <h1 className="mt-4 text-xl font-semibold text-[#f0f0f5]">
             Reset Password

@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { getBranchFilter } from "@/lib/branch-filter";
 import { requireAuth } from "@/lib/api-auth";
 
-const AUTH_ROLES = ["OWNER", "MANAGER", "SALES_MANAGER", "ACCOUNTANT"];
+const AUTH_ROLES = ["OWNER", "MANAGER", "SALES_MANAGER", "SALES_REP", "ACCOUNTANT"];
 
 export async function GET(request: NextRequest) {
   const { error } = await requireAuth(AUTH_ROLES);

@@ -1,17 +1,18 @@
 import { NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { getBranchFilter } from "@/lib/branch-filter";
 
 export async function GET(request: Request) {
   try {
-    const token = await getToken({ req: request as any });
-    if (!token?.id) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = token.id as string;
-    const branchFilter = await getBranchFilter(request as any);
+    const userId = session.user.id;
+    const branchId = session.user.branchId || null;
+    const branchFilter = branchId ? { branchId } : null;
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
@@ -79,7 +80,7 @@ export async function GET(request: Request) {
       transactions: todayTransactions,
       averageSale,
       pendingOrders,
-      recentSales: recentSales.map((s: any) => ({
+      recentSales: recentSales.map((s) => ({
         ...s,
         total: Number(s.total),
       })),
@@ -88,7 +89,7 @@ export async function GET(request: Request) {
         openingBalance: Number(drawerStatus?.openingBalance ?? 0),
         openedAt: drawerStatus?.openedAt?.toISOString() ?? null,
       },
-      paymentMethods: paymentMethods.map((pm: any) => ({
+      paymentMethods: paymentMethods.map((pm) => ({
         name: pm.paymentMethod,
         count: pm._count,
       })),

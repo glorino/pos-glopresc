@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, APP_NAME } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import {
@@ -174,7 +174,7 @@ export default function ShopPage() {
       <div className="sticky top-16 z-40 border-b border-[#2a2a3a] bg-[#0a0a0f]/80 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           <div className="relative max-w-md flex-1">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
             <input
               type="text"
               placeholder={t("searchProducts")}
@@ -203,7 +203,7 @@ export default function ShopPage() {
           <h1 className="text-3xl font-bold text-[#f0f0f5] sm:text-5xl">
             {t("welcomeTo")}{" "}
             <span className="bg-gradient-to-r from-[#d4a843] to-[#c49a38] bg-clip-text text-transparent">
-              Firstlady Oil
+              {t("appName")}
             </span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-[#9090a0]">
@@ -405,7 +405,7 @@ export default function ShopPage() {
                 <div className="mb-2 flex justify-between text-sm">
                   <span className="text-[#9090a0]">{t("shipping")}</span>
                   <span className="font-bold text-[#d4a843]">
-                    {effectiveShipping > 0 ? formatCurrency(effectiveShipping) : `₦0.00 (${t("free")})`}
+                    {effectiveShipping > 0 ? formatCurrency(effectiveShipping) : `${formatCurrency(0)} (${t("free")})`}
                   </span>
                 </div>
                 <div className="mb-4 flex justify-between border-t border-[#2a2a3a] pt-2 text-sm">
@@ -526,7 +526,7 @@ export default function ShopPage() {
                 <div className="mt-1 flex justify-between text-sm">
                   <span className="text-[#9090a0]">{t("shipping")}</span>
                   <span className="font-bold text-[#d4a843]">
-                    {effectiveShipping > 0 ? formatCurrency(effectiveShipping) : `₦0.00 (${t("free")})`}
+                    {effectiveShipping > 0 ? formatCurrency(effectiveShipping) : `${formatCurrency(0)} (${t("free")})`}
                   </span>
                 </div>
                 <hr className="my-3 border-[#2a2a3a]" />
@@ -562,7 +562,7 @@ export default function ShopPage() {
                       alert(t("couldNotVerifyPayment"));
                     }
                   }}
-                  onClose={() => {}}
+                  onClose={() => setCheckoutOpen(false)}
                 />
               )}
             </div>

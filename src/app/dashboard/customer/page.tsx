@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { formatCurrency, formatDateTime, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDateTime, formatDate, APP_NAME } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
 import {
   ShoppingCart,
@@ -75,7 +75,7 @@ interface CustomerProfile {
 
 const LOYALTY_TIERS = [
   { name: "Bronze", min: 0, max: 499, color: "text-amber-600", bg: "bg-amber-900/30" },
-  { name: "Silver", min: 500, max: 1999, color: "text-gray-300", bg: "bg-gray-500/20" },
+  { name: "Silver", min: 500, max: 1999, color: "text-[#9090a0]", bg: "bg-[#9090a0]/20" },
   { name: "Gold", min: 2000, max: 4999, color: "text-[#d4a843]", bg: "bg-[#d4a843]/20" },
   { name: "Platinum", min: 5000, max: Infinity, color: "text-purple-400", bg: "bg-purple-500/20" },
 ];
@@ -195,7 +195,7 @@ export default function CustomerDashboard() {
     {
       label: t("contactSupport"),
       icon: MessageSquare,
-      action: () => window.open("mailto:support@glopresc.com?subject=Customer%20Support%20Request", "_blank"),
+      action: () => window.open(`mailto:${process.env.BUSINESS_EMAIL || `support@${APP_NAME.toLowerCase().replace(/\s+/g, '')}.com`}?subject=Customer%20Support%20Request`, "_blank"),
     },
   ];
 

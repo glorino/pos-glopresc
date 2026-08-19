@@ -133,8 +133,14 @@ export default function Topbar({ title, user, onMenuToggle }: TopbarProps) {
     ACCOUNTANT: "/dashboard/accounting",
     AUDITOR: "/dashboard/auditor",
     CUSTOMER: "/dashboard/customer",
+    CASHIER: "/dashboard/cashier",
+    CFO: "/dashboard/accounting",
+    HR_MANAGER: "/dashboard/owner",
+    CHIEF_CHEF: "/dashboard/inventory",
+    BUSINESS_CONTINUITY_MANAGER: "/dashboard/auditor",
+    BUSINESS_EFFICIENCY_MANAGER: "/dashboard/manager",
   };
-  const profileRoute = roleSettingsMap[user.role] || "/dashboard/owner/settings";
+  const profileRoute = roleSettingsMap[user.role] || "/login";
   const settingsRoute = user.role === "OWNER" || user.role === "MANAGER" ? "/dashboard/owner/settings" : profileRoute;
 
   const initials = user.name

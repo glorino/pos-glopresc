@@ -38,11 +38,20 @@ const roleColors: Record<string, string> = {
   OWNER: "badge-danger",
   MANAGER: "badge-purple",
   SALES_MANAGER: "badge-info",
+  SALES_REP: "badge-success",
   CASHIER: "badge-success",
-  INVENTORY_MANAGER: "badge-warning",
-  PROCUREMENT: "badge-info",
+  WAREHOUSE_MANAGER: "badge-warning",
+  WAREHOUSE_REP: "badge-warning",
+  PROCUREMENT_MANAGER: "badge-info",
+  PROCUREMENT_REP: "badge-info",
   ACCOUNTANT: "badge-purple",
   AUDITOR: "badge-warning",
+  CUSTOMER: "badge-success",
+  CFO: "badge-purple",
+  HR_MANAGER: "badge-info",
+  CHIEF_CHEF: "badge-warning",
+  BUSINESS_CONTINUITY_MANAGER: "badge-info",
+  BUSINESS_EFFICIENCY_MANAGER: "badge-info",
 };
 
 const roleOptions = [
@@ -50,10 +59,19 @@ const roleOptions = [
   "MANAGER",
   "SALES_MANAGER",
   "SALES_REP",
+  "CASHIER",
   "WAREHOUSE_MANAGER",
+  "WAREHOUSE_REP",
   "PROCUREMENT_MANAGER",
+  "PROCUREMENT_REP",
   "ACCOUNTANT",
   "AUDITOR",
+  "CUSTOMER",
+  "CFO",
+  "HR_MANAGER",
+  "CHIEF_CHEF",
+  "BUSINESS_CONTINUITY_MANAGER",
+  "BUSINESS_EFFICIENCY_MANAGER",
 ];
 
 interface UserFormData {
@@ -229,7 +247,7 @@ export default function UserManagementPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3 flex-wrap">
             <div className="relative flex-1 sm:w-72">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
                 type="text"
                 placeholder={t("searchUsers")}
@@ -355,7 +373,7 @@ export default function UserManagementPage() {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
           <div className="glass-card w-full max-w-lg p-6">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-[#f0f0f5]">

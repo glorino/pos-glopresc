@@ -18,6 +18,7 @@ import {
 import PublicHeader from "@/components/layout/PublicHeader";
 import PublicFooter from "@/components/layout/PublicFooter";
 import { useTranslation } from "@/contexts/LanguageContext";
+import { APP_NAME } from "@/lib/utils";
 
 const topFeatureKeys = [
   {
@@ -102,12 +103,12 @@ export default function LandingPage() {
                 {t("builtForModernRetail")}
               </div>
               <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl animate-fade-in-up">
-                Firstlady Oil{" "}
+                {APP_NAME}{" "}
                 <span
                   key={currentPhrase}
                   className="inline-block bg-gradient-to-r from-[#d4a843] to-[#c49a38] bg-clip-text text-transparent animate-[fadeIn_0.5s_ease-in-out]"
                 >
-                  {t(phraseKeys[currentPhrase] as any)}
+                  {t(phraseKeys[currentPhrase])}
                 </span>
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#9090a0] animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
@@ -129,7 +130,7 @@ export default function LandingPage() {
                   ))}
                 </div>
                 <p className="text-sm text-[#9090a0]">
-                  <span className="font-semibold text-[#f0f0f5]">500+</span> businesses trust Firstlady Oil
+                  <span className="font-semibold text-[#f0f0f5]">Shop owners</span> love {APP_NAME}
                 </p>
               </div>
             </div>
@@ -137,7 +138,7 @@ export default function LandingPage() {
               <div className="relative overflow-hidden rounded-2xl border border-[#2a2a3a] shadow-2xl shadow-[#d4a843]/10">
                 <Image
                   src={showcaseImages[currentImage]}
-                  alt="Firstlady Oil Dashboard"
+                  alt={`${APP_NAME} Dashboard`}
                   width={800}
                   height={500}
                   className="h-[420px] w-full object-cover transition-opacity duration-1000"
@@ -152,7 +153,7 @@ export default function LandingPage() {
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-[#f0f0f5]">New sale completed</p>
-                        <p className="text-xs text-[#9090a0]">₦45,200.00 via Card</p>
+                        <p className="text-xs text-[#9090a0]">45,200.00 via Card</p>
                       </div>
                       <span className="ml-auto text-xs text-[#10b981]">Just now</span>
                     </div>
@@ -175,9 +176,9 @@ export default function LandingPage() {
       {/* ── Trusted By ────────────────────────────────────── */}
       <section className="border-y border-[#2a2a3a] bg-[#111118]/50 py-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="mb-8 text-center text-sm text-[#606070] uppercase tracking-wider">Trusted by leading retailers</p>
+          <p className="mb-8 text-center text-sm text-[#606070] uppercase tracking-wider">Trusted by shop owners everywhere</p>
           <div className="flex flex-wrap items-center justify-center gap-8 opacity-40">
-            {["Retail Corp", "MegaMart", "ShopHub", "QuickTrade", "ValueStore"].map((name) => (
+            {["Retail Shops", "Boutiques", "Supermarkets", "Restaurants", "Pharmacies"].map((name) => (
               <div key={name} className="text-lg font-bold text-[#9090a0]">{name}</div>
             ))}
           </div>
@@ -207,7 +208,7 @@ export default function LandingPage() {
                   <div className="relative mb-5 h-44 overflow-hidden rounded-xl">
                     <Image
                       src={feature.image}
-                      alt={t(feature.titleKey as any)}
+                      alt={t(feature.titleKey)}
                       width={600}
                       height={400}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -219,10 +220,10 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <h3 className="mb-2 text-lg font-semibold text-[#f0f0f5]">
-                    {t(feature.titleKey as any)}
+                    {t(feature.titleKey)}
                   </h3>
                   <p className="text-sm leading-relaxed text-[#9090a0]">
-                    {t(feature.descKey as any)}
+                    {t(feature.descKey)}
                   </p>
                 </div>
               );
@@ -245,14 +246,14 @@ export default function LandingPage() {
               How It <span className="text-[#d4a843]">Works</span>
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-[#9090a0]">
-              Get started in three simple steps
+              Up and running in 3 simple steps
             </p>
           </div>
           <div className="grid gap-8 md:grid-cols-3 stagger-children">
             {[
-              { step: "01", icon: Users, title: "Create Account", desc: "Sign up and set up your business profile in minutes" },
-              { step: "02", icon: Package, title: "Add Products", desc: "Import your inventory or add products manually" },
-              { step: "03", icon: Zap, title: "Start Selling", desc: "Process sales, track inventory, and grow your business" },
+              { step: "01", icon: Users, title: "Sign In", desc: "Log in to your account and you're ready to go" },
+              { step: "02", icon: Package, title: "Set Up Shop", desc: "Add your products, set prices, and configure your settings" },
+              { step: "03", icon: Zap, title: "Start Selling", desc: "Ring up customers, track stock, and watch your sales grow" },
             ].map((item) => {
               const Icon = item.icon;
               return (
@@ -277,7 +278,7 @@ export default function LandingPage() {
             {statKeys.map((stat) => (
               <div key={stat.labelKey} className="text-center opacity-0 animate-scale-in">
                 <div className="text-3xl font-bold text-[#d4a843] sm:text-4xl">{stat.value}</div>
-                <div className="mt-1 text-sm text-[#9090a0]">{t(stat.labelKey as any)}</div>
+                <div className="mt-1 text-sm text-[#9090a0]">{t(stat.labelKey)}</div>
               </div>
             ))}
           </div>
@@ -289,13 +290,13 @@ export default function LandingPage() {
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
           <div className="mb-8 text-4xl text-[#d4a843]/20">&ldquo;</div>
           <p className="text-xl leading-relaxed text-[#f0f0f5] sm:text-2xl">
-            Firstlady Oil transformed how we manage our retail business. The real-time inventory tracking and sales analytics have saved us countless hours.
+            {APP_NAME} made running my shop so much easier. I can see exactly what&apos;s in stock, track my daily sales, and I don&apos;t need an accountant to understand my numbers.
           </p>
           <div className="mt-8 flex items-center justify-center gap-4">
             <div className="h-12 w-12 rounded-full bg-gradient-to-br from-[#d4a843]/30 to-[#3b82f6]/30" />
             <div className="text-left">
-              <p className="font-semibold text-[#f0f0f5]">Adewale Firstlady</p>
-              <p className="text-sm text-[#9090a0]">Founder & CEO</p>
+              <p className="font-semibold text-[#f0f0f5]">Happy Shop Owner</p>
+              <p className="text-sm text-[#9090a0]">Small Business Owner</p>
             </div>
           </div>
         </div>
@@ -313,7 +314,7 @@ export default function LandingPage() {
               {ctaFeatureKeys.map((f) => (
                 <div key={f} className="flex items-center gap-2 text-sm text-[#9090a0]">
                   <Check size={16} className="text-[#d4a843]" />
-                  {t(f as any)}
+                  {t(f)}
                 </div>
               ))}
             </div>

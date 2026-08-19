@@ -9,7 +9,7 @@ export async function requireAuth(allowedRoles?: Role[]) {
   if (!session?.user) {
     return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }), session: null };
   }
-  if (allowedRoles && !allowedRoles.includes((session.user as any).role)) {
+  if (allowedRoles && !allowedRoles.includes(session.user.role)) {
     return { error: NextResponse.json({ error: "Forbidden" }, { status: 403 }), session: null };
   }
   return { error: null, session };

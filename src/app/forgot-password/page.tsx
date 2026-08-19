@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Mail, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { APP_NAME } from "@/lib/utils";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -61,7 +62,7 @@ export default function ForgotPasswordPage() {
                 <circle cx="46" cy="46" r="3" fill="#000"/>
               </svg>
             </div>
-            <span className="text-xl font-bold text-[#f0f0f5]">Firstlady Oil</span>
+            <span className="text-xl font-bold text-[#f0f0f5]">{APP_NAME}</span>
           </Link>
           <h1 className="mt-4 text-xl font-semibold text-[#f0f0f5]">
             Forgot Password

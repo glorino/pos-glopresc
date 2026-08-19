@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, FormEvent } from "react";
 import { MessageCircle, X, Send, Bot, User, Minimize2, Maximize2, ShoppingCart, Package, BarChart3, Users, Settings, HelpCircle } from "lucide-react";
+import { APP_NAME } from "@/lib/utils";
 
 interface Message {
   id: string;
@@ -63,7 +64,7 @@ const BOT_RESPONSES: { keywords: string[]; response: string }[] = [
   },
   {
     keywords: ["role", "permission", "access", "user role", "who can"],
-    response: "Firstlady Oil has 11 roles:\n\n• **Owner** — Full system access\n• **Manager** — Operations & management\n• **Warehouse Manager** — Stock management\n• **Warehouse Rep** — Stock adjustments\n• **Procurement Manager** — Supplier & PO management\n• **Procurement Rep** — Stock requests\n• **Sales Manager** — Sales oversight\n• **Sales Rep** — POS terminal\n• **Accountant** — Financial management\n• **Auditor** — System audit\n• **Customer** — Self-service portal\n\n💡 Each role has specific permissions and dashboard views."
+    response: `${APP_NAME} has 11 roles:\n\n• **Owner** — Full system access\n• **Manager** — Operations & management\n• **Warehouse Manager** — Stock management\n• **Warehouse Rep** — Stock adjustments\n• **Procurement Manager** — Supplier & PO management\n• **Procurement Rep** — Stock requests\n• **Sales Manager** — Sales oversight\n• **Sales Rep** — POS terminal\n• **Accountant** — Financial management\n• **Auditor** — System audit\n• **Customer** — Self-service portal\n\n💡 Each role has specific permissions and dashboard views.`
   },
   {
     keywords: ["close register", "close drawer", "close cash", "end of day", "cash register"],
@@ -79,11 +80,11 @@ const BOT_RESPONSES: { keywords: string[]; response: string }[] = [
   },
   {
     keywords: ["branch", "multi-branch", "location", "store"],
-    response: "Firstlady Oil supports **multi-branch** operations:\n\n• Manage multiple locations from one account\n• Centralized reporting across branches\n• Branch-specific settings (tax, receipt)\n• Stock transfers between branches\n• Per-branch user assignments\n\n💡 Go to **Owner > Branches** to manage your locations."
+    response: `${APP_NAME} supports **multi-branch** operations:\n\n• Manage multiple locations from one account\n• Centralized reporting across branches\n• Branch-specific settings (tax, receipt)\n• Stock transfers between branches\n• Per-branch user assignments\n\n💡 Go to **Owner > Branches** to manage your locations.`
   },
   {
     keywords: ["shipping", "delivery", "deliver", "ship"],
-    response: "Firstlady Oil supports shipping:\n\n• **Google Maps** distance-based calculation\n• Configurable **rate per km** in Settings\n• **Free shipping** threshold option\n• Real-time **delivery estimates**\n\n💡 Admin can configure shipping in **Settings > Shipping**."
+    response: `${APP_NAME} supports shipping:\n\n• **Google Maps** distance-based calculation\n• Configurable **rate per km** in Settings\n• **Free shipping** threshold option\n• Real-time **delivery estimates**\n\n💡 Admin can configure shipping in **Settings > Shipping**.`
   },
   {
     keywords: ["payment", "pay", "flutterwave", "card", "transfer", "mobile"],
@@ -107,7 +108,7 @@ const BOT_RESPONSES: { keywords: string[]; response: string }[] = [
   },
   {
     keywords: ["hello", "hi", "hey", "good morning", "good afternoon", "good evening"],
-    response: "Hello! 👋 I'm the **Firstlady Oil AI Assistant**.\n\nI can help you with:\n• Processing sales\n• Managing inventory\n• Generating reports\n• Customer management\n• System configuration\n\nWhat would you like to know?"
+    response: `Hello! 👋 I'm the **${APP_NAME} AI Assistant**.\n\nI can help you with:\n• Processing sales\n• Managing inventory\n• Generating reports\n• Customer management\n• System configuration\n\nWhat would you like to know?`
   },
   {
     keywords: ["help", "what can you do", "options", "menu"],
@@ -188,7 +189,7 @@ export default function AIChatbot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: generateId(),
-      text: "Hello! 👋 I'm the **Firstlady Oil AI Assistant**.\n\nI can help you with sales, inventory, reports, and more. What would you like to know?",
+      text: `Hello! 👋 I'm the **${APP_NAME} AI Assistant**.\n\nI can help you with sales, inventory, reports, and more. What would you like to know?`,
       sender: "bot",
       timestamp: new Date(),
       quickReplies: ["Process a Sale", "Add Product", "View Reports", "Help"],
@@ -288,7 +289,7 @@ export default function AIChatbot() {
             <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#111118] bg-[#10b981]" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-[#f0f0f5]">Firstlady Oil Assistant</h3>
+            <h3 className="text-sm font-semibold text-[#f0f0f5]">{APP_NAME} Assistant</h3>
             <p className="text-[10px] text-[#10b981]">● Online — Ready to help</p>
           </div>
         </div>

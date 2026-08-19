@@ -505,7 +505,7 @@ export default function BranchesPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
           <div className="glass-card w-full max-w-lg p-6">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-[#f0f0f5]">
@@ -647,7 +647,7 @@ export default function BranchesPage() {
 
       {/* Staff Assignment Modal */}
       {showStaffModal && selectedBranch && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
           <div className="glass-card w-full max-w-2xl p-6 max-h-[80vh] overflow-hidden flex flex-col">
             <div className="mb-6 flex items-center justify-between">
               <div>

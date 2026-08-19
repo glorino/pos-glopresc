@@ -13,6 +13,7 @@ import {
   Truck,
 } from "lucide-react";
 import { useTranslation } from "@/contexts/LanguageContext";
+import { APP_NAME, APP_CURRENCY } from "@/lib/utils";
 
 interface Settings {
   [group: string]: Record<string, string>;
@@ -34,7 +35,7 @@ const defaultSettings: Settings = {
     taxInclusive: "false",
   },
   receipt: {
-    header: "Firstlady Oil",
+    header: APP_NAME,
     footer: "Thank you for your purchase!",
     paperSize: "80mm",
   },
@@ -204,8 +205,8 @@ export default function BusinessSettingsPage() {
       icon: Truck,
       fields: [
         { key: "originAddress", label: t("businessAddressShipping"), type: "text" },
-        { key: "ratePerKm", label: `${t("shippingFeePerKm")} (₦)`, type: "number" },
-        { key: "minFee", label: `${t("minimumShippingFee")} (₦)`, type: "number" },
+        { key: "ratePerKm", label: `${t("shippingFeePerKm")} (${APP_CURRENCY})`, type: "number" },
+        { key: "minFee", label: `${t("minimumShippingFee")} (${APP_CURRENCY})`, type: "number" },
         { key: "freeShippingThreshold", label: t("freeShippingAbove"), type: "number" },
       ],
     },
@@ -296,10 +297,33 @@ export default function BusinessSettingsPage() {
                   <div>
                     <label className="mb-1 block text-sm text-[#9090a0]">{t("logoLabel")}</label>
                     <div className="flex items-center gap-3">
-                      <button className="btn btn-secondary btn-sm">
-                        <Upload size={14} />
-                        {t("uploadLogo")}
-                      </button>
+                <input
+                    type="file"
+                    accept="image/*"
+                    id="logo-upload"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const formData = new FormData();
+                      formData.append("file", file);
+                      const res = await fetch("/api/upload", {
+                        method: "POST",
+                        body: formData,
+                      });
+                      const data = await res.json();
+                      if (data.url) {
+                        updateSetting("business", "logo", data.url);
+                      }
+                    }}
+                  />
+                  <label
+                    htmlFor="logo-upload"
+                    className="btn btn-secondary btn-sm cursor-pointer"
+                  >
+                    <Upload size={14} />
+                    {t("uploadLogo")}
+                  </label>
                       <span className="text-xs text-[#606070]">{t("pngJpgUpTo2MB")}</span>
                     </div>
                   </div>

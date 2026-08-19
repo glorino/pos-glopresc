@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CreditCard } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, APP_NAME, APP_CURRENCY } from "@/lib/utils";
 
 declare global {
   interface Window {
@@ -68,31 +68,17 @@ export default function FlutterwavePayment({
       window.FlutterwaveCheckout({
         public_key,
         tx_ref,
-        amount: amount * 100,
-        currency: "NGN",
+        amount,
+          currency: APP_CURRENCY,
         customer: { email, name },
         customizations: {
-          title: "Firstlady Oil",
+          title: APP_NAME,
           description,
           logo: "",
         },
-        callback: async (response: Record<string, unknown>) => {
-          if (response.status === "successful") {
-            try {
-              const verifyRes = await fetch(
-                `/api/payments/verify?transaction_id=${response.transaction_id}`
-              );
-              const verifyData = await verifyRes.json();
-              if (verifyData.status === "success" && onSuccess) {
-                onSuccess(response);
-              } else {
-                alert("Payment verification failed. Please contact support.");
-              }
-            } catch {
-              alert("Could not verify payment. Please contact support.");
-            }
-          }
+        callback: (response: Record<string, unknown>) => {
           setLoading(false);
+          if (onSuccess) onSuccess(response);
         },
         onclose: () => {
           setLoading(false);

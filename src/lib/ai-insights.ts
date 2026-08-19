@@ -1,4 +1,5 @@
 import { db } from "./db";
+import { formatCurrency } from "./utils";
 
 export interface AIInsight {
   id: string;
@@ -18,7 +19,7 @@ function daysAgo(n: number): Date {
 }
 
 function currency(n: number): string {
-  return `₦${n.toLocaleString("en-NG", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+  return formatCurrency(n);
 }
 
 export async function getOwnerInsights(): Promise<AIInsight[]> {
@@ -35,7 +36,7 @@ export async function getOwnerInsights(): Promise<AIInsight[]> {
     db.sale.aggregate({ where: { status: "COMPLETED", createdAt: { gte: weekAgo } }, _sum: { total: true }, _count: { id: true } }),
     db.sale.aggregate({ where: { status: "COMPLETED", createdAt: { gte: twoWeeksAgo, lt: weekAgo } }, _sum: { total: true }, _count: { id: true } }),
     db.product.count({ where: { isActive: true } }),
-    db.product.count({ where: { isActive: true, stockQuantity: { lte: db.product.fields.minStockLevel as any } } }).catch(() => 0),
+    db.product.count({ where: { isActive: true, stockQuantity: { lte: 5 } } }),
     db.customer.count({ where: { isActive: true } }),
     db.expense.count({ where: { status: "PENDING" } }),
     db.cashDrawer.findMany({ where: { status: "CLOSED", closedAt: { gte: daysAgo(7) } }, select: { difference: true } }),

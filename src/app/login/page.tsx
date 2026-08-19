@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, AlertCircle, ArrowLeft } from "lucide-react";
+import { APP_NAME } from "@/lib/utils";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -45,8 +46,14 @@ export default function LoginPage() {
           ACCOUNTANT: "/dashboard/accounting",
           AUDITOR: "/dashboard/auditor",
           CUSTOMER: "/dashboard/customer",
+          CASHIER: "/dashboard/cashier",
+          CFO: "/dashboard/accounting",
+          HR_MANAGER: "/dashboard/owner",
+          CHIEF_CHEF: "/dashboard/inventory",
+          BUSINESS_CONTINUITY_MANAGER: "/dashboard/auditor",
+          BUSINESS_EFFICIENCY_MANAGER: "/dashboard/manager",
         };
-        router.push(roleRoutes[role] || "/dashboard/owner");
+        router.push(roleRoutes[role] || "/login");
         router.refresh();
       }
     } catch {
@@ -75,7 +82,7 @@ export default function LoginPage() {
                 <circle cx="46" cy="46" r="3" fill="#000"/>
               </svg>
             </div>
-            <span className="text-xl font-bold text-[#f0f0f5]">Firstlady Oil</span>
+            <span className="text-xl font-bold text-[#f0f0f5]">{APP_NAME}</span>
           </Link>
           <h1 className="mt-4 text-xl font-semibold text-[#f0f0f5]">
             Welcome back
@@ -196,7 +203,7 @@ export default function LoginPage() {
         <p className="mt-6 text-center text-sm text-[#606070]">
           Don&apos;t have an account?{" "}
           <Link
-            href="mailto:sales@firstladyoil.com"
+            href={`mailto:sales@${APP_NAME.toLowerCase().replace(/\s+/g, '')}.com`}
             className="font-medium text-[#d4a843] hover:text-[#c49a38]"
           >
             Contact Sales

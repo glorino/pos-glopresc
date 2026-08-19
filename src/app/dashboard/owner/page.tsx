@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { formatCurrency, formatDateTime } from "@/lib/utils";
+import { formatCurrency, formatDateTime, APP_CURRENCY } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
 import {
   DollarSign,
@@ -66,6 +66,13 @@ interface DashboardData {
     stockQuantity: number;
     minStockLevel: number;
   }[];
+  recentActivity: {
+    type: string;
+    label: string;
+    detail: string;
+    time: string;
+  }[];
+  salesBreakdown: { name: string; value: number }[];
   branchRanking: {
     id: string;
     name: string;
@@ -124,8 +131,6 @@ export default function OwnerDashboard() {
       gradient: "from-[#d4a843] to-[#b8942f]",
       bgGradient: "from-[#d4a843]/15 via-[#d4a843]/5 to-transparent",
       iconColor: "text-[#d4a843]",
-      trend: "+12.5%",
-      trendUp: true,
     },
     {
       label: t("totalSales"),
@@ -134,8 +139,6 @@ export default function OwnerDashboard() {
       gradient: "from-[#3b82f6] to-[#2563eb]",
       bgGradient: "from-[#3b82f6]/15 via-[#3b82f6]/5 to-transparent",
       iconColor: "text-[#3b82f6]",
-      trend: "+8.2%",
-      trendUp: true,
     },
     {
       label: t("activeProducts"),
@@ -144,8 +147,6 @@ export default function OwnerDashboard() {
       gradient: "from-[#8b5cf6] to-[#7c3aed]",
       bgGradient: "from-[#8b5cf6]/15 via-[#8b5cf6]/5 to-transparent",
       iconColor: "text-[#8b5cf6]",
-      trend: "+3",
-      trendUp: true,
     },
     {
       label: t("totalCustomers"),
@@ -154,8 +155,6 @@ export default function OwnerDashboard() {
       gradient: "from-[#10b981] to-[#059669]",
       bgGradient: "from-[#10b981]/15 via-[#10b981]/5 to-transparent",
       iconColor: "text-[#10b981]",
-      trend: "+15",
-      trendUp: true,
     },
     {
       label: t("pendingExpenses"),
@@ -192,20 +191,6 @@ export default function OwnerDashboard() {
     { label: t("shopLabel"), action: () => router.push('/shop'), icon: Store, color: "text-[#d4a843]" },
     { label: t("settingsLabel"), action: () => router.push('/dashboard/owner/settings'), icon: Settings, color: "text-[#10b981]" },
     { label: t("addUser"), action: () => router.push('/dashboard/owner/users'), icon: UserPlus, color: "text-[#f43f5e]" },
-  ];
-
-  const recentActivity = [
-    { icon: ShoppingCart, label: t("newSaleRecorded"), detail: "Invoice #INV-2024-042", time: "2 min ago", color: "text-[#10b981]" },
-    { icon: CreditCard, label: t("paymentReceived"), detail: "₦45,000 via Flutterwave", time: "5 min ago", color: "text-[#3b82f6]" },
-    { icon: AlertTriangle, label: t("lowStockAlert"), detail: "3 products below threshold", time: "12 min ago", color: "text-[#f59e0b]" },
-    { icon: Package, label: t("stockUpdated"), detail: "25 items added to inventory", time: "1 hr ago", color: "text-[#8b5cf6]" },
-    { icon: Users, label: t("newCustomer"), detail: "Oluwaseun Adebayo registered", time: "2 hr ago", color: "text-[#d4a843]" },
-  ];
-
-  const salesBreakdown = [
-    { name: t("products"), value: 68 },
-    { name: t("services"), value: 22 },
-    { name: t("bookings"), value: 10 },
   ];
 
   return (
@@ -246,12 +231,14 @@ export default function OwnerDashboard() {
                     <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${stat.gradient} shadow-lg`}>
                       <Icon size={18} className="text-white" />
                     </div>
+                    {stat.trend && (
                     <span className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
                       stat.trendUp ? "bg-[#10b981]/15 text-[#10b981]" : "bg-[#f43f5e]/15 text-[#f43f5e]"
                     }`}>
                       {stat.trendUp ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
-                      {stat.trendUp ? stat.trend : stat.trend}
+                      {stat.trend}
                     </span>
+                    )}
                   </div>
                   <p className="mt-3 text-2xl font-bold text-[#f0f0f5]">
                     {stat.value}
@@ -279,7 +266,7 @@ export default function OwnerDashboard() {
               </div>
               <div className="flex items-center gap-2 text-sm text-[#10b981]">
                 <TrendingUp size={16} />
-                <span className="font-medium">+12.5% {t("vsLastYear")}</span>
+                <span className="font-medium">{t("revenueOverview")}</span>
               </div>
             </div>
             <div className="h-[320px]">
@@ -296,7 +283,7 @@ export default function OwnerDashboard() {
                   <YAxis
                     stroke="#606070"
                     fontSize={12}
-                    tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`}
+                    tickFormatter={(v) => `${APP_CURRENCY} ${(v / 1000).toFixed(0)}k`}
                   />
                   <Tooltip
                     contentStyle={{
@@ -330,7 +317,7 @@ export default function OwnerDashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={salesBreakdown}
+                    data={data?.salesBreakdown ?? []}
                     cx="50%"
                     cy="50%"
                     innerRadius={55}
@@ -339,7 +326,7 @@ export default function OwnerDashboard() {
                     strokeWidth={2}
                     stroke="#16161f"
                   >
-                    {salesBreakdown.map((_, index) => (
+                    {(data?.salesBreakdown ?? []).map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -355,7 +342,7 @@ export default function OwnerDashboard() {
               </ResponsiveContainer>
             </div>
             <div className="mt-2 space-y-2">
-              {salesBreakdown.map((item, index) => (
+              {(data?.salesBreakdown ?? []).map((item, index) => (
                 <div key={item.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: COLORS[index] }} />
@@ -374,7 +361,7 @@ export default function OwnerDashboard() {
             <h3 className="mb-4 text-lg font-semibold text-[#f0f0f5]">
               {t("quickActions")}
             </h3>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {quickActions.map((action) => {
                 const Icon = action.icon;
                 return (
@@ -401,11 +388,12 @@ export default function OwnerDashboard() {
               <Clock size={16} className="text-[#606070]" />
             </div>
             <div className="space-y-3">
-              {recentActivity.map((activity, index) => {
-                const Icon = activity.icon;
+              {data?.recentActivity?.map((activity, index) => {
+                const Icon = activity.type === "sale" ? ShoppingCart : activity.type === "expense" ? CreditCard : AlertTriangle;
+                const color = activity.type === "sale" ? "text-[#10b981]" : activity.type === "expense" ? "text-[#3b82f6]" : "text-[#f59e0b]";
                 return (
                   <div key={index} className="flex items-center gap-3 rounded-xl border border-[#2a2a3a] bg-[#1c1c28]/50 p-3 transition-all hover:bg-[#1c1c28]">
-                    <div className={`flex h-8 w-8 items-center justify-center rounded-lg bg-[#2a2a3a]/50 ${activity.color}`}>
+                    <div className={`flex h-8 w-8 items-center justify-center rounded-lg bg-[#2a2a3a]/50 ${color}`}>
                       <Icon size={14} />
                     </div>
                     <div className="flex-1">
@@ -416,6 +404,9 @@ export default function OwnerDashboard() {
                   </div>
                 );
               })}
+              {(!data?.recentActivity || data.recentActivity.length === 0) && (
+                <p className="text-center text-sm text-[#606070]">No recent activity</p>
+              )}
             </div>
           </div>
         </div>

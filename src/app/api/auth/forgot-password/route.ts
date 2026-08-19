@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { checkRateLimit, getRateLimitKey } from "@/lib/rate-limit";
 import crypto from "crypto";
 
 export async function POST(request: NextRequest) {
+  const rateLimitKey = getRateLimitKey(request, "forgot-pw");
+  const rateLimit = checkRateLimit(rateLimitKey, 5, 300000);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again in 5 minutes." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil((rateLimit.retryAfterMs || 300000) / 1000)) } }
+    );
+  }
+
   try {
     const body = await request.json();
     const { email } = body;
@@ -16,7 +26,6 @@ export async function POST(request: NextRequest) {
 
     const user = await db.user.findUnique({ where: { email } });
 
-    // Always return success to prevent email enumeration
     const successMessage =
       "If an account exists with this email, you will receive a password reset link shortly.";
 
@@ -24,11 +33,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: successMessage });
     }
 
-    // Generate a cryptographically secure token
     const token = crypto.randomBytes(32).toString("hex");
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
 
-    // Store token in the database
     await db.user.update({
       where: { id: user.id },
       data: {
@@ -37,12 +44,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // In production, send email/SMS. For demo, log only the user email.
-    console.log(`[PASSWORD RESET] Request for: ${user.email}`);
+    // TODO: Send email/SMS with reset link containing the token
+    // For now, return the token in development only
+    const response: Record<string, unknown> = { message: successMessage };
+    if (process.env.NODE_ENV !== "production") {
+      response._debug_token = token;
+    }
 
-    return NextResponse.json({
-      message: successMessage,
-    });
+    return NextResponse.json(response);
   } catch (error) {
     console.error("Forgot password error:", error);
     return NextResponse.json(

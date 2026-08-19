@@ -21,8 +21,11 @@ import {
   Store,
   Building2,
   DollarSign,
+  AlertTriangle,
+  Calendar,
 } from "lucide-react";
 import { useTranslation } from "@/contexts/LanguageContext";
+import { APP_NAME } from "@/lib/utils";
 import type { TranslationKey } from "@/lib/translations";
 
 type UserRole =
@@ -36,7 +39,13 @@ type UserRole =
   | "SALES_REP"
   | "ACCOUNTANT"
   | "AUDITOR"
-  | "CUSTOMER";
+  | "CUSTOMER"
+  | "CASHIER"
+  | "CFO"
+  | "HR_MANAGER"
+  | "CHIEF_CHEF"
+  | "BUSINESS_CONTINUITY_MANAGER"
+  | "BUSINESS_EFFICIENCY_MANAGER";
 
 interface NavItem {
   icon: React.ElementType;
@@ -65,6 +74,8 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
         { icon: Users, label: "customers", href: "/dashboard/sales-manager/customers" },
         { icon: Shield, label: "users", href: "/dashboard/owner/users" },
         { icon: Building2, label: "branches", href: "/dashboard/owner/branches" },
+        { icon: AlertTriangle, label: "cashShortages", href: "/dashboard/owner/cash-shortages" },
+        { icon: Calendar, label: "bookings", href: "/dashboard/owner/bookings" },
         { icon: Settings, label: "settings", href: "/dashboard/owner/settings" },
       ],
     },
@@ -107,6 +118,7 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
         { icon: Package, label: "products", href: "/dashboard/inventory/products" },
         { icon: ClipboardList, label: "stock", href: "/dashboard/inventory/stock" },
         { icon: FileText, label: "categories", href: "/dashboard/inventory/categories" },
+        { icon: Package, label: "finishedProducts", href: "/dashboard/inventory/finished-products" },
       ],
     },
   ],
@@ -236,6 +248,102 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
       ],
     },
   ],
+  CASHIER: [
+    {
+      items: [
+        { icon: Home, label: "home", href: "/" },
+        { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/cashier" },
+      ],
+    },
+    {
+      title: "sales",
+      items: [
+        { icon: ShoppingCart, label: "pos", href: "/dashboard/cashier/pos" },
+        { icon: ClipboardList, label: "mySales", href: "/dashboard/sales-manager/sales" },
+        { icon: Users, label: "customers", href: "/dashboard/sales-manager/customers" },
+      ],
+    },
+  ],
+  CFO: [
+    {
+      items: [
+        { icon: Home, label: "home", href: "/" },
+        { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/accounting" },
+      ],
+    },
+    {
+      title: "finance",
+      items: [
+        { icon: BarChart3, label: "reports", href: "/dashboard/owner/reports" },
+        { icon: CreditCard, label: "expenses", href: "/dashboard/accounting/expenses" },
+        { icon: FileText, label: "invoices", href: "/dashboard/accounting/invoices" },
+        { icon: DollarSign, label: "cashDrawerReports", href: "/dashboard/accounting/cash-reports" },
+      ],
+    },
+  ],
+  HR_MANAGER: [
+    {
+      items: [
+        { icon: Home, label: "home", href: "/" },
+        { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/hr" },
+      ],
+    },
+    {
+      title: "management",
+      items: [
+        { icon: Users, label: "users", href: "/dashboard/owner/users" },
+        { icon: Calendar, label: "leaveRequests", href: "/dashboard/hr" },
+        { icon: BarChart3, label: "reports", href: "/dashboard/owner/reports" },
+      ],
+    },
+  ],
+  CHIEF_CHEF: [
+    {
+      items: [
+        { icon: Home, label: "home", href: "/" },
+        { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/chef" },
+      ],
+    },
+    {
+      title: "inventory",
+      items: [
+        { icon: Package, label: "products", href: "/dashboard/inventory/products" },
+        { icon: ClipboardList, label: "stock", href: "/dashboard/inventory/stock" },
+        { icon: FileText, label: "categories", href: "/dashboard/inventory/categories" },
+      ],
+    },
+  ],
+  BUSINESS_CONTINUITY_MANAGER: [
+    {
+      items: [
+        { icon: Home, label: "home", href: "/" },
+        { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/bcm" },
+      ],
+    },
+    {
+      title: "audit",
+      items: [
+        { icon: BarChart3, label: "reports", href: "/dashboard/owner/reports" },
+        { icon: Shield, label: "auditLogs", href: "/dashboard/auditor" },
+      ],
+    },
+  ],
+  BUSINESS_EFFICIENCY_MANAGER: [
+    {
+      items: [
+        { icon: Home, label: "home", href: "/" },
+        { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/bem" },
+      ],
+    },
+    {
+      title: "operations",
+      items: [
+        { icon: BarChart3, label: "reports", href: "/dashboard/owner/reports" },
+        { icon: ShoppingCart, label: "sales", href: "/dashboard/sales-manager/sales" },
+        { icon: Package, label: "inventory", href: "/dashboard/inventory" },
+      ],
+    },
+  ],
 };
 
 interface SidebarProps {
@@ -250,8 +358,8 @@ export default function Sidebar({ role, currentPath }: SidebarProps) {
   return (
     <aside className="sidebar flex flex-col" id="sidebar">
       <div className="flex h-16 items-center gap-2.5 border-b border-[#2a2a3a] px-5">
-        <Image src="/favicon.svg" alt="Firstlady Oil" width={36} height={36} className="h-9 w-9" />
-        <span className="text-xl font-black tracking-tight text-[#f0f0f5]">Firstlady <span className="text-[#d4a843]">Oil</span></span>
+        <Image src="/favicon.svg" alt={APP_NAME} width={36} height={36} className="h-9 w-9" />
+        <span className="text-xl font-black tracking-tight text-[#f0f0f5]">{APP_NAME}</span>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4">

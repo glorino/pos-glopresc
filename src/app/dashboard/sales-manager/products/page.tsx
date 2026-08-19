@@ -78,14 +78,14 @@ export default function SalesProductsPage() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
                 type="text"
                 placeholder={t("searchProducts")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchProducts()}
-                className="input w-64 pl-10"
+                className="input w-full max-w-xs pl-10"
               />
             </div>
             <select
@@ -168,7 +168,7 @@ export default function SalesProductsPage() {
 
         {/* Product Detail Modal */}
         {selectedProduct && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setSelectedProduct(null)}>
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4" onClick={() => setSelectedProduct(null)}>
             <div className="w-full max-w-md rounded-2xl border border-[#2a2a3a] bg-[#111118] p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-[#f0f0f5]">{t("product")}</h3>

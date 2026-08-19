@@ -181,14 +181,14 @@ export default function ExpenseManagementPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3">
             <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
                 type="text"
                 placeholder={t("searchExpenses")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchExpenses()}
-                className="input w-64 pl-10"
+                className="input w-full max-w-xs pl-10"
               />
             </div>
             <select
@@ -296,7 +296,7 @@ export default function ExpenseManagementPage() {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
           <div className="glass-card w-full max-w-lg p-6">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-[#f0f0f5]">{t("addExpenseTitle")}</h2>
@@ -367,10 +367,43 @@ export default function ExpenseManagementPage() {
 
               <div>
                 <label className="mb-1 block text-sm text-[#9090a0]">{t("receiptLabel")}</label>
-                <button type="button" className="btn btn-secondary btn-sm">
+                <input
+                  type="file"
+                  accept="image/*"
+                  id="receipt-upload"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const formDataUpload = new FormData();
+                    formDataUpload.append("file", file);
+                    const res = await fetch("/api/upload", {
+                      method: "POST",
+                      body: formDataUpload,
+                    });
+                    const data = await res.json();
+                    if (data.url) {
+                      setFormData({ ...formData, receipt: data.url });
+                    }
+                  }}
+                />
+                <label
+                  htmlFor="receipt-upload"
+                  className="btn btn-secondary btn-sm cursor-pointer"
+                >
                   <Upload size={14} />
                   {t("uploadReceipt")}
-                </button>
+                </label>
+                {formData.receipt && (
+                  <a
+                    href={formData.receipt}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-2 text-xs text-[#d4a843] underline"
+                  >
+                    {t("receiptUploaded")}
+                  </a>
+                )}
               </div>
 
               <div>

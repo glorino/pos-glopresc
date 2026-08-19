@@ -277,7 +277,7 @@ export default function ProcurementDashboard() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="input select w-40"
+              className="input select w-full max-w-[10rem]"
             >
               <option value="">{t("allStatus")}</option>
               <option value="PENDING">{t("pending")}</option>

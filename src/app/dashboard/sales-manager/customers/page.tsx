@@ -166,7 +166,7 @@ export default function SalesCustomersPage() {
                 placeholder="Search customers..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="input w-64 pl-10"
+                className="input w-full max-w-xs pl-10"
               />
             </div>
           </div>
@@ -218,7 +218,7 @@ export default function SalesCustomersPage() {
                       </span>
                     </td>
                     <td className="text-[#9090a0]">
-                      {("_count" in customer ? (customer as any)._count?.sales : 0) || 0}
+                      {("_count" in customer ? (customer as { _count?: { sales?: number } })._count?.sales : 0) || 0}
                     </td>
                     <td>
                       <span className={`badge ${customer.isActive ? "badge-success" : "badge-danger"}`}>
@@ -259,7 +259,7 @@ export default function SalesCustomersPage() {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
           <div className="glass-card w-full max-w-lg p-6">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-[#f0f0f5]">
@@ -369,7 +369,7 @@ export default function SalesCustomersPage() {
       )}
 
       {selectedCustomer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
           <div className="glass-card w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-[#f0f0f5]">
@@ -402,7 +402,7 @@ export default function SalesCustomersPage() {
               </div>
             </div>
 
-            <div className="mb-6 grid grid-cols-3 gap-4">
+            <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4 text-center">
                 <p className="text-2xl font-bold text-[#d4a843]">
                   {formatCurrency(selectedCustomer.totalSpent)}

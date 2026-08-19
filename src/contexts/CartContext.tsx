@@ -33,7 +33,7 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | null>(null);
 
-const CART_KEY = "firstlady-oil-cart";
+const CART_KEY = "ssv-shop-cart";
 
 function loadCart(): CartItem[] {
   if (typeof window === "undefined") return [];
@@ -48,7 +48,7 @@ function loadCart(): CartItem[] {
 function saveCart(cart: CartItem[]) {
   try {
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
-  } catch {}
+  } catch { /* localStorage unavailable - gracefully degrade */ }
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {

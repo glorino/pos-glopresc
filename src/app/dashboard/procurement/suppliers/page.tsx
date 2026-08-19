@@ -118,7 +118,7 @@ export default function ProcurementSuppliersPage() {
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 sm:w-72">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
             <input type="text" placeholder={t("searchSuppliersPlaceholder")} value={search} onChange={(e) => setSearch(e.target.value)} className="input pl-10" />
           </div>
           <button onClick={openAddModal} className="btn btn-primary"><Plus size={16} /> {t("addSupplierBtn")}</button>
@@ -178,7 +178,7 @@ export default function ProcurementSuppliersPage() {
         )}
 
         {showModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
             <div className="glass-card w-full max-w-lg p-6">
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-[#f0f0f5]">{editingSupplier ? t("editSupplier") : t("addSupplierTitle")}</h2>

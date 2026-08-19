@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { MapPin, Truck, Loader2 } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
 
 interface ShippingSettings {
   originAddress: string;
@@ -51,7 +52,7 @@ export default function ShippingCalculator({ weight, onCalculate }: ShippingCalc
           freeShippingThreshold: data.freeShippingThreshold || 0,
         });
       })
-      .catch(() => {});
+      .catch(() => { /* Settings fetch failed - use defaults */ });
   }, []);
 
   async function handleCalculate() {
@@ -149,11 +150,11 @@ export default function ShippingCalculator({ weight, onCalculate }: ShippingCalc
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-[#9090a0]">Distance: {result.distance} km</p>
-              <p className="text-xs text-[#9090a0]">Rate: ₦{result.ratePerKm.toLocaleString()}/km</p>
+              <p className="text-xs text-[#9090a0]">Rate: {formatCurrency(result.ratePerKm)}/km</p>
             </div>
             <div className="text-right">
               <p className="text-sm font-bold text-[#d4a843]">
-                ₦{result.fee.toLocaleString()}
+                {formatCurrency(result.fee)}
               </p>
               <p className="text-[10px] text-[#9090a0]">{result.estimate}</p>
             </div>

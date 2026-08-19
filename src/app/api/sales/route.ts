@@ -2,13 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { generateInvoiceNumber } from "@/lib/utils";
 import { sendSMS } from "@/lib/sms";
-import { getToken } from "next-auth/jwt";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { requireAuth } from "@/lib/api-auth";
 
 export async function GET(request: NextRequest) {
-  const { error } = await requireAuth(["OWNER", "MANAGER", "SALES_MANAGER", "ACCOUNTANT"]);
+  const { error } = await requireAuth(["OWNER", "MANAGER", "SALES_MANAGER", "SALES_REP", "ACCOUNTANT"]);
   if (error) return error;
   try {
     const { searchParams } = new URL(request.url);
@@ -87,13 +86,12 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { customerId, items, paymentMethod, amountPaid, notes, discount = 0, tax = 0, customerName, customerEmail } = body;
+    const { customerId, items, paymentMethod, amountPaid, notes, discount = 0, tax = 0, customerName, customerEmail, txRef } = body;
 
-    const token = await getToken({ req: request as any });
     const session = await getServerSession(authOptions);
-    const branchId = token?.branchId as string | undefined || null;
+    const branchId = session?.user?.branchId || null;
 
-    let userId = (session?.user as any)?.id;
+    let userId = session?.user?.id;
 
     if (!userId) {
       let guestUser = await db.user.findFirst({ where: { email: "guest@system.local" } });
@@ -176,6 +174,7 @@ export async function POST(request: NextRequest) {
           amountPaid: Number(amountPaid ?? total),
           changeDue: Number(amountPaid ?? total) - total,
           paymentMethod: paymentMethod ?? "CASH",
+          txRef: txRef || null,
           status: "COMPLETED",
           notes: notes || null,
           items: {
@@ -206,13 +205,20 @@ export async function POST(request: NextRequest) {
       return newSale;
     });
 
-    if (sale.customer) {
+    if (txRef) {
+      await db.payment.updateMany({
+        where: { reference: txRef },
+        data: { saleId: sale.id },
+      });
+    }
+
+    if (resolvedCustomerId) {
       const customerPhone = await db.customer.findUnique({
         where: { id: resolvedCustomerId },
         select: { phone: true },
       });
       if (customerPhone?.phone) {
-        const message = `Firstlady Oil Receipt: Invoice ${sale.invoiceNumber}, Total: \u20A6${Number(sale.total).toLocaleString("en-NG", { minimumFractionDigits: 2 })}. Thank you for your purchase!`;
+        const message = `${process.env.APP_NAME || "SSV Shop"} Receipt: Invoice ${sale.invoiceNumber}, Total: ${Number(sale.total).toLocaleString("en-NG", { minimumFractionDigits: 2 })}. Thank you for your purchase!`;
         sendSMS(customerPhone.phone, message);
       }
     }

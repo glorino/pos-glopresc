@@ -1,17 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { getBranchFilter } from "@/lib/branch-filter";
 
 export async function GET(request: Request) {
   try {
-    const token = await getToken({ req: request as any });
-    if (!token?.id) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = token.id as string;
-    const branchFilter = await getBranchFilter(request as any);
+    const userId = session.user.id;
+    const branchId = session.user.branchId || null;
+    const branchFilter = branchId ? { branchId } : null;
     const { searchParams } = new URL(request.url);
     const date = searchParams.get("date") || new Date().toISOString().split("T")[0];
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getBranchFilterFromSession } from "@/lib/branch-filter";
+import { getBranchFilterFromSession, getBranchIdFromSession } from "@/lib/branch-filter";
 import { Prisma } from "@prisma/client";
 import { requireAuth } from "@/lib/api-auth";
 
@@ -10,7 +10,8 @@ export async function GET(request: NextRequest) {
   try {
     const branchFilter = session?.user
       ? getBranchFilterFromSession(session)
-      : ({ branchId: "__NONE__" } as any);
+      : null;
+    const scopedBranchId = session?.user ? getBranchIdFromSession(session) : null;
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") ?? "1");
@@ -56,24 +57,24 @@ export async function GET(request: NextRequest) {
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
     // Build branch-scoped where helpers
-    const branchProductWhere: Record<string, any> = {};
-    if (branchFilter) {
+    const branchProductWhere: Record<string, unknown> = {};
+    if (scopedBranchId) {
       branchProductWhere.OR = [
-        { branchId: branchFilter.OR?.[0]?.branchId },
+        { branchId: scopedBranchId },
         { branchId: null },
       ];
     }
-    const branchSaleWhere: Record<string, any> = {};
-    if (branchFilter) {
+    const branchSaleWhere: Record<string, unknown> = {};
+    if (scopedBranchId) {
       branchSaleWhere.OR = [
-        { branchId: branchFilter.OR?.[0]?.branchId },
+        { branchId: scopedBranchId },
         { branchId: null },
       ];
     }
-    const branchExpenseWhere: Record<string, any> = {};
-    if (branchFilter) {
+    const branchExpenseWhere: Record<string, unknown> = {};
+    if (scopedBranchId) {
       branchExpenseWhere.OR = [
-        { branchId: branchFilter.OR?.[0]?.branchId },
+        { branchId: scopedBranchId },
         { branchId: null },
       ];
     }
@@ -234,7 +235,7 @@ export async function GET(request: NextRequest) {
       WHERE "stockQuantity" > 0
         AND "stockQuantity" <= "minStockLevel"
         AND "isActive" = true
-        ${branchFilter ? Prisma.sql`AND ("branchId" = ${branchFilter.OR?.[0]?.branchId} OR "branchId" IS NULL)` : Prisma.sql``}
+        ${scopedBranchId ? Prisma.sql`AND ("branchId" = ${scopedBranchId} OR "branchId" IS NULL)` : Prisma.sql``}
     `;
     const lowStockCount = Number(lowStockResult[0]?.count ?? 0);
 

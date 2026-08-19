@@ -16,6 +16,7 @@ import {
 import PublicHeader from "@/components/layout/PublicHeader";
 import PublicFooter from "@/components/layout/PublicFooter";
 import { useTranslation } from "@/contexts/LanguageContext";
+import { APP_NAME } from "@/lib/utils";
 
 const valueKeys = [
   {
@@ -36,23 +37,23 @@ const valueKeys = [
 ];
 
 const team = [
-  { name: "Adewale Firstlady", role: "Founder & CEO", initials: "AF", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" },
+  { name: "Adewale SSV", role: "Founder & CEO", initials: "AF", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" },
   { name: "Blessing Okoro", role: "Head of Product", initials: "BO", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face" },
   { name: "Chukwu Emeka", role: "Lead Engineer", initials: "CE", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face" },
   { name: "Fatima Bello", role: "Head of Design", initials: "FB", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face" },
 ];
 
 const milestones = [
-  { year: "2020", title: "Founded", desc: "Firstlady Oil was born from a need for better retail tools" },
-  { year: "2021", title: "First 100 Users", desc: "Reached our first milestone of active businesses" },
-  { year: "2022", title: "Multi-Branch", desc: "Launched multi-branch support for growing businesses" },
-  { year: "2023", title: "500+ Users", desc: "Expanded to serve hundreds of retailers globally" },
+  { year: "2020", title: "Founded", desc: `${APP_NAME} was born from a simple idea: make running a shop easy for everyone` },
+  { year: "2021", title: "First Users", desc: "Shop owners started using it and loved how simple it is" },
+  { year: "2022", title: "Full Feature Set", desc: "Added inventory, sales tracking, and financial reporting" },
+  { year: "2023", title: "Growing Fast", desc: "More shop owners discovering the easiest way to manage their business" },
 ];
 
 const contactInfo = [
   { icon: MapPin, label: "Address", value: "Worldwide" },
-  { icon: Phone, label: "Phone", value: "+234 800 FIRSTLADYOIL" },
-  { icon: Mail, label: "Email", value: "support@firstladyoil.com" },
+  { icon: Phone, label: "Phone", value: process.env.BUSINESS_PHONE || "" },
+  { icon: Mail, label: "Email", value: process.env.BUSINESS_EMAIL || `info@${APP_NAME.toLowerCase().replace(/\s+/g, '')}.com` },
   { icon: Clock, label: "Hours", value: "Mon – Fri, 8 AM – 6 PM" },
 ];
 
@@ -81,10 +82,10 @@ export default function AboutPage() {
               <p className="mt-6 max-w-xl text-lg text-[#9090a0] animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
                 {t("aboutHeroDesc")}
               </p>
-              <div className="mt-8 grid grid-cols-3 gap-6 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+              <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-6 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
                 {[
-                  { icon: Users, value: "500+", label: "Active Users" },
-                  { icon: Award, value: "4+", label: "Years Experience" },
+                  { icon: Users, value: "Shop Owners", label: "Who Use It" },
+                  { icon: Award, value: "Simple", label: "And Effective" },
                   { icon: TrendingUp, value: "99.9%", label: "Uptime" },
                 ].map((stat) => (
                   <div key={stat.label} className="text-center">
@@ -99,7 +100,7 @@ export default function AboutPage() {
               <div className="overflow-hidden rounded-2xl border border-[#2a2a3a] shadow-2xl shadow-[#d4a843]/10">
                 <Image
                   src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=500&fit=crop"
-                  alt="Firstlady Oil Team"
+                  alt={`${APP_NAME} Team`}
                   width={800}
                   height={500}
                   className="h-[400px] w-full object-cover"
@@ -180,10 +181,10 @@ export default function AboutPage() {
                     <Icon size={24} />
                   </div>
                   <h3 className="mb-2 text-lg font-semibold text-[#f0f0f5]">
-                    {t(v.titleKey as any)}
+                    {t(v.titleKey)}
                   </h3>
                   <p className="text-sm leading-relaxed text-[#9090a0]">
-                    {t(v.descKey as any)}
+                    {t(v.descKey)}
                   </p>
                 </div>
               );

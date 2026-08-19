@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
+import { join, extname } from "path";
 import { randomUUID } from "crypto";
 import { requireAuth } from "@/lib/api-auth";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
+const MAX_SIZE = 5 * 1024 * 1024;
+const UPLOAD_ROLES = ["OWNER", "MANAGER", "SALES_MANAGER", "WAREHOUSE_MANAGER"];
 
 export async function POST(request: NextRequest) {
-  const { error } = await requireAuth();
+  const { error, session } = await requireAuth(UPLOAD_ROLES);
   if (error) return error;
   try {
     const formData = await request.formData();
@@ -35,11 +37,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const ext = extname(file.name).toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+      return NextResponse.json(
+        { error: "Invalid file extension" },
+        { status: 400 }
+      );
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const ext = file.name.split(".").pop() || "jpg";
-    const filename = `${randomUUID()}.${ext}`;
+    const filename = `${randomUUID()}${ext}`;
     const uploadDir = join(process.cwd(), "public", "images");
     const filepath = join(uploadDir, filename);
 
@@ -53,11 +62,9 @@ export async function POST(request: NextRequest) {
       size: file.size,
       type: file.type,
     }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Upload error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to upload file" },
-      { status: 500 }
-    );
+    const message = error instanceof Error ? error.message : "Failed to upload file";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

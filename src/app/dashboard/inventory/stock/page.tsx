@@ -38,6 +38,8 @@ interface Product {
   name: string;
   sku: string;
   stockQuantity: number;
+  minStockLevel?: number;
+  barcode?: string;
 }
 
 export default function InventoryStockPage() {
@@ -127,8 +129,8 @@ export default function InventoryStockPage() {
         setProducts(allProducts);
         setLowStockAlerts(
           allProducts.filter(
-            (p: Product & { minStockLevel: number }) =>
-              (p as any).stockQuantity <= (p as any).minStockLevel || (p as any).stockQuantity === 0
+            (p: Product) =>
+              p.stockQuantity <= (p.minStockLevel ?? 5) || p.stockQuantity === 0
           )
         );
       }
@@ -142,7 +144,7 @@ export default function InventoryStockPage() {
     const match = products.find(
       (p) =>
         p.sku.toLowerCase() === barcode.toLowerCase() ||
-        (p as any).barcode?.toLowerCase() === barcode.toLowerCase()
+        (p.barcode && p.barcode.toLowerCase() === barcode.toLowerCase())
     );
     if (match) {
       setFormData({ ...formData, productId: match.id });
@@ -454,7 +456,7 @@ export default function InventoryStockPage() {
                     <div className="flex items-center gap-3">
                       <div
                         className={`h-2.5 w-2.5 rounded-full ${
-                          (product as any).stockQuantity === 0 ? "bg-[#f43f5e]" : "bg-[#f59e0b]"
+                          (product.stockQuantity === 0 ? "bg-[#f43f5e]" : "bg-[#f59e0b]")
                         }`}
                       />
                       <div>
@@ -465,13 +467,13 @@ export default function InventoryStockPage() {
                     <div className="text-right">
                       <p
                         className={`text-sm font-bold ${
-                          (product as any).stockQuantity === 0 ? "text-[#f43f5e]" : "text-[#f59e0b]"
+                          (product.stockQuantity === 0 ? "text-[#f43f5e]" : "text-[#f59e0b]")
                         }`}
                       >
                         {product.stockQuantity} {t("left")}
                       </p>
                       <p className="text-xs text-[#606070]">
-                        {t("minLabelShort")} {(product as any).minStockLevel}
+                        {t("minLabelShort")} {product.minStockLevel ?? 5}
                       </p>
                     </div>
                   </div>
@@ -489,7 +491,7 @@ export default function InventoryStockPage() {
 
           <div className="mb-4 flex items-center gap-3">
             <div className="relative flex-1 sm:w-72">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
                 type="text"
                 placeholder={t("searchAdjustments")}

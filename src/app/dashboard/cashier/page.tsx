@@ -74,6 +74,12 @@ export default function CashierDashboard() {
   const [closingBalance, setClosingBalance] = useState("");
   const [actualBalance, setActualBalance] = useState("");
   const [closingDrawer, setClosingDrawer] = useState(false);
+  const [openingBalance, setOpeningBalance] = useState("");
+  const [openingDrawer, setOpeningDrawer] = useState(false);
+
+  const expectedClosing = dailySummary
+    ? (dailySummary.drawer?.openingBalance ?? 0) + (dailySummary.totalCashReceived ?? 0) - (dailySummary.totalChangeGiven ?? 0)
+    : 0;
 
   useEffect(() => {
     async function fetchData() {
@@ -200,7 +206,7 @@ export default function CashierDashboard() {
     <DashboardLayout title={t("salesRepDashboard")}>
       <div className="space-y-6">
         {/* Hero POS Card */}
-        <div className="glass-card relative overflow-hidden p-8">
+        <div className="glass-card relative overflow-hidden p-6">
           <div className="absolute inset-0 bg-gradient-to-br from-[#d4a843]/10 via-[#d4a843]/5 to-transparent" />
           <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#d4a843]/10 blur-3xl" />
           <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-[#d4a843]/5 blur-3xl" />
@@ -248,6 +254,66 @@ export default function CashierDashboard() {
           })}
         </div>
 
+        {/* Open Register */}
+        {!data?.drawerStatus.isOpen && (
+          <div className="glass-card border border-[#10b981]/20 p-6">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#10b981] to-[#059669]">
+                <Unlock size={18} className="text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-[#f0f0f5]">Open Register</h3>
+                <p className="text-sm text-[#9090a0]">Start your shift by opening the cash register</p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+              <div className="flex-1">
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("openingBalance")}</label>
+                <input
+                  type="number"
+                  value={openingBalance}
+                  onChange={(e) => setOpeningBalance(e.target.value)}
+                  placeholder="Enter opening balance"
+                  className="input"
+                  min="0"
+                />
+              </div>
+              <button
+                onClick={async () => {
+                  if (!openingBalance || Number(openingBalance) < 0) {
+                    alert("Please enter a valid opening balance");
+                    return;
+                  }
+                  setOpeningDrawer(true);
+                  try {
+                    const res = await fetch("/api/cash-drawer", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ openingBalance: Number(openingBalance) }),
+                    });
+                    if (res.ok) {
+                      setData((prev) => prev ? { ...prev, drawerStatus: { isOpen: true, openingBalance: Number(openingBalance), openedAt: new Date().toISOString() } } : prev);
+                      setOpeningBalance("");
+                    } else {
+                      const err = await res.json();
+                      alert(err.error || "Failed to open register");
+                    }
+                  } catch (error) {
+                    alert("Failed to open register");
+                  } finally {
+                    setOpeningDrawer(false);
+                  }
+                }}
+                disabled={openingDrawer}
+                className="btn btn-primary gap-2"
+              >
+                <Unlock size={16} />
+                {openingDrawer ? "Opening..." : "Open Register"}
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Daily Cash Register Summary */}
         <div className="glass-card p-6">
           <div className="mb-4 flex items-center justify-between">
@@ -293,8 +359,8 @@ export default function CashierDashboard() {
                 <p className="text-xs text-[#9090a0]">{t("transactions")}</p>
                 <p className="mt-1 text-lg font-bold text-[#8b5cf6]">{dailySummary.totalTransactions}</p>
               </div>
-            </div>
-          )}
+          </div>
+        )}
         </div>
 
         {/* Close Register */}
@@ -309,35 +375,54 @@ export default function CashierDashboard() {
                 <p className="text-sm text-[#9090a0]">{t("closeRegisterDesc")}</p>
               </div>
             </div>
+            {dailySummary && (
+              <div className="mb-4 grid grid-cols-1 sm:grid-cols-3 gap-4 rounded-xl border border-[#2a2a3a] bg-[#1c1c28] p-4">
+                <div>
+                  <p className="text-xs text-[#9090a0]">{t("openingBalance")}</p>
+                  <p className="mt-1 text-lg font-bold text-[#f0f0f5]">{formatCurrency(dailySummary.drawer?.openingBalance ?? 0)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#9090a0]">Cash Received</p>
+                  <p className="mt-1 text-lg font-bold text-[#10b981]">{formatCurrency(dailySummary.totalCashReceived ?? 0)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#9090a0]">Change Given</p>
+                  <p className="mt-1 text-lg font-bold text-[#f43f5e]">-{formatCurrency(dailySummary.totalChangeGiven ?? 0)}</p>
+                </div>
+              </div>
+            )}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
               <div className="flex-1">
-                <label className="mb-1 block text-sm text-[#9090a0]">{t("closingBalance")}</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">Expected Closing (auto-calculated)</label>
                 <input
                   type="number"
-                  value={closingBalance}
-                  onChange={(e) => setClosingBalance(e.target.value)}
-                  placeholder={t("enterClosingBalance")}
-                  className="input"
+                  value={expectedClosing}
+                  readOnly
+                  className="input bg-[#16161f] cursor-not-allowed"
                 />
               </div>
               <div className="flex-1">
-                <label className="mb-1 block text-sm text-[#9090a0]">{t("actualBalance")}</label>
+                <label className="mb-1 block text-sm text-[#9090a0]">{t("actualBalance")} (count your cash)</label>
                 <input
                   type="number"
                   value={actualBalance}
                   onChange={(e) => setActualBalance(e.target.value)}
-                  placeholder={t("enterActualBalance")}
+                  placeholder="Count cash and enter here"
                   className="input"
                 />
               </div>
+              {actualBalance && (
+                <div className="flex-1">
+                  <label className="mb-1 block text-sm text-[#9090a0]">Difference</label>
+                  <p className={`text-lg font-bold ${Number(actualBalance) - expectedClosing === 0 ? "text-[#10b981]" : "text-[#f43f5e]"}`}>
+                    {formatCurrency(Number(actualBalance) - expectedClosing)}
+                  </p>
+                </div>
+              )}
               <button
                 onClick={async () => {
-                  if (!closingBalance || Number(closingBalance) < 0) {
-                    alert("Please enter a valid closing balance");
-                    return;
-                  }
                   if (!actualBalance || Number(actualBalance) < 0) {
-                    alert("Please enter a valid actual balance");
+                    alert("Please count your cash and enter the actual balance");
                     return;
                   }
                   setClosingDrawer(true);
@@ -345,7 +430,7 @@ export default function CashierDashboard() {
                     const res = await fetch("/api/cash-drawer", {
                       method: "PUT",
                       headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ closingBalance: Number(closingBalance), actualBalance: Number(actualBalance) }),
+                      body: JSON.stringify({ closingBalance: expectedClosing, actualBalance: Number(actualBalance) }),
                     });
                     if (res.ok) {
                       setData((prev) => prev ? { ...prev, drawerStatus: { ...prev.drawerStatus, isOpen: false } } : prev);
@@ -383,7 +468,7 @@ export default function CashierDashboard() {
             </div>
           </div>
           <div className="relative">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white" />
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#606070]" />
             <input
               type="text"
               placeholder={t("searchProducts")}

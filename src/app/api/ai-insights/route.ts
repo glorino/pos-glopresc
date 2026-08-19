@@ -7,8 +7,8 @@ export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ insights: [] });
 
-  const role = (session.user as any).role;
-  const userId = (session.user as any).id;
+  const role = session.user.role;
+  const userId = session.user.id;
 
   try {
     let insights: Awaited<ReturnType<typeof getOwnerInsights>> = [];

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { formatCurrency, formatDateTime } from "@/lib/utils";
+import { formatCurrency, formatDateTime, APP_CURRENCY } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
 import {
   DollarSign,
@@ -173,14 +173,14 @@ export default function AccountingDashboard() {
                 type="date"
                 value={dateFrom}
                 onChange={(e) => setDateFrom(e.target.value)}
-                className="input w-40"
+                className="input w-full max-w-[10rem]"
               />
               <span className="text-sm text-[#606070]">{t("toLabel")}</span>
               <input
                 type="date"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
-                className="input w-40"
+                className="input w-full max-w-[10rem]"
               />
               {(dateFrom || dateTo) && (
                 <button
@@ -276,7 +276,7 @@ export default function AccountingDashboard() {
                       <YAxis
                         stroke="#606070"
                         fontSize={12}
-                        tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`}
+                        tickFormatter={(v) => `${APP_CURRENCY} ${(v / 1000).toFixed(0)}k`}
                       />
                       <Tooltip
                         contentStyle={{

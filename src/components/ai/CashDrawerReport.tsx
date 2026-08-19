@@ -101,13 +101,13 @@ export default function CashDrawerReport() {
             type="date"
             value={dateRange.start}
             onChange={(e) => setDateRange((p) => ({ ...p, start: e.target.value }))}
-            className="input w-40"
+            className="input w-full max-w-[10rem]"
           />
           <input
             type="date"
             value={dateRange.end}
             onChange={(e) => setDateRange((p) => ({ ...p, end: e.target.value }))}
-            className="input w-40"
+            className="input w-full max-w-[10rem]"
           />
           <div className="flex rounded-lg border border-[#2a2a3a] bg-[#1c1c28] p-0.5">
             <button

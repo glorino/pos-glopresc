@@ -206,7 +206,7 @@ export default function InvoicesPage() {
       return;
     }
     try {
-      const message = `Reminder: Invoice ${invoice.invoiceNumber} for ₦${invoice.total.toLocaleString()} is pending payment.`;
+      const message = `Reminder: Invoice ${invoice.invoiceNumber} for ${formatCurrency(Number(invoice.total))} is pending payment.`;
       const res = await fetch("/api/sms/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -272,14 +272,14 @@ export default function InvoicesPage() {
               </button>
             </div>
             <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#606070]" />
               <input
                 type="text"
                 placeholder={t("searchInvoicesPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && (invoiceType === "customer" ? fetchInvoices() : fetchSupplierInvoices())}
-                className="input w-64 pl-10"
+                className="input w-full max-w-xs pl-10"
               />
             </div>
             <select
@@ -455,7 +455,7 @@ export default function InvoicesPage() {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
           <div className="glass-card w-full max-w-lg p-6">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-[#f0f0f5]">{t("createInvoiceBtn")}</h2>

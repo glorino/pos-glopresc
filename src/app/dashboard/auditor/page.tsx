@@ -605,7 +605,7 @@ export default function AuditorDashboard() {
             <select
               value={actionFilter}
               onChange={(e) => setActionFilter(e.target.value)}
-              className="input select w-40"
+              className="input select w-full max-w-[10rem]"
             >
               <option value="">{t("allActions")}</option>
               <option value="LOGIN">{t("login")}</option>
@@ -618,13 +618,13 @@ export default function AuditorDashboard() {
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="input w-40"
+              className="input w-full max-w-[10rem]"
             />
             <input
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
-              className="input w-40"
+              className="input w-full max-w-[10rem]"
             />
             <button onClick={fetchData} className="btn btn-secondary btn-sm">
               <RefreshCw size={14} />

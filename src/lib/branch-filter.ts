@@ -10,8 +10,8 @@ import { NextRequest } from "next/server";
  *   { OR: [{ branchId: "xxx" }, { branchId: null }] }
  * or null for no filter (Owner).
  */
-export async function getBranchFilter(request: NextRequest): Promise<Record<string, any> | null> {
-  const token = await getToken({ req: request as any });
+export async function getBranchFilter(request: NextRequest): Promise<Record<string, unknown> | null> {
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   if (!token?.id) return { branchId: "__NONE__" };
 
   const role = token.role as string;
@@ -33,7 +33,7 @@ export async function getBranchFilter(request: NextRequest): Promise<Record<stri
  * Returns null for OWNER (no filter), or the branchId string.
  */
 export async function getBranchId(request: NextRequest): Promise<string | null> {
-  const token = await getToken({ req: request as any });
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   if (!token?.id) return null;
   if (token.role === "OWNER") return null;
   return (token.branchId as string) || null;
@@ -42,7 +42,7 @@ export async function getBranchId(request: NextRequest): Promise<string | null> 
 /**
  * Gets the branch WHERE clause from a NextAuth session object.
  */
-export function getBranchFilterFromSession(session: any): Record<string, any> | null {
+export function getBranchFilterFromSession(session: { user?: { id?: string; role?: string; branchId?: string | null } } | null): Record<string, unknown> | null {
   if (!session?.user?.id) return { branchId: "__NONE__" };
 
   const role = session.user.role || "";
@@ -63,8 +63,8 @@ export function getBranchFilterFromSession(session: any): Record<string, any> | 
  * Gets the raw branchId string from a NextAuth session object.
  * Returns null for OWNER (no filter).
  */
-export function getBranchIdFromSession(session: any): string | null {
+export function getBranchIdFromSession(session: { user?: { id?: string; role?: string; branchId?: string | null } } | null): string | null {
   if (!session?.user?.id) return null;
   if (session.user.role === "OWNER") return null;
-  return (session.user.branchId as string) || null;
+  return session.user.branchId || null;
 }

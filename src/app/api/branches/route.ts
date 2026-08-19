@@ -32,23 +32,41 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const branchesWithStats = branches.map((branch) => ({
-      id: branch.id,
-      name: branch.name,
-      code: branch.code,
-      address: branch.address,
-      phone: branch.phone,
-      email: branch.email,
-      isActive: branch.isActive,
-      isDefault: branch.isDefault,
-      createdAt: branch.createdAt,
-      updatedAt: branch.updatedAt,
-      userCount: branch._count.users,
-      productCount: branch._count.products,
-      saleCount: branch._count.sales,
-      expenseCount: branch._count.expenses,
-      totalRevenue: branch.sales.reduce((sum, s) => sum + Number(s.total), 0),
-    }));
+    // Get all sales with no branchId to attribute to the default branch
+    const defaultBranch = branches.find((b) => b.isDefault);
+    let unassignedSalesTotal = 0;
+    let unassignedSalesCount = 0;
+    if (defaultBranch) {
+      const unassigned = await db.sale.aggregate({
+        _sum: { total: true },
+        _count: true,
+        where: { branchId: null, status: "COMPLETED" },
+      });
+      unassignedSalesTotal = Number(unassigned._sum.total ?? 0);
+      unassignedSalesCount = unassigned._count;
+    }
+
+    const branchesWithStats = branches.map((branch) => {
+      const branchRevenue = branch.sales.reduce((sum, s) => sum + Number(s.total), 0);
+      const isDefaultBranch = branch.isDefault;
+      return {
+        id: branch.id,
+        name: branch.name,
+        code: branch.code,
+        address: branch.address,
+        phone: branch.phone,
+        email: branch.email,
+        isActive: branch.isActive,
+        isDefault: branch.isDefault,
+        createdAt: branch.createdAt,
+        updatedAt: branch.updatedAt,
+        userCount: branch._count.users,
+        productCount: branch._count.products,
+        saleCount: branch._count.sales + (isDefaultBranch ? unassignedSalesCount : 0),
+        expenseCount: branch._count.expenses,
+        totalRevenue: branchRevenue + (isDefaultBranch ? unassignedSalesTotal : 0),
+      };
+    });
 
     return NextResponse.json({ branches: branchesWithStats });
   } catch (error) {

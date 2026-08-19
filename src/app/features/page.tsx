@@ -170,7 +170,7 @@ export default function FeaturesPage() {
                     href={`#${s.id}`}
                     className="rounded-lg border border-[#2a2a3a] bg-[#1c1c28]/50 px-3 py-1.5 text-xs font-medium text-[#9090a0] transition-all hover:border-[#d4a843]/30 hover:text-[#d4a843]"
                   >
-                    {t(s.titleKey as any)}
+                    {t(s.titleKey)}
                   </a>
                 ))}
               </div>
@@ -210,10 +210,10 @@ export default function FeaturesPage() {
             <div className={`grid items-center gap-12 ${idx % 2 === 0 ? "lg:grid-cols-[1fr_1.2fr]" : "lg:grid-cols-[1.2fr_1fr]"}`}>
               <div className={idx % 2 === 0 ? "order-1" : "order-2"}>
                 <h2 className="text-2xl font-bold sm:text-3xl">
-                  {t(section.titleKey as any)}
+                  {t(section.titleKey)}
                 </h2>
                 <p className="mt-3 max-w-xl text-[#9090a0]">
-                  {t(section.descKey as any)}
+                  {t(section.descKey)}
                 </p>
                 <div className="mt-8 grid gap-4 sm:grid-cols-2">
                   {section.features.map((feature) => {
@@ -228,10 +228,10 @@ export default function FeaturesPage() {
                         </div>
                         <div>
                           <h3 className="text-sm font-semibold text-[#f0f0f5]">
-                            {t(feature.titleKey as any)}
+                            {t(feature.titleKey)}
                           </h3>
                           <p className="mt-0.5 text-xs leading-relaxed text-[#9090a0]">
-                            {t(feature.descKey as any)}
+                            {t(feature.descKey)}
                           </p>
                         </div>
                       </div>
@@ -243,7 +243,7 @@ export default function FeaturesPage() {
                 <div className="overflow-hidden rounded-2xl border border-[#2a2a3a] shadow-xl">
                   <Image
                     src={section.image}
-                    alt={t(section.titleKey as any)}
+                    alt={t(section.titleKey)}
                     width={800}
                     height={400}
                     className="h-[350px] w-full object-cover"
