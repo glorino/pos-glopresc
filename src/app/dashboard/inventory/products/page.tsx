@@ -98,6 +98,7 @@ function InventoryProductsPage() {
       if (search) params.set("search", search);
       if (categoryFilter) params.set("categoryId", categoryFilter);
       params.set("limit", "200");
+      params.set("isActive", "true");
       const res = await fetch(`/api/products?${params}`);
       if (res.ok) {
         const data = await res.json();

@@ -99,6 +99,7 @@ export default function InventoryDashboard() {
     const params = buildParams();
     params.set("page", String(page));
     params.set("limit", "10");
+    params.set("isActive", "true");
     const res = await fetch(`/api/products?${params.toString()}`);
     if (res.ok) {
       const json = await res.json();
@@ -111,6 +112,7 @@ export default function InventoryDashboard() {
     params.set("page", String(page));
     params.set("limit", "10");
     params.set("isRawMaterial", "true");
+    params.set("isActive", "true");
     const res = await fetch(`/api/products?${params.toString()}`);
     if (res.ok) {
       const json = await res.json();

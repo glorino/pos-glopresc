@@ -122,7 +122,7 @@ export default function InventoryStockPage() {
 
   async function fetchProducts() {
     try {
-      const res = await fetch("/api/products?limit=200");
+      const res = await fetch("/api/products?limit=200&isActive=true");
       if (res.ok) {
         const data = await res.json();
         const allProducts = data.products;
