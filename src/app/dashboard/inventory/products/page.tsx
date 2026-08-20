@@ -14,6 +14,7 @@ import {
   AlertTriangle,
   Filter,
   X,
+  Trash2,
 } from "lucide-react";
 
 interface Product {
@@ -82,6 +83,7 @@ function InventoryProductsPage() {
 
   const userRole = session?.user?.role as string | undefined;
   const isReadOnly = userRole === "WAREHOUSE_REP";
+  const canDelete = userRole === "OWNER" || userRole === "MANAGER" || userRole === "WAREHOUSE_MANAGER";
 
   useEffect(() => {
     if (searchParams.get("action") === "add") {
@@ -153,6 +155,16 @@ function InventoryProductsPage() {
       }
     } catch (error) {
       console.error("Failed to adjust stock:", error);
+    }
+  }
+
+  async function handleDeleteProduct(productId: string, productName: string) {
+    if (!confirm(`Are you sure you want to delete "${productName}"?`)) return;
+    try {
+      const res = await fetch(`/api/products?id=${productId}`, { method: "DELETE" });
+      if (res.ok) fetchProducts();
+    } catch (error) {
+      console.error("Failed to delete product:", error);
     }
   }
 
@@ -274,6 +286,7 @@ function InventoryProductsPage() {
                   <th>{t("statusCol")}</th>
                   <th>{t("valueCol")}</th>
                   {!isReadOnly && <th>{t("quickAdjustCol")}</th>}
+                  {canDelete && <th>Actions</th>}
                 </tr>
               </thead>
               <tbody>
@@ -359,11 +372,22 @@ function InventoryProductsPage() {
                       )}
                     </td>
                     )}
+                    {canDelete && (
+                      <td>
+                        <button
+                          onClick={() => handleDeleteProduct(product.id, product.name)}
+                          className="rounded-lg p-2 text-[#9090a0] hover:bg-[#f43f5e]/10 hover:text-[#f43f5e]"
+                          title="Delete product"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
                 {products.length === 0 && (
                   <tr>
-                    <td colSpan={isReadOnly ? 7 : 8} className="text-center text-[#606070]">
+                    <td colSpan={8} className="text-center text-[#606070]">
                       {t("noProductsFound")}
                     </td>
                   </tr>
