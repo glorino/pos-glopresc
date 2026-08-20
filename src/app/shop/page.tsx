@@ -69,6 +69,10 @@ export default function ShopPage() {
         setFreeShippingThreshold(data.freeShippingThreshold || 0);
       })
       .catch(() => {});
+    if (window.location.search.includes("checkout=1")) {
+      window.history.replaceState({}, "", "/shop");
+      setTimeout(() => setCheckoutOpen(true), 300);
+    }
   }, []);
 
   async function fetchProducts() {
@@ -203,7 +207,7 @@ export default function ShopPage() {
           <h1 className="text-3xl font-bold text-[#f0f0f5] sm:text-5xl">
             {t("welcomeTo")}{" "}
             <span className="bg-gradient-to-r from-[#d4a843] to-[#c49a38] bg-clip-text text-transparent">
-              {t("appName")}
+              {APP_NAME}
             </span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-[#9090a0]">
@@ -304,7 +308,15 @@ export default function ShopPage() {
                     </span>
                   </div>
                   <button
-                    onClick={() => cartAddToCart(product)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (product.stockQuantity > 0) {
+                        cartAddToCart(product);
+                        setCartOpen(false);
+                        setCheckoutOpen(true);
+                      }
+                    }}
                     disabled={product.stockQuantity <= 0}
                     className="btn btn-primary mt-3 w-full text-xs"
                   >
