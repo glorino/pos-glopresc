@@ -37,7 +37,7 @@ export default function FlutterwavePayment({
     }
     const script = document.createElement("script");
     script.id = "flutterwave-script";
-    script.src = "https://checkout.flutterwave.com/js/rave.js";
+    script.src = "https://checkout.flutterwave.com/v3.js";
     script.onload = () => setScriptLoaded(true);
     document.head.appendChild(script);
   }, []);
