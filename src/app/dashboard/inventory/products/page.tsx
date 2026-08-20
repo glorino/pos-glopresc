@@ -163,9 +163,15 @@ function InventoryProductsPage() {
     if (!confirm(`Are you sure you want to delete "${productName}"?`)) return;
     try {
       const res = await fetch(`/api/products?id=${productId}`, { method: "DELETE" });
-      if (res.ok) fetchProducts();
+      if (res.ok) {
+        fetchProducts();
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to delete product");
+      }
     } catch (error) {
       console.error("Failed to delete product:", error);
+      alert("Failed to delete product");
     }
   }
 

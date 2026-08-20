@@ -31,9 +31,7 @@ export async function GET(request: NextRequest) {
 
     const where: Record<string, any> = {};
 
-    if (isActive !== null && isActive !== undefined) {
-      where.isActive = isActive === "true";
-    }
+    where.isActive = isActive !== null && isActive !== undefined ? isActive === "true" : true;
 
     if (isRawMaterial !== null && isRawMaterial !== undefined) {
       where.isRawMaterial = isRawMaterial === "true";
