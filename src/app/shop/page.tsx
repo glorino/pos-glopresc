@@ -16,7 +16,6 @@ import {
   ChevronRight,
   ArrowLeft,
   CreditCard,
-  CheckCircle2,
   MapPin,
 } from "lucide-react";
 import PublicHeader from "@/components/layout/PublicHeader";
@@ -57,7 +56,6 @@ export default function ShopPage() {
   const [shippingEstimate, setShippingEstimate] = useState("");
   const [shippingAddress, setShippingAddress] = useState("");
   const [freeShippingThreshold, setFreeShippingThreshold] = useState(0);
-  const [orderSuccess, setOrderSuccess] = useState(false);
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerName, setCustomerName] = useState("");
 
@@ -117,12 +115,12 @@ export default function ShopPage() {
       });
 
       if (res.ok) {
-        setOrderSuccess(true);
         clearCart();
         setCheckoutOpen(false);
         setShippingFee(0);
         setShippingEstimate("");
         setShippingAddress("");
+        window.location.href = `/shop/orders/${encodeURIComponent(txRef)}`;
       } else {
         const data = await res.json();
         console.error("Sale creation failed:", data);
@@ -146,32 +144,6 @@ export default function ShopPage() {
       product.category?.name === selectedDbCategory;
     return matchesSearch && matchesCategory;
   });
-
-  if (orderSuccess) {
-    return (
-      <div className="min-h-screen bg-[#0a0a0f]">
-        <div className="flex min-h-screen items-center justify-center px-4">
-          <div className="w-full max-w-md rounded-2xl border border-[#2a2a3a] bg-[#111118] p-8 text-center">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#10b981]/10">
-              <CheckCircle2 size={40} className="text-[#10b981]" />
-            </div>
-            <h2 className="text-2xl font-bold text-[#f0f0f5]">{t("orderConfirmed")}</h2>
-            <p className="mt-2 text-sm text-[#9090a0]">
-              {t("orderConfirmedDesc")}
-            </p>
-            <Link
-              href="/shop"
-              onClick={() => setOrderSuccess(false)}
-              className="btn btn-primary mt-8 inline-flex items-center gap-2"
-            >
-              <ArrowLeft size={16} />
-              {t("continueShopping")}
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
