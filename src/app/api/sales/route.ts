@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
           total,
           amountPaid: Number(amountPaid ?? total),
           changeDue: Number(amountPaid ?? total) - total,
-          paymentMethod: paymentMethod ?? "CASH",
+          paymentMethod: (paymentMethod ?? "CASH").toUpperCase(),
           txRef: txRef || null,
           status: "COMPLETED",
           notes: notes || null,
@@ -227,7 +227,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error("Sales POST error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to create sale" },
+      { error: error.message || "Failed to create sale", details: error.stack },
       { status: 500 }
     );
   }

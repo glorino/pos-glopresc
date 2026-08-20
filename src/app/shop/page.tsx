@@ -108,7 +108,7 @@ export default function ShopPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items,
-          paymentMethod: "online",
+          paymentMethod: "ONLINE",
           amountPaid: subtotal + effectiveShipping,
           txRef,
           customerName,
@@ -124,9 +124,12 @@ export default function ShopPage() {
         setShippingEstimate("");
         setShippingAddress("");
       } else {
-                        alert(t("failedToRecordSale"));
+        const data = await res.json();
+        console.error("Sale creation failed:", data);
+        alert(t("failedToRecordSale") + (data.error ? ` (${data.error})` : ""));
       }
-    } catch {
+    } catch (err) {
+        console.error("Sale creation error:", err);
         alert(t("failedToRecordSale"));
     }
   }
