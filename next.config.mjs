@@ -11,7 +11,7 @@ const nextConfig = {
       {
         source: '/(.*)',
         headers: [
-          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-XSS-Protection', value: '1; mode=block' },
@@ -20,11 +20,11 @@ const nextConfig = {
           { key: 'Content-Security-Policy', value: [
             "default-src 'self'",
             "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.paystack.co https://checkout.flutterwave.com https://maps.googleapis.com",
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-            "img-src 'self' data: blob: https://images.unsplash.com https://placehold.co https://maps.googleapis.com",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://checkout.flutterwave.com",
+            "img-src 'self' data: blob: https://images.unsplash.com https://placehold.co https://maps.googleapis.com https://checkout.flutterwave.com",
             "font-src 'self' https://fonts.gstatic.com",
-            "connect-src 'self' https://api.termii.com https://api.flutterwave.com https://maps.googleapis.com",
-            "frame-src https://checkout.flutterwave.com https://js.paystack.co",
+            "connect-src 'self' https://api.termii.com https://api.flutterwave.com https://maps.googleapis.com https://checkout.flutterwave.com https://rave-api.flutterwave.com",
+            "frame-src 'self' https://checkout.flutterwave.com https://js.paystack.co https://*.flutterwave.com",
           ].join('; ') },
         ],
       },
