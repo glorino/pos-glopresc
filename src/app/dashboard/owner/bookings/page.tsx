@@ -294,7 +294,7 @@ export default function BookingsPage() {
       </div>
 
       {showModal && editingBooking && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
           <div className="glass-card w-full max-w-lg p-6">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-[#f0f0f5]">
@@ -365,7 +365,7 @@ export default function BookingsPage() {
       )}
 
       {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
           <div className="glass-card w-full max-w-md p-6">
             <h2 className="mb-4 text-xl font-semibold text-[#f0f0f5]">Delete Booking</h2>
             <p className="mb-6 text-[#9090a0]">

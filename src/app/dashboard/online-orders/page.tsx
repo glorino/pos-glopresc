@@ -51,10 +51,6 @@ export default function OnlineOrdersPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<OnlineOrder | null>(null);
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
   async function fetchOrders() {
     try {
       setLoading(true);
@@ -118,7 +114,7 @@ export default function OnlineOrdersPage() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout title={t("onlineOrders")}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

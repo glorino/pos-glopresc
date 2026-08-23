@@ -212,9 +212,9 @@ export async function POST(request: NextRequest) {
         data: { saleId: sale.id },
       });
 
-      const staffRoles = ["OWNER", "MANAGER", "WAREHOUSE_MANAGER", "SALES_MANAGER"];
+      const staffRoles = ["OWNER", "MANAGER", "WAREHOUSE_MANAGER", "SALES_MANAGER"] as const;
       const staffUsers = await db.user.findMany({
-        where: { role: { in: staffRoles }, isActive: true },
+        where: { role: { in: staffRoles as any }, isActive: true },
         select: { id: true },
       });
       const addressNote = shippingAddress ? ` Deliver to: ${shippingAddress}` : "";
@@ -224,8 +224,8 @@ export async function POST(request: NextRequest) {
             data: {
               userId: u.id,
               title: "New Online Order",
-              message: `Invoice ${sale.invoiceNumber} — ${sale.items.length} item(s), Total: ₦${Number(sale.total).toLocaleString("en-NG", { minimumFractionDigits: 2 })}.${addressNote}`,
-              type: "ORDER",
+              message: `Invoice ${sale.invoiceNumber} — ${sale.items.length} item(s), Total: ${Number(sale.total).toLocaleString("en-NG", { minimumFractionDigits: 2 })}.${addressNote}`,
+              type: "INFO",
             },
           }).catch(() => {})
         )
@@ -247,7 +247,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error("Sales POST error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to create sale", details: error.stack },
+      { error: error.message || "Failed to create sale" },
       { status: 500 }
     );
   }
