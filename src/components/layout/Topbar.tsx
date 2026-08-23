@@ -173,7 +173,7 @@ export default function Topbar({ title, user, onMenuToggle }: TopbarProps) {
           <input
             type="text"
             placeholder={t("searchPlaceholder")}
-            className="input !py-2 !pl-9 !pr-4 !text-sm w-56 focus:w-64 transition-all"
+            className="input !py-2 !pl-9 !pr-4 !text-sm w-56 focus:w-64 transition-all hidden sm:block"
           />
         </div>
 
@@ -195,7 +195,7 @@ export default function Topbar({ title, user, onMenuToggle }: TopbarProps) {
           </button>
 
           {notifOpen && (
-            <div className="absolute right-0 top-full z-50 mt-2 w-80 max-h-[70vh] overflow-hidden rounded-xl border border-[#2a2a3a] bg-[#16161f] shadow-xl sm:w-96">
+            <div className="absolute right-0 top-full z-50 mt-2 w-[calc(100vw-2rem)] max-w-[24rem] max-h-[70vh] overflow-hidden rounded-xl border border-[#2a2a3a] bg-[#16161f] shadow-xl">
               <div className="flex items-center justify-between border-b border-[#2a2a3a] px-4 py-3">
                 <h3 className="text-sm font-semibold text-[#f0f0f5]">{t("notifications")}</h3>
                 {unreadCount > 0 && (
@@ -300,16 +300,6 @@ export default function Topbar({ title, user, onMenuToggle }: TopbarProps) {
                 </p>
                 <p className="text-xs text-[#606070]">{user.email}</p>
               </div>
-              <button
-                onClick={() => {
-                  setDropdownOpen(false);
-                  router.push(settingsRoute);
-                }}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#9090a0] hover:bg-white/5 hover:text-[#f0f0f5]"
-              >
-                <User size={14} />
-                {t("profile")}
-              </button>
               <button
                 onClick={() => {
                   setDropdownOpen(false);

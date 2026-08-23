@@ -23,6 +23,7 @@ import {
   DollarSign,
   AlertTriangle,
   Calendar,
+  ShoppingBag,
 } from "lucide-react";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { APP_NAME } from "@/lib/utils";
@@ -76,6 +77,7 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
         { icon: Building2, label: "branches", href: "/dashboard/owner/branches" },
         { icon: AlertTriangle, label: "cashShortages", href: "/dashboard/owner/cash-shortages" },
         { icon: Calendar, label: "bookings", href: "/dashboard/owner/bookings" },
+        { icon: ShoppingBag, label: "onlineOrders", href: "/dashboard/online-orders" },
         { icon: Settings, label: "settings", href: "/dashboard/owner/settings" },
       ],
     },
@@ -92,6 +94,7 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
       title: "operations",
       items: [
         { icon: ShoppingCart, label: "sales", href: "/dashboard/sales-manager/sales" },
+        { icon: ShoppingBag, label: "onlineOrders", href: "/dashboard/online-orders" },
         { icon: Users, label: "customers", href: "/dashboard/sales-manager/customers" },
         { icon: Package, label: "inventory", href: "/dashboard/inventory" },
         { icon: Truck, label: "procurement", href: "/dashboard/procurement" },
@@ -110,6 +113,7 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
       items: [
         { icon: Home, label: "home", href: "/" },
         { icon: LayoutDashboard, label: "dashboard", href: "/dashboard/inventory" },
+        { icon: ShoppingBag, label: "onlineOrders", href: "/dashboard/online-orders" },
       ],
     },
     {
@@ -185,6 +189,7 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
       title: "sales",
       items: [
         { icon: ShoppingCart, label: "sales", href: "/dashboard/sales-manager/sales" },
+        { icon: ShoppingBag, label: "onlineOrders", href: "/dashboard/online-orders" },
         { icon: Users, label: "customers", href: "/dashboard/sales-manager/customers" },
       ],
     },

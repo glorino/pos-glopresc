@@ -15,6 +15,7 @@ import {
   ShoppingCart,
   Filter,
   ChevronDown,
+  MapPin,
 } from "lucide-react";
 
 interface SaleItem {
@@ -38,6 +39,7 @@ interface Sale {
   paymentMethod: string;
   status: string;
   notes: string | null;
+  shippingAddress: string | null;
   createdAt: string;
   items: SaleItem[];
 }
@@ -184,6 +186,7 @@ export default function SalesManagementPage() {
               className="input select w-auto"
             >
               <option value="">{t("allPayments")}</option>
+              <option value="ONLINE">Online</option>
               <option value="CASH">{t("cash")}</option>
               <option value="CARD">{t("card")}</option>
               <option value="TRANSFER">{t("transfer")}</option>
@@ -341,6 +344,18 @@ export default function SalesManagementPage() {
                   <span className="badge badge-info">{selectedSale.paymentMethod}</span>
                 </div>
               </div>
+
+              {selectedSale.shippingAddress && (
+                <div className="rounded-xl border border-[#f59e0b]/30 bg-[#f59e0b]/5 p-3">
+                  <div className="flex items-start gap-2">
+                    <MapPin size={16} className="mt-0.5 shrink-0 text-[#f59e0b]" />
+                    <div>
+                      <p className="text-xs font-semibold text-[#f59e0b]">DELIVERY ADDRESS</p>
+                      <p className="text-sm text-[#f0f0f5]">{selectedSale.shippingAddress}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="border-t border-[#2a2a3a] pt-4">
                 <h4 className="mb-3 text-sm font-semibold text-[#f0f0f5]">{t("itemsCol")}</h4>

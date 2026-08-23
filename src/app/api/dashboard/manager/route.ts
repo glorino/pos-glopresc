@@ -162,7 +162,6 @@ export async function GET(request: Request) {
 
     const todayRevenue = Number(todayRevenueResult._sum.total ?? 0);
     const totalInventoryQuantity = Number(inventoryValueResult._sum.stockQuantity ?? 0);
-    const inventoryValue = totalInventoryQuantity * 0;
 
     const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const thisWeekData: { name: string; thisWeek: number; lastWeek: number }[] = [];
@@ -175,8 +174,8 @@ export async function GET(request: Request) {
 
       thisWeekData.push({
         name: weekDays[i],
-        thisWeek: 0,
-        lastWeek: 0,
+        thisWeek: Number(thisWeekSales?._sum?.total ?? 0),
+        lastWeek: Number(lastWeekSales?._sum?.total ?? 0),
       });
     }
 

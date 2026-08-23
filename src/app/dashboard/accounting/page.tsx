@@ -168,7 +168,7 @@ export default function AccountingDashboard() {
         {/* Date Range Filter & Total Payments */}
         <div className="glass-card p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <input
                 type="date"
                 value={dateFrom}

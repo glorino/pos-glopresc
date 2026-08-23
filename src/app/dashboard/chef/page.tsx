@@ -16,6 +16,7 @@ import {
   Download,
   CheckCircle,
 } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
 
 interface MenuItem {
   id: string;
@@ -159,7 +160,7 @@ export default function ChefDashboard() {
     { label: "View Products", action: () => router.push("/dashboard/inventory/products"), icon: Utensils, color: "text-[#d4a843]" },
     { label: "Stock", action: () => router.push("/dashboard/inventory/stock"), icon: Package, color: "text-[#3b82f6]" },
     { label: "Categories", action: () => router.push("/dashboard/inventory/categories"), icon: ClipboardList, color: "text-[#8b5cf6]" },
-    { label: "Finished Products", action: () => router.push("/dashboard/inventory/finished"), icon: ChefHat, color: "text-[#10b981]" },
+    { label: "Finished Products", action: () => router.push("/dashboard/inventory/finished-products"), icon: ChefHat, color: "text-[#10b981]" },
   ];
 
   return (
@@ -290,7 +291,7 @@ export default function ChefDashboard() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-semibold text-[#d4a843]">₦{order.total?.toLocaleString()}</p>
+                    <p className="text-sm font-semibold text-[#d4a843]">{formatCurrency(order.total ?? 0)}</p>
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                         order.status === "COMPLETED"

@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { customerId, items, paymentMethod, amountPaid, notes, discount = 0, tax = 0, customerName, customerEmail, txRef } = body;
+    const { customerId, items, paymentMethod, amountPaid, notes, discount = 0, tax = 0, customerName, customerEmail, txRef, shippingAddress } = body;
 
     const session = await getServerSession(authOptions);
     const branchId = session?.user?.branchId || null;
@@ -177,6 +177,7 @@ export async function POST(request: NextRequest) {
           txRef: txRef || null,
           status: "COMPLETED",
           notes: notes || null,
+          shippingAddress: shippingAddress || null,
           items: {
             create: saleItems,
           },
@@ -210,6 +211,25 @@ export async function POST(request: NextRequest) {
         where: { reference: txRef },
         data: { saleId: sale.id },
       });
+
+      const staffRoles = ["OWNER", "MANAGER", "WAREHOUSE_MANAGER", "SALES_MANAGER"];
+      const staffUsers = await db.user.findMany({
+        where: { role: { in: staffRoles }, isActive: true },
+        select: { id: true },
+      });
+      const addressNote = shippingAddress ? ` Deliver to: ${shippingAddress}` : "";
+      await Promise.all(
+        staffUsers.map((u) =>
+          db.notification.create({
+            data: {
+              userId: u.id,
+              title: "New Online Order",
+              message: `Invoice ${sale.invoiceNumber} — ${sale.items.length} item(s), Total: ₦${Number(sale.total).toLocaleString("en-NG", { minimumFractionDigits: 2 })}.${addressNote}`,
+              type: "ORDER",
+            },
+          }).catch(() => {})
+        )
+      );
     }
 
     if (resolvedCustomerId) {

@@ -111,6 +111,7 @@ export default function ShopPage() {
           txRef,
           customerName,
           customerEmail,
+          shippingAddress,
         }),
       });
 

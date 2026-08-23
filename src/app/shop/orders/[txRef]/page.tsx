@@ -11,7 +11,7 @@ import {
   Copy,
   Check,
 } from "lucide-react";
-import { APP_NAME } from "@/lib/utils";
+import { formatCurrency, APP_NAME } from "@/lib/utils";
 
 interface OrderItem {
   name: string;
@@ -187,9 +187,7 @@ export default function OrderConfirmationPage() {
                     </div>
                   </div>
                   <p className="text-sm font-semibold text-[#f0f0f5]">
-                    {APP_NAME.includes("₦") || true
-                      ? `₦${item.total.toLocaleString("en-NG", { minimumFractionDigits: 2 })}`
-                      : `$${item.total.toFixed(2)}`}
+                    {formatCurrency(item.total)}
                   </p>
                 </div>
               ))}
@@ -200,14 +198,14 @@ export default function OrderConfirmationPage() {
             <div className="flex justify-between text-sm">
               <span className="text-[#9090a0]">Subtotal</span>
               <span className="text-[#f0f0f5]">
-                ₦{order.subtotal.toLocaleString("en-NG", { minimumFractionDigits: 2 })}
+                {formatCurrency(order.subtotal)}
               </span>
             </div>
             {order.discount > 0 && (
               <div className="flex justify-between text-sm">
                 <span className="text-[#9090a0]">Discount</span>
                 <span className="text-[#10b981]">
-                  -₦{order.discount.toLocaleString("en-NG", { minimumFractionDigits: 2 })}
+                  -{formatCurrency(order.discount)}
                 </span>
               </div>
             )}
@@ -215,14 +213,14 @@ export default function OrderConfirmationPage() {
               <div className="flex justify-between text-sm">
                 <span className="text-[#9090a0]">Tax</span>
                 <span className="text-[#f0f0f5]">
-                  ₦{order.tax.toLocaleString("en-NG", { minimumFractionDigits: 2 })}
+                  {formatCurrency(order.tax)}
                 </span>
               </div>
             )}
             <div className="border-t border-[#2a2a3a] pt-2 flex justify-between">
               <span className="text-base font-bold text-[#f0f0f5]">Total Paid</span>
               <span className="text-lg font-bold text-[#f59e0b]">
-                ₦{order.total.toLocaleString("en-NG", { minimumFractionDigits: 2 })}
+                {formatCurrency(order.total)}
               </span>
             </div>
           </div>

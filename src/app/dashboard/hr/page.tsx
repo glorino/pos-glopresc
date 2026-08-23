@@ -154,8 +154,8 @@ export default function HRDashboard() {
 
   const quickActions = [
     { label: "View Employees", action: () => router.push("/dashboard/owner/users"), icon: Users, color: "text-[#d4a843]" },
-    { label: "Manage Leave", action: () => router.push("/dashboard/hr/leave"), icon: Calendar, color: "text-[#f59e0b]" },
-    { label: "View Attendance", action: () => router.push("/dashboard/hr/attendance"), icon: Clock, color: "text-[#3b82f6]" },
+    { label: "Manage Leave", action: () => router.push("/dashboard/hr"), icon: Calendar, color: "text-[#f59e0b]" },
+    { label: "View Attendance", action: () => router.push("/dashboard/hr"), icon: Clock, color: "text-[#3b82f6]" },
   ];
 
   return (
@@ -213,7 +213,7 @@ export default function HRDashboard() {
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-[#f0f0f5]">Recent Leave Requests</h3>
               <button
-                onClick={() => router.push("/dashboard/hr/leave")}
+                onClick={() => router.push("/dashboard/hr")}
                 className="flex items-center gap-1 text-sm text-[#d4a843] hover:text-[#b8942f]"
               >
                 View All <ArrowRight size={14} />

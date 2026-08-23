@@ -173,7 +173,7 @@ export default function BEMDashboard() {
   ];
 
   const quickActions = [
-    { label: "Reports", action: () => router.push("/dashboard/bem/reports"), icon: FileText, color: "text-[#3b82f6]" },
+    { label: "Reports", action: () => router.push("/dashboard/bem"), icon: FileText, color: "text-[#3b82f6]" },
     { label: "Sales", action: () => router.push("/dashboard/owner/reports"), icon: BarChart3, color: "text-[#d4a843]" },
     { label: "Inventory", action: () => router.push("/dashboard/inventory/stock"), icon: TrendingUp, color: "text-[#10b981]" },
   ];
@@ -300,7 +300,7 @@ export default function BEMDashboard() {
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-[#f0f0f5]">Recent Efficiency Reports</h3>
               <button
-                onClick={() => router.push("/dashboard/bem/reports")}
+                onClick={() => router.push("/dashboard/bem")}
                 className="flex items-center gap-1 text-sm text-[#d4a843] hover:text-[#b8942f]"
               >
                 View All <ArrowRight size={14} />

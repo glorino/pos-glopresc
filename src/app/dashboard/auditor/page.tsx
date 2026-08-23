@@ -588,7 +588,7 @@ export default function AuditorDashboard() {
         {/* Audit Log Filters */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-lg font-semibold text-[#f0f0f5]">{t("auditLogsSection")}</h3>
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <div className="relative">
               <Search
                 size={16}

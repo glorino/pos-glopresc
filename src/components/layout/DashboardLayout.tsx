@@ -81,7 +81,7 @@ export default function DashboardLayout({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar title={title} user={displayUser} onMenuToggle={() => setSidebarOpen((p) => !p)} />
-        <main className={`flex-1 overflow-y-auto ${noPadding ? "" : "p-4 sm:p-6"}`}>{children}</main>
+        <main className={`flex-1 overflow-y-auto overflow-x-hidden ${noPadding ? "" : "p-4 sm:p-6"}`}>{children}</main>
       </div>
 
       <AIChatbot />

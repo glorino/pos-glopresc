@@ -169,8 +169,8 @@ export default function BCMDashboard() {
   ];
 
   const quickActions = [
-    { label: "View Audit Logs", action: () => router.push("/dashboard/bcm/audit-logs"), icon: Eye, color: "text-[#3b82f6]" },
-    { label: "Reports", action: () => router.push("/dashboard/bcm/reports"), icon: FileText, color: "text-[#8b5cf6]" },
+    { label: "View Audit Logs", action: () => router.push("/dashboard/auditor"), icon: Eye, color: "text-[#3b82f6]" },
+    { label: "Reports", action: () => router.push("/dashboard/owner/reports"), icon: FileText, color: "text-[#8b5cf6]" },
   ];
 
   return (
@@ -343,7 +343,7 @@ export default function BCMDashboard() {
               <h3 className="text-lg font-semibold text-[#f0f0f5]">Recent Audit Logs</h3>
             </div>
             <button
-              onClick={() => router.push("/dashboard/bcm/audit-logs")}
+              onClick={() => router.push("/dashboard/auditor")}
               className="flex items-center gap-1 text-sm text-[#d4a843] hover:text-[#b8942f]"
             >
               View All <ArrowRight size={14} />
