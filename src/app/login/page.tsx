@@ -48,10 +48,10 @@ export default function LoginPage() {
           CUSTOMER: "/dashboard/customer",
           CASHIER: "/dashboard/cashier",
           CFO: "/dashboard/accounting",
-          HR_MANAGER: "/dashboard/owner",
-          CHIEF_CHEF: "/dashboard/inventory",
-          BUSINESS_CONTINUITY_MANAGER: "/dashboard/auditor",
-          BUSINESS_EFFICIENCY_MANAGER: "/dashboard/manager",
+          HR_MANAGER: "/dashboard/hr",
+          CHIEF_CHEF: "/dashboard/chef",
+          BUSINESS_CONTINUITY_MANAGER: "/dashboard/bcm",
+          BUSINESS_EFFICIENCY_MANAGER: "/dashboard/bem",
         };
         router.push(roleRoutes[role] || "/login");
         router.refresh();

@@ -289,8 +289,7 @@ export default function ShopPage() {
                       e.stopPropagation();
                       if (product.stockQuantity > 0) {
                         cartAddToCart(product);
-                        setCartOpen(false);
-                        setCheckoutOpen(true);
+                        setCartOpen(true);
                       }
                     }}
                     disabled={product.stockQuantity <= 0}

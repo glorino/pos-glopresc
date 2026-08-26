@@ -173,7 +173,7 @@ export default function BEMDashboard() {
   ];
 
   const quickActions = [
-    { label: "Reports", action: () => router.push("/dashboard/bem"), icon: FileText, color: "text-[#3b82f6]" },
+    { label: "Reports", action: () => document.getElementById("reports-section")?.scrollIntoView({ behavior: "smooth" }), icon: FileText, color: "text-[#3b82f6]" },
     { label: "Sales", action: () => router.push("/dashboard/owner/reports"), icon: BarChart3, color: "text-[#d4a843]" },
     { label: "Inventory", action: () => router.push("/dashboard/inventory/stock"), icon: TrendingUp, color: "text-[#10b981]" },
   ];
@@ -296,7 +296,7 @@ export default function BEMDashboard() {
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           {/* Recent Efficiency Reports */}
-          <div className="glass-card p-6">
+          <div id="reports-section" className="glass-card p-6">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-[#f0f0f5]">Recent Efficiency Reports</h3>
               <button

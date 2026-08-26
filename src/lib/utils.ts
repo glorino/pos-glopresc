@@ -75,32 +75,6 @@ export function generateSKU(prefix: string): string {
   return `${prefix}-${random}`;
 }
 
-export function getStatusBadgeClass(status: string): string {
-  switch (status) {
-    case "PENDING": return "badge-warning";
-    case "APPROVED": return "badge-info";
-    case "ORDERED": return "badge-purple";
-    case "RECEIVED":
-    case "COMPLETED":
-    case "PAID": return "badge-success";
-    case "CANCELLED":
-    case "REJECTED": return "badge-danger";
-    case "RETURNED":
-    case "REFUNDED": return "badge-warning";
-    default: return "badge-info";
-  }
-}
-
-export function getUrgencyBadgeClass(urgency: string): string {
-  switch (urgency) {
-    case "URGENT": return "badge-danger";
-    case "HIGH": return "badge-warning";
-    case "NORMAL": return "badge-info";
-    case "LOW": return "badge-success";
-    default: return "badge-info";
-  }
-}
-
 export const APP_URL = process.env.APP_URL || "http://localhost:3000";
 export const APP_NAME = process.env.APP_NAME || "SSV Shop POS";
 export const APP_CURRENCY = process.env.NEXT_PUBLIC_CURRENCY || "NGN";

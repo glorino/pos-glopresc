@@ -58,15 +58,17 @@ export default function ChefDashboard() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [lowStock, setLowStock] = useState<LowStockItem[]>([]);
+  const [wasteReports, setWasteReports] = useState<WasteReport[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [prodRes, orderRes, stockRes] = await Promise.all([
+        const [prodRes, orderRes, stockRes, wasteRes] = await Promise.all([
           fetch("/api/products"),
           fetch("/api/sales"),
           fetch("/api/inventory/stock"),
+          fetch("/api/waste-reports"),
         ]);
         if (prodRes.ok) {
           const d = await prodRes.json();
@@ -81,6 +83,17 @@ export default function ChefDashboard() {
           const items = Array.isArray(d) ? d : d.stock ?? [];
           setLowStock(items.filter((i: LowStockItem) => i.stockQuantity <= i.minStockLevel));
         }
+        if (wasteRes.ok) {
+          const d = await wasteRes.json();
+          const mapped = (Array.isArray(d) ? d : []).map((w: Record<string, unknown>) => ({
+            id: w.id as string,
+            itemName: (w.product as Record<string, string>)?.name || "Unknown",
+            quantityWasted: w.quantity as number,
+            reason: w.reason as string,
+            date: w.createdAt as string,
+          }));
+          setWasteReports(mapped);
+        }
       } catch (error) {
         console.error("Failed to fetch chef dashboard data:", error);
       } finally {
@@ -92,12 +105,6 @@ export default function ChefDashboard() {
 
   const todayStr = new Date().toISOString().slice(0, 10);
   const todayOrders = orders.filter((o) => o.createdAt?.startsWith(todayStr));
-
-  const mockWasteReports: WasteReport[] = [
-    { id: "1", itemName: "Fresh Tomatoes", quantityWasted: 5, reason: "Spoiled", date: "2026-08-17" },
-    { id: "2", itemName: "Chicken Breast", quantityWasted: 3, reason: "Expired", date: "2026-08-16" },
-    { id: "3", itemName: "Lettuce", quantityWasted: 2, reason: "Wilting", date: "2026-08-15" },
-  ];
 
   const exportToCSV = () => {
     const rows = orders.map((o) => [o.invoiceNumber, o.total, o.status, o.createdAt].join(","));
@@ -148,7 +155,7 @@ export default function ChefDashboard() {
     },
     {
       label: "Waste Reports",
-      value: mockWasteReports.length.toLocaleString(),
+      value: wasteReports.length.toLocaleString(),
       icon: Package,
       gradient: "from-[#f59e0b] to-[#d97706]",
       bgGradient: "from-[#f59e0b]/15 via-[#f59e0b]/5 to-transparent",
@@ -322,7 +329,7 @@ export default function ChefDashboard() {
             </div>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            {mockWasteReports.map((report) => (
+            {wasteReports.map((report) => (
               <div
                 key={report.id}
                 className="rounded-xl border border-[#f59e0b]/20 bg-[#f59e0b]/5 p-4 transition-all hover:bg-[#f59e0b]/10"

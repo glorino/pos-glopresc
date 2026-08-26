@@ -27,7 +27,8 @@ model Branch {
   expenses         Expense[]
   shifts           Shift[]
   budgets          Budget[]
-  damageReports    DamageReport[]
+   damageReports    DamageReport[]
+   wasteReports     WasteReport[]
 }
 
 // ── Users & Auth ──────────────────────────────────────────
@@ -68,7 +69,9 @@ model User {
   leaveRequests           LeaveRequest[]
   approvedLeaves          LeaveRequest[]    @relation("ApprovedLeaves")
   attendance              Attendance[]
-  damageReports           DamageReport[]
+   damageReports           DamageReport[]
+   wasteReports            WasteReport[]
+   incidents               Incident[]
 
   @@index([role])
   @@index([email])
@@ -175,7 +178,8 @@ model Product {
   stockAdjustments   StockAdjustment[]
   purchaseOrderItems PurchaseOrderItem[]
   reviews            ProductReview[]
-  DamageReport       DamageReport[]
+   DamageReport       DamageReport[]
+   wasteReports       WasteReport[]
 
   @@index([sku])
   @@index([name])
@@ -856,6 +860,85 @@ model DamageReport {
 
   @@index([productId])
   @@index([reportedBy])
+}
+
+// ── Waste Reports ───────────────────────────────────────
+model WasteReport {
+  id          String   @id @default(cuid())
+  productId   String
+  quantity    Int
+  reason      String   // EXPIRED, DAMAGED, SPOILED, OVERCOOKED, OTHER
+  reportedBy  String
+  branchId    String?
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  product  Product  @relation(fields: [productId], references: [id])
+  reporter User     @relation(fields: [reportedBy], references: [id])
+  branch   Branch?  @relation(fields: [branchId], references: [id])
+
+  @@index([productId])
+  @@index([reportedBy])
+}
+
+// ── BCM: Incidents ──────────────────────────────────────
+model Incident {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  severity    String   // LOW, MEDIUM, HIGH, CRITICAL
+  status      String   @default("REPORTED") // REPORTED, IN_PROGRESS, MONITORING, RESOLVED
+  reportedBy  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  reporter User @relation(fields: [reportedBy], references: [id])
+
+  @@index([status])
+  @@index([severity])
+}
+
+// ── BCM: Risk Assessments ───────────────────────────────
+model RiskAssessment {
+  id           String   @id @default(cuid())
+  area         String
+  riskLevel    String   // LOW, MEDIUM, HIGH, CRITICAL
+  score        Int
+  lastAssessed DateTime @default(now())
+  status       String   @default("ACTIVE") // ACTIVE, MONITORED, MITIGATED
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([status])
+  @@index([riskLevel])
+}
+
+// ── BEM: KPIs ───────────────────────────────────────────
+model KPI {
+  id       String  @id @default(cuid())
+  name     String
+  target   Float
+  current  Float
+  unit     String  @default("count")
+  status   String  @default("ACTIVE") // ACTIVE, COMPLETED, ARCHIVED
+  trend    String  @default("STABLE") // UP, DOWN, STABLE
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+// ── BEM: Process Improvements ───────────────────────────
+model ProcessImprovement {
+  id          String   @id @default(cuid())
+  process     String
+  description String
+  status      String   @default("PROPOSED") // PROPOSED, IN_PROGRESS, COMPLETED
+  impact      String   @default("LOW") // LOW, MEDIUM, HIGH
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
 }
 
 // ── Shipments ───────────────────────────────────────────

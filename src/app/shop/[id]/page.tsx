@@ -74,7 +74,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   function handleAddToCart() {
     if (!product) return;
     addToCart(product, quantity);
-    window.location.href = "/shop?checkout=1";
+    window.location.href = "/shop?cart=1";
   }
 
   if (loading) {

@@ -221,9 +221,19 @@ export default function OwnerReportsPage() {
 
   const handleExportCSV = (tab: string) => {
     const data = getExportData(tab);
-    if (!data) return;
-    const csv = JSON.stringify(data, null, 2);
-    const blob = new Blob([csv], { type: "application/json" });
+    if (!data || !Array.isArray(data) || data.length === 0) return;
+    const headers = Object.keys(data[0]);
+    const rows = data.map((row: Record<string, unknown>) =>
+      headers.map((h) => {
+        const val = row[h];
+        const str = String(val ?? "");
+        return str.includes(",") || str.includes('"') || str.includes("\n")
+          ? `"${str.replace(/"/g, '""')}"`
+          : str;
+      }).join(",")
+    );
+    const csv = [headers.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;

@@ -70,8 +70,6 @@ export async function GET(request: Request) {
       inventoryValueResult,
       pendingApprovals,
       customerVisits,
-      thisWeekSales,
-      lastWeekSales,
       staffPerformance,
       expenseSummary,
       lowStockItems,
@@ -103,24 +101,6 @@ export async function GET(request: Request) {
       db.customer.count({
         where: {
           createdAt: { gte: startOfToday, lte: endOfToday },
-        },
-      }),
-      db.sale.aggregate({
-        _sum: { total: true },
-        _count: true,
-        where: {
-          status: "COMPLETED",
-          createdAt: { gte: startOfThisWeek, lte: now },
-          ...(branchFilter || {}),
-        },
-      }),
-      db.sale.aggregate({
-        _sum: { total: true },
-        _count: true,
-        where: {
-          status: "COMPLETED",
-          createdAt: { gte: startOfLastWeek, lte: endOfLastWeek },
-          ...(branchFilter || {}),
         },
       }),
       db.user.findMany({
@@ -167,15 +147,41 @@ export async function GET(request: Request) {
     const thisWeekData: { name: string; thisWeek: number; lastWeek: number }[] = [];
 
     for (let i = 0; i < 7; i++) {
-      const dayDate = new Date(startOfThisWeek);
-      dayDate.setDate(dayDate.getDate() + i);
-      const lastDayDate = new Date(startOfLastWeek);
-      lastDayDate.setDate(lastDayDate.getDate() + i);
+      const dayStart = new Date(startOfThisWeek);
+      dayStart.setDate(dayStart.getDate() + i);
+      dayStart.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(dayStart);
+      dayEnd.setHours(23, 59, 59, 999);
+
+      const lastDayStart = new Date(startOfLastWeek);
+      lastDayStart.setDate(lastDayStart.getDate() + i);
+      lastDayStart.setHours(0, 0, 0, 0);
+      const lastDayEnd = new Date(lastDayStart);
+      lastDayEnd.setHours(23, 59, 59, 999);
+
+      const [thisDayTotal, lastDayTotal] = await Promise.all([
+        db.sale.aggregate({
+          _sum: { total: true },
+          where: {
+            status: "COMPLETED",
+            createdAt: { gte: dayStart, lte: dayEnd },
+            ...(branchFilter || {}),
+          },
+        }),
+        db.sale.aggregate({
+          _sum: { total: true },
+          where: {
+            status: "COMPLETED",
+            createdAt: { gte: lastDayStart, lte: lastDayEnd },
+            ...(branchFilter || {}),
+          },
+        }),
+      ]);
 
       thisWeekData.push({
         name: weekDays[i],
-        thisWeek: Number(thisWeekSales?._sum?.total ?? 0),
-        lastWeek: Number(lastWeekSales?._sum?.total ?? 0),
+        thisWeek: Number(thisDayTotal._sum.total ?? 0),
+        lastWeek: Number(lastDayTotal._sum.total ?? 0),
       });
     }
 

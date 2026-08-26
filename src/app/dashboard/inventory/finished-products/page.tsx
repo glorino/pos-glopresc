@@ -85,7 +85,7 @@ export default function FinishedProductsPage() {
       const res = await fetch("/api/finished-products");
       if (res.ok) {
         const data = await res.json();
-        setProducts(data.products ?? data ?? []);
+        setProducts(data.items ?? data.products ?? data ?? []);
       }
     } catch (error) {
       console.error("Failed to fetch finished products:", error);

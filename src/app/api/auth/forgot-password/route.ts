@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { checkRateLimit, getRateLimitKey } from "@/lib/rate-limit";
+import { sendSMS } from "@/lib/sms";
 import crypto from "crypto";
 
 export async function POST(request: NextRequest) {
@@ -44,11 +45,24 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // TODO: Send email/SMS with reset link containing the token
-    // For now, return the token in development only
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || "http://localhost:3000";
+    const resetUrl = `${appUrl}/reset-password?token=${token}`;
+
+    if (user.phone) {
+      try {
+        await sendSMS(
+          user.phone,
+          `Your ${process.env.APP_NAME || "SSV Shop POS"} password reset link: ${resetUrl} (expires in 1 hour). Ignore if you didn't request this.`
+        );
+      } catch (smsError) {
+        console.error("Failed to send reset SMS:", smsError);
+      }
+    }
+
     const response: Record<string, unknown> = { message: successMessage };
     if (process.env.NODE_ENV !== "production") {
       response._debug_token = token;
+      response._debug_reset_url = resetUrl;
     }
 
     return NextResponse.json(response);

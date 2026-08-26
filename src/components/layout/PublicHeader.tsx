@@ -52,7 +52,7 @@ export default function PublicHeader() {
             Login
           </Link>
           <Link
-            href="/dashboard/owner"
+            href="/login"
             className="btn btn-primary !py-2 !px-4 text-sm"
           >
             Go to Dashboard

@@ -54,14 +54,16 @@ export default function HRDashboard() {
   const { t } = useTranslation();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [attendance, setAttendance] = useState<Attendance[]>([]);
+  const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [empRes, attRes] = await Promise.all([
+        const [empRes, attRes, leaveRes] = await Promise.all([
           fetch("/api/users"),
           fetch("/api/attendance"),
+          fetch("/api/leave-requests"),
         ]);
         if (empRes.ok) {
           const empData = await empRes.json();
@@ -70,6 +72,21 @@ export default function HRDashboard() {
         if (attRes.ok) {
           const attData = await attRes.json();
           setAttendance(Array.isArray(attData) ? attData : attData.attendance ?? []);
+        }
+        if (leaveRes.ok) {
+          const leaveData = await leaveRes.json();
+          const mapped = (Array.isArray(leaveData) ? leaveData : []).map((l: Record<string, unknown>) => ({
+            id: l.id as string,
+            employeeName: (l.user as Record<string, string>)?.firstName
+              ? `${(l.user as Record<string, string>).firstName} ${(l.user as Record<string, string>).lastName}`
+              : "Unknown",
+            type: l.type as string,
+            startDate: l.startDate as string,
+            endDate: l.endDate as string,
+            status: l.status as string,
+            days: Math.max(1, Math.round((new Date(l.endDate as string).getTime() - new Date(l.startDate as string).getTime()) / 86400000)),
+          }));
+          setLeaveRequests(mapped);
         }
       } catch (error) {
         console.error("Failed to fetch HR data:", error);
@@ -80,15 +97,8 @@ export default function HRDashboard() {
     fetchData();
   }, []);
 
-  const mockLeaveRequests: LeaveRequest[] = [
-    { id: "1", employeeName: "Amina Bello", type: "Annual Leave", startDate: "2026-08-20", endDate: "2026-08-25", status: "PENDING", days: 5 },
-    { id: "2", employeeName: "Chukwu Eze", type: "Sick Leave", startDate: "2026-08-18", endDate: "2026-08-19", status: "APPROVED", days: 2 },
-    { id: "3", employeeName: "Fatima Abubakar", type: "Annual Leave", startDate: "2026-08-22", endDate: "2026-08-24", status: "PENDING", days: 3 },
-    { id: "4", employeeName: "Ibrahim Musa", type: "Maternity Leave", startDate: "2026-09-01", endDate: "2026-12-01", status: "PENDING", days: 90 },
-  ];
-
   const totalEmployees = employees.length;
-  const pendingLeave = mockLeaveRequests.filter((r) => r.status === "PENDING").length;
+  const pendingLeave = leaveRequests.filter((r) => r.status === "PENDING").length;
   const activeAttendance = attendance.filter((a) => a.clockIn && !a.clockOut).length;
   const todayStr = new Date().toISOString().slice(0, 10);
   const todayAttendance = attendance.filter((a) => a.date === todayStr);
@@ -154,8 +164,8 @@ export default function HRDashboard() {
 
   const quickActions = [
     { label: "View Employees", action: () => router.push("/dashboard/owner/users"), icon: Users, color: "text-[#d4a843]" },
-    { label: "Manage Leave", action: () => router.push("/dashboard/hr"), icon: Calendar, color: "text-[#f59e0b]" },
-    { label: "View Attendance", action: () => router.push("/dashboard/hr"), icon: Clock, color: "text-[#3b82f6]" },
+    { label: "Manage Leave", action: () => document.getElementById("leave-section")?.scrollIntoView({ behavior: "smooth" }), icon: Calendar, color: "text-[#f59e0b]" },
+    { label: "View Attendance", action: () => document.getElementById("attendance-section")?.scrollIntoView({ behavior: "smooth" }), icon: Clock, color: "text-[#3b82f6]" },
   ];
 
   return (
@@ -209,18 +219,18 @@ export default function HRDashboard() {
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           {/* Recent Leave Requests */}
-          <div className="glass-card p-6">
+          <div id="leave-section" className="glass-card p-6">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-[#f0f0f5]">Recent Leave Requests</h3>
               <button
-                onClick={() => router.push("/dashboard/hr")}
+                onClick={() => document.getElementById("leave-section")?.scrollIntoView({ behavior: "smooth" })}
                 className="flex items-center gap-1 text-sm text-[#d4a843] hover:text-[#b8942f]"
               >
                 View All <ArrowRight size={14} />
               </button>
             </div>
             <div className="space-y-3">
-              {mockLeaveRequests.map((request) => (
+              {leaveRequests.map((request) => (
                 <div
                   key={request.id}
                   className="flex items-center justify-between rounded-xl border border-[#2a2a3a] bg-[#1c1c28]/50 p-3 transition-all hover:bg-[#1c1c28]"
@@ -260,7 +270,7 @@ export default function HRDashboard() {
           </div>
 
           {/* Attendance Overview */}
-          <div className="glass-card p-6">
+          <div id="attendance-section" className="glass-card p-6">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-[#f0f0f5]">Today&apos;s Attendance</h3>
               <button

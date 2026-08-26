@@ -115,7 +115,7 @@ export default function LandingPage() {
                 {t("heroDescription")}
               </p>
               <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-                <Link href="/dashboard/owner" className="btn btn-primary btn-lg group">
+                <Link href="/login" className="btn btn-primary btn-lg group">
                   {t("goToDashboard")}
                   <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
                 </Link>
@@ -319,7 +319,7 @@ export default function LandingPage() {
               ))}
             </div>
             <div className="relative mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/dashboard/owner" className="btn btn-primary btn-lg group">
+              <Link href="/login" className="btn btn-primary btn-lg group">
                 {t("getStartedFree")}
                 <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
               </Link>

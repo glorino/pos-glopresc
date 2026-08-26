@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { APP_NAME } from "@/lib/utils";
+import { checkRateLimit, getRateLimitKey } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
+  const rateLimitKey = getRateLimitKey(request, "payment-init");
+  const rateLimit = checkRateLimit(rateLimitKey, 10, 60000);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await request.json();
     const { amount, email, name, description, saleId } = body;
@@ -10,6 +20,29 @@ export async function POST(request: NextRequest) {
     if (!amount || !email || !name) {
       return NextResponse.json(
         { error: "amount, email, and name are required" },
+        { status: 400 }
+      );
+    }
+
+    const numAmount = Number(amount);
+    if (isNaN(numAmount) || numAmount <= 0) {
+      return NextResponse.json(
+        { error: "Amount must be a positive number" },
+        { status: 400 }
+      );
+    }
+
+    if (numAmount > 1000000) {
+      return NextResponse.json(
+        { error: "Amount exceeds maximum allowed" },
+        { status: 400 }
+      );
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: "Invalid email format" },
         { status: 400 }
       );
     }
@@ -38,7 +71,7 @@ export async function POST(request: NextRequest) {
     await db.payment.create({
       data: {
         saleId: saleId || undefined,
-        amount: Number(amount),
+        amount: numAmount,
         method: "ONLINE",
         reference: txRef,
         description: description || `Payment for ${APP_NAME}`,
@@ -50,7 +83,7 @@ export async function POST(request: NextRequest) {
       status: "success",
       tx_ref: txRef,
       public_key: publicKey,
-      amount,
+      amount: numAmount,
       currency,
       customer: { email, name },
       description: description || `Payment for ${APP_NAME}`,

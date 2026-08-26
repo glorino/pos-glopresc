@@ -1,13 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { checkRateLimit, getRateLimitKey } from "@/lib/rate-limit";
 
 export async function GET(request: NextRequest) {
+  const rateLimitKey = getRateLimitKey(request, "payment-verify");
+  const rateLimit = checkRateLimit(rateLimitKey, 20, 60000);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      { status: 429 }
+    );
+  }
+
   const { searchParams } = new URL(request.url);
   const transactionId = searchParams.get("transaction_id");
 
   if (!transactionId) {
     return NextResponse.json(
       { error: "transaction_id is required" },
+      { status: 400 }
+    );
+  }
+
+  if (!/^\d+$/.test(transactionId)) {
+    return NextResponse.json(
+      { error: "Invalid transaction_id format" },
       { status: 400 }
     );
   }

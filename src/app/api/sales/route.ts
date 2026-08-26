@@ -7,7 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { requireAuth } from "@/lib/api-auth";
 
 export async function GET(request: NextRequest) {
-  const { error } = await requireAuth(["OWNER", "MANAGER", "SALES_MANAGER", "SALES_REP", "ACCOUNTANT"]);
+  const { error } = await requireAuth(["OWNER", "MANAGER", "WAREHOUSE_MANAGER", "SALES_MANAGER", "SALES_REP", "ACCOUNTANT"]);
   if (error) return error;
   try {
     const { searchParams } = new URL(request.url);
