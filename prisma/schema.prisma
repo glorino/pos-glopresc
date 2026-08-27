@@ -69,9 +69,10 @@ model User {
   leaveRequests           LeaveRequest[]
   approvedLeaves          LeaveRequest[]    @relation("ApprovedLeaves")
   attendance              Attendance[]
-   damageReports           DamageReport[]
-   wasteReports            WasteReport[]
-   incidents               Incident[]
+damageReports           DamageReport[]
+    wasteReports            WasteReport[]
+    incidents               Incident[]
+    procurementPayments     ProcurementPayment[]  @relation("ProcurementPayer")
 
   @@index([role])
   @@index([email])
@@ -576,6 +577,7 @@ model PurchaseOrder {
   supplier Supplier            @relation(fields: [supplierId], references: [id])
   items    PurchaseOrderItem[]
   creator  User                @relation("PurchaseOrderCreator", fields: [createdBy], references: [id])
+  payments ProcurementPayment[]
 
   @@index([orderNumber])
   @@index([status])
@@ -587,6 +589,8 @@ enum PurchaseStatus {
   PENDING
   APPROVED
   ORDERED
+  PAID
+  PARTIALLY_RECEIVED
   RECEIVED
   CANCELLED
 }
@@ -602,6 +606,26 @@ model PurchaseOrderItem {
 
   purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
   product       Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+// ── Procurement Payments ────────────────────────────────────
+model ProcurementPayment {
+  id              String   @id @default(cuid())
+  purchaseOrderId String
+  amount          Decimal  @db.Decimal(10, 2)
+  method          PaymentMethod
+  reference       String?  @unique
+  notes           String?
+  paidBy          String
+  paidAt          DateTime @default(now())
+  createdAt       DateTime @default(now())
+
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  payer         User          @relation("ProcurementPayer", fields: [paidBy], references: [id])
+
+  @@index([purchaseOrderId])
+  @@index([paidBy])
+  @@index([paidAt])
 }
 
 // ── Stock Adjustments ─────────────────────────────────────

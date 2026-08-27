@@ -1189,6 +1189,30 @@ export const en = {
   walkInLabel: "Walk-in",
   viewBtn: "View",
 
+  // Procurement Payments (new keys only)
+  procurementPaymentsTitle: "Procurement Payments",
+  purchaseOrdersLabel: "Purchase Orders",
+  paymentsLabel: "Payments",
+  searchPayments: "Search payments...",
+  totalPurchaseOrders: "Total Purchase Orders",
+  totalPaidLabel: "Total Paid",
+  totalPendingPayment: "Total Pending Payment",
+  paidCol: "Paid",
+  remainingCol: "Remaining",
+  receivedCol: "Received",
+  partiallyReceivedLabel: "Partially Received",
+  receiveOrderBtn: "Receive Order",
+  processingLabel: "Processing...",
+  amountLabel: "Amount",
+  methodLabel: "Method",
+  referenceLabel: "Reference",
+  paidByCol: "Paid By",
+  notesCol: "Notes",
+  addPaymentBtn: "Add Payment",
+  maxAmount: "Max amount:",
+  noPaymentsFound: "No payments found",
+  paymentsWillAppear: "Payments will appear here once recorded.",
+
   // Shop remaining
   cartEmptyShop: "Your cart is empty",
   fullNameLabel: "Full Name",
@@ -2402,7 +2426,7 @@ export const fr: Record<TranslationKey, string> = {
   walkInLabel: "Client de passage",
   viewBtn: "Voir",
 
-  // Boutique restant (new FR keys)
+  // Boutique restant (nouvelles clés FR)
   cartEmptyShop: "Votre panier est vide",
   fullNameLabel: "Nom complet",
   emailAddressLabel: "Adresse email",

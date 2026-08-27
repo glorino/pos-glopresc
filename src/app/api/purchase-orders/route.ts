@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { generateOrderNumber } from "@/lib/utils";
 import { requireAuth } from "@/lib/api-auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { UserRole } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   const { error } = await requireAuth();
@@ -73,8 +76,10 @@ export async function POST(request: NextRequest) {
   const { error } = await requireAuth(["OWNER", "MANAGER", "PROCUREMENT_MANAGER"]);
   if (error) return error;
   try {
+    const session = await getServerSession(authOptions);
+    const userId = (session?.user as { id?: string })?.id || "system";
     const body = await request.json();
-    const { supplierId, items, expectedDate, notes, createdBy } = body;
+    const { supplierId, items, expectedDate, notes } = body;
 
     if (!supplierId || !items || items.length === 0) {
       return NextResponse.json(
@@ -97,7 +102,7 @@ export async function POST(request: NextRequest) {
         total,
         expectedDate: expectedDate ? new Date(expectedDate) : null,
         notes: notes || null,
-        createdBy: createdBy || "system",
+        createdBy: userId,
         items: {
           create: items.map((item: any) => ({
             productId: item.productId,
@@ -167,6 +172,32 @@ export async function PUT(request: NextRequest) {
         },
       },
     });
+
+    // Notify on status change
+    if (data.status) {
+      const notifyRoles: string[] = [];
+      if (data.status === "APPROVED") notifyRoles.push("PROCUREMENT_MANAGER", "WAREHOUSE_MANAGER");
+      if (data.status === "ORDERED") notifyRoles.push("OWNER", "MANAGER");
+      if (data.status === "CANCELLED") notifyRoles.push("OWNER", "MANAGER", "ACCOUNTANT");
+
+      if (notifyRoles.length > 0) {
+        const notifyUsers = await db.user.findMany({
+          where: { role: { in: notifyRoles as UserRole[] }, isActive: true },
+          select: { id: true },
+        });
+        if (notifyUsers.length > 0) {
+          await db.notification.createMany({
+            data: notifyUsers.map((u) => ({
+              userId: u.id,
+              title: `PO ${data.status}`,
+              message: `Purchase Order ${purchaseOrder.orderNumber} has been ${data.status.toLowerCase()}.`,
+              type: data.status === "CANCELLED" ? "WARNING" : "INFO",
+              link: "/dashboard/procurement/purchase-orders",
+            })),
+          });
+        }
+      }
+    }
 
     return NextResponse.json({
       ...purchaseOrder,

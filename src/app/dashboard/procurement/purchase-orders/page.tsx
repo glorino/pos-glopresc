@@ -5,18 +5,28 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
 import {
-  ClipboardList,
-  Plus,
-  Search,
-  Eye,
-  X,
-  Package,
-  Truck,
-  CheckCircle,
-  Clock,
-  XCircle,
-  RefreshCw,
+  ClipboardList, Plus, Search, Eye, X, Package, Truck, CheckCircle,
+  Clock, XCircle, RefreshCw, DollarSign, ArrowRight,
 } from "lucide-react";
+
+interface POItem {
+  id: string;
+  quantity: number;
+  unitCost: number;
+  total: number;
+  receivedQty: number;
+  product: { id: string; name: string; sku: string };
+}
+
+interface Payment {
+  id: string;
+  amount: number;
+  method: string;
+  reference: string | null;
+  notes: string | null;
+  paidAt: string;
+  payer: { firstName: string; lastName: string };
+}
 
 interface PurchaseOrder {
   id: string;
@@ -24,9 +34,11 @@ interface PurchaseOrder {
   total: number;
   status: string;
   expectedDate: string | null;
+  notes: string | null;
   createdAt: string;
   supplier: { id: string; name: string };
-  items?: { id: string; quantity: number; unitPrice: number; product: { name: string } }[];
+  items: POItem[];
+  payments?: Payment[];
 }
 
 export default function PurchaseOrdersPage() {
@@ -36,10 +48,18 @@ export default function PurchaseOrdersPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<PurchaseOrder | null>(null);
+  const [detailOrder, setDetailOrder] = useState<PurchaseOrder | null>(null);
+  const [userRole, setUserRole] = useState("");
+  const [processing, setProcessing] = useState(false);
+  const [receiveForm, setReceiveForm] = useState<Record<string, number>>({});
+  const [paymentForm, setPaymentForm] = useState({ amount: "", method: "BANK_TRANSFER", reference: "", notes: "" });
+  const [activeTab, setActiveTab] = useState<"details" | "payments" | "receive">("details");
 
   useEffect(() => {
-    fetchOrders();
-  }, [statusFilter]);
+    fetch("/api/auth/session").then(r => r.json()).then(d => setUserRole(d?.user?.role || ""));
+  }, []);
+
+  useEffect(() => { fetchOrders(); }, [statusFilter]);
 
   async function fetchOrders() {
     setLoading(true);
@@ -51,30 +71,113 @@ export default function PurchaseOrdersPage() {
         const json = await res.json();
         setOrders(json.purchaseOrders || json || []);
       }
-    } catch (err) {
-      console.error("Failed to fetch orders:", err);
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { console.error("Failed to fetch orders:", err); }
+    finally { setLoading(false); }
+  }
+
+  async function fetchOrderDetail(id: string) {
+    try {
+      const [poRes, payRes] = await Promise.all([
+        fetch(`/api/purchase-orders`),
+        fetch(`/api/purchase-orders/${id}/payments`),
+      ]);
+      if (poRes.ok) {
+        const json = await poRes.json();
+        const all = json.purchaseOrders || [];
+        const found = all.find((o: PurchaseOrder) => o.id === id);
+        if (found) {
+          if (payRes.ok) {
+            const payJson = await payRes.json();
+            found.payments = payJson.purchaseOrder?.payments || [];
+          }
+          setDetailOrder(found);
+          const recv: Record<string, number> = {};
+          (found.items || []).forEach((item: POItem) => { recv[item.id] = 0; });
+          setReceiveForm(recv);
+        }
+      }
+    } catch (err) { console.error("Failed to fetch order detail:", err); }
+  }
+
+  async function handleApprove(id: string) {
+    setProcessing(true);
+    try {
+      const res = await fetch("/api/purchase-orders", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status: "APPROVED" }),
+      });
+      if (res.ok) {
+        fetchOrders();
+        if (detailOrder?.id === id) fetchOrderDetail(id);
+      }
+    } finally { setProcessing(false); }
+  }
+
+  async function handleMarkPaid(id: string) {
+    if (!detailOrder) return;
+    setProcessing(true);
+    try {
+      const totalPaid = (detailOrder.payments || []).reduce((s, p) => s + p.amount, 0);
+      const remaining = detailOrder.total - totalPaid;
+      const res = await fetch(`/api/purchase-orders/${id}/payments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: remaining,
+          method: paymentForm.method,
+          reference: paymentForm.reference || undefined,
+          notes: paymentForm.notes || "Full payment",
+        }),
+      });
+      if (res.ok) {
+        fetchOrders();
+        fetchOrderDetail(id);
+        setPaymentForm({ amount: "", method: "BANK_TRANSFER", reference: "", notes: "" });
+      }
+    } finally { setProcessing(false); }
+  }
+
+  async function handleReceive(id: string) {
+    if (!detailOrder) return;
+    setProcessing(true);
+    try {
+      const items = Object.entries(receiveForm)
+        .filter(([, qty]) => qty > 0)
+        .map(([itemId, receivedQty]) => ({ id: itemId, receivedQty }));
+
+      if (items.length === 0) { setProcessing(false); return; }
+
+      const res = await fetch(`/api/purchase-orders/${id}/receive`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items }),
+      });
+      if (res.ok) {
+        fetchOrders();
+        fetchOrderDetail(id);
+        setActiveTab("details");
+      }
+    } finally { setProcessing(false); }
   }
 
   const statusColors: Record<string, string> = {
-    PENDING: "badge-warning",
-    APPROVED: "badge-info",
-    RECEIVED: "badge-success",
-    CANCELLED: "badge-danger",
+    PENDING: "badge-warning", APPROVED: "badge-info", ORDERED: "badge-purple",
+    PAID: "badge-success", PARTIALLY_RECEIVED: "badge-warning",
+    RECEIVED: "badge-success", CANCELLED: "badge-danger",
+  };
+  const statusIcons: Record<string, unknown> = {
+    PENDING: Clock, APPROVED: CheckCircle, ORDERED: Truck,
+    PAID: DollarSign, PARTIALLY_RECEIVED: Package,
+    RECEIVED: CheckCircle, CANCELLED: XCircle,
   };
 
-  const statusIcons: Record<string, any> = {
-    PENDING: Clock,
-    APPROVED: CheckCircle,
-    RECEIVED: Package,
-    CANCELLED: XCircle,
-  };
+  const canApprove = ["OWNER", "MANAGER", "PROCUREMENT_MANAGER"].includes(userRole);
+  const canPay = ["OWNER", "MANAGER", "ACCOUNTANT", "CFO"].includes(userRole);
+  const canReceive = ["OWNER", "MANAGER", "WAREHOUSE_MANAGER", "WAREHOUSE_REP"].includes(userRole);
 
-  const filteredOrders = orders.filter((o) =>
-    search === "" ||
-    o.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
+  const filtered = orders.filter((o) =>
+    search === "" || o.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
     o.supplier.name.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -89,12 +192,18 @@ export default function PurchaseOrdersPage() {
           <div className="flex gap-2">
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="input select w-full max-w-[10rem]">
               <option value="">{t("allStatus")}</option>
-              <option value="PENDING">{t("pendingLabel")}</option>
-              <option value="APPROVED">{t("approvedLabel")}</option>
-              <option value="RECEIVED">{t("receivedLabel")}</option>
-              <option value="CANCELLED">{t("cancelledLabel")}</option>
+              <option value="PENDING">Pending</option>
+              <option value="APPROVED">Approved</option>
+              <option value="ORDERED">Ordered</option>
+              <option value="PAID">Paid</option>
+              <option value="PARTIALLY_RECEIVED">Partially Received</option>
+              <option value="RECEIVED">Received</option>
+              <option value="CANCELLED">Cancelled</option>
             </select>
             <button onClick={fetchOrders} className="btn btn-secondary btn-sm"><RefreshCw size={14} /></button>
+            {canApprove && (
+              <a href="/dashboard/procurement/purchase-orders/new" className="btn btn-primary btn-sm"><Plus size={14} /> New PO</a>
+            )}
           </div>
         </div>
 
@@ -102,7 +211,7 @@ export default function PurchaseOrdersPage() {
           <div className="flex h-[40vh] items-center justify-center">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4a843] border-t-transparent" />
           </div>
-        ) : filteredOrders.length === 0 ? (
+        ) : filtered.length === 0 ? (
           <div className="glass-card flex flex-col items-center justify-center p-12">
             <ClipboardList size={48} className="mb-4 text-[#606070]" />
             <h3 className="text-lg font-semibold text-[#f0f0f5]">{t("noPurchaseOrdersFound")}</h3>
@@ -123,8 +232,8 @@ export default function PurchaseOrdersPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredOrders.map((order) => {
-                  const StatusIcon = statusIcons[order.status] || Clock;
+                {filtered.map((order) => {
+                  const StatusIcon = (statusIcons[order.status] || Clock) as React.ComponentType<{ size?: number; className?: string }>;
                   return (
                     <tr key={order.id}>
                       <td className="font-mono text-sm font-medium text-[#f0f0f5]">{order.orderNumber}</td>
@@ -135,13 +244,34 @@ export default function PurchaseOrdersPage() {
                       <td>
                         <span className={`badge ${statusColors[order.status] || "badge-info"}`}>
                           <StatusIcon size={10} className="mr-1" />
-                          {order.status}
+                          {order.status.replace("_", " ")}
                         </span>
                       </td>
                       <td>
-                        <button onClick={() => setSelectedOrder(order)} className="rounded-lg p-2 text-[#9090a0] hover:bg-[#2a2a3a] hover:text-[#3b82f6]">
-                          <Eye size={14} />
-                        </button>
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => { setSelectedOrder(order); fetchOrderDetail(order.id); setActiveTab("details"); }}
+                            className="rounded-lg p-2 text-[#9090a0] hover:bg-[#2a2a3a] hover:text-[#3b82f6]" title="View">
+                            <Eye size={14} />
+                          </button>
+                          {canApprove && order.status === "PENDING" && (
+                            <button onClick={() => handleApprove(order.id)} disabled={processing}
+                              className="rounded-lg bg-[#10b981]/20 p-2 text-[#10b981] hover:bg-[#10b981]/30 disabled:opacity-50" title="Approve">
+                              <CheckCircle size={14} />
+                            </button>
+                          )}
+                          {canPay && (order.status === "APPROVED" || order.status === "ORDERED") && (
+                            <button onClick={() => { setSelectedOrder(order); fetchOrderDetail(order.id); setActiveTab("payments"); }}
+                              className="rounded-lg bg-[#d4a843]/20 p-2 text-[#d4a843] hover:bg-[#d4a843]/30" title="Record Payment">
+                              <DollarSign size={14} />
+                            </button>
+                          )}
+                          {canReceive && (order.status === "PAID" || order.status === "PARTIALLY_RECEIVED") && (
+                            <button onClick={() => { setSelectedOrder(order); fetchOrderDetail(order.id); setActiveTab("receive"); }}
+                              className="rounded-lg bg-[#3b82f6]/20 p-2 text-[#3b82f6] hover:bg-[#3b82f6]/30" title="Receive Goods">
+                              <Package size={14} />
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -151,32 +281,145 @@ export default function PurchaseOrdersPage() {
           </div>
         )}
 
-        {selectedOrder && (
+        {selectedOrder && detailOrder && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
-            <div className="glass-card w-full max-w-lg p-6">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-[#f0f0f5]">{t("orderDetail")} {selectedOrder.orderNumber}</h2>
-                <button onClick={() => setSelectedOrder(null)} className="text-[#606070] hover:text-[#f0f0f5]"><X size={20} /></button>
+            <div className="glass-card w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-[#f0f0f5]">{detailOrder.orderNumber}</h2>
+                <button onClick={() => { setSelectedOrder(null); setDetailOrder(null); }} className="text-[#606070] hover:text-[#f0f0f5]"><X size={20} /></button>
               </div>
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm"><span className="text-[#9090a0]">Supplier</span><span className="text-[#f0f0f5]">{selectedOrder.supplier.name}</span></div>
-                <div className="flex justify-between text-sm"><span className="text-[#9090a0]">Status</span><span className={`badge ${statusColors[selectedOrder.status]}`}>{selectedOrder.status}</span></div>
-                <div className="flex justify-between text-sm"><span className="text-[#9090a0]">Total</span><span className="font-medium text-[#d4a843]">{formatCurrency(selectedOrder.total)}</span></div>
-                <div className="flex justify-between text-sm"><span className="text-[#9090a0]">Created</span><span className="text-[#f0f0f5]">{formatDate(selectedOrder.createdAt)}</span></div>
-                {selectedOrder.items && selectedOrder.items.length > 0 && (
-                  <div className="mt-4">
-                    <h4 className="mb-2 text-sm font-medium text-[#9090a0]">{t("itemsHeading")}</h4>
+
+              <div className="mb-4 flex gap-2 border-b border-[#2a2a3a] pb-2">
+                {(["details", "payments", "receive"] as const).map((tab) => (
+                  <button key={tab} onClick={() => setActiveTab(tab)}
+                    className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${activeTab === tab ? "bg-[#d4a843]/20 text-[#d4a843]" : "text-[#9090a0] hover:text-[#f0f0f5]"}`}>
+                    {tab === "details" ? "Details" : tab === "payments" ? "Payments" : "Receive Goods"}
+                  </button>
+                ))}
+              </div>
+
+              {activeTab === "details" && (
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm"><span className="text-[#9090a0]">Supplier</span><span className="text-[#f0f0f5]">{detailOrder.supplier.name}</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-[#9090a0]">Status</span><span className={`badge ${statusColors[detailOrder.status]}`}>{detailOrder.status.replace("_", " ")}</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-[#9090a0]">Total</span><span className="font-medium text-[#d4a843]">{formatCurrency(detailOrder.total)}</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-[#9090a0]">Expected</span><span className="text-[#f0f0f5]">{detailOrder.expectedDate ? formatDate(detailOrder.expectedDate) : "—"}</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-[#9090a0]">Created</span><span className="text-[#f0f0f5]">{formatDate(detailOrder.createdAt)}</span></div>
+                  {detailOrder.notes && <div className="flex justify-between text-sm"><span className="text-[#9090a0]">Notes</span><span className="text-[#f0f0f5]">{detailOrder.notes}</span></div>}
+                  {detailOrder.items?.length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="mb-2 text-sm font-medium text-[#9090a0]">Items</h4>
+                      <div className="space-y-2">
+                        {detailOrder.items.map((item) => (
+                          <div key={item.id} className="flex items-center justify-between rounded-lg bg-[#12121a] p-3 text-sm">
+                            <div>
+                              <span className="text-[#f0f0f5]">{item.product.name}</span>
+                              <span className="ml-2 text-xs text-[#606070]">({item.product.sku})</span>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-[#9090a0]">{item.quantity} x {formatCurrency(item.unitCost)}</span>
+                              {item.receivedQty > 0 && (
+                                <span className="ml-2 text-xs text-[#10b981]">({item.receivedQty} received)</span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {canApprove && detailOrder.status === "PENDING" && (
+                    <button onClick={() => handleApprove(detailOrder.id)} disabled={processing}
+                      className="btn btn-primary mt-4 w-full">
+                      {processing ? "Processing..." : "Approve Purchase Order"}
+                    </button>
+                  )}
+                  {canApprove && detailOrder.status === "APPROVED" && (
+                    <button onClick={async () => {
+                      setProcessing(true);
+                      await fetch("/api/purchase-orders", {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ id: detailOrder.id, status: "ORDERED" }),
+                      });
+                      fetchOrders();
+                      fetchOrderDetail(detailOrder.id);
+                      setProcessing(false);
+                    }} disabled={processing}
+                      className="btn btn-primary mt-4 w-full">
+                      {processing ? "Processing..." : "Mark as Ordered (Supplier Contacted)"}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {activeTab === "payments" && (
+                <div className="space-y-4">
+                  <div className="rounded-lg bg-[#12121a] p-4">
+                    <div className="flex justify-between text-sm mb-2"><span className="text-[#9090a0]">Order Total</span><span className="font-medium text-[#d4a843]">{formatCurrency(detailOrder.total)}</span></div>
+                    <div className="flex justify-between text-sm mb-2"><span className="text-[#9090a0]">Total Paid</span><span className="font-medium text-[#10b981]">{formatCurrency((detailOrder.payments || []).reduce((s, p) => s + p.amount, 0))}</span></div>
+                    <div className="flex justify-between text-sm"><span className="text-[#9090a0]">Balance</span><span className="font-medium text-[#f43f5e]">{formatCurrency(detailOrder.total - (detailOrder.payments || []).reduce((s, p) => s + p.amount, 0))}</span></div>
+                  </div>
+
+                  {detailOrder.payments && detailOrder.payments.length > 0 && (
                     <div className="space-y-2">
-                      {selectedOrder.items.map((item) => (
-                        <div key={item.id} className="flex justify-between rounded-lg bg-[#12121a] p-3 text-sm">
-                          <span className="text-[#f0f0f5]">{item.product.name}</span>
-                          <span className="text-[#9090a0]">{item.quantity} x {formatCurrency(item.unitPrice)}</span>
+                      <h4 className="text-sm font-medium text-[#9090a0]">Payment History</h4>
+                      {detailOrder.payments.map((pay) => (
+                        <div key={pay.id} className="flex items-center justify-between rounded-lg bg-[#12121a] p-3 text-sm">
+                          <div>
+                            <span className="text-[#f0f0f5]">{formatCurrency(pay.amount)}</span>
+                            <span className="ml-2 text-xs text-[#606070]">{pay.method.replace("_", " ")}</span>
+                          </div>
+                          <span className="text-xs text-[#9090a0]">{formatDate(pay.paidAt)}</span>
                         </div>
                       ))}
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+
+                  {canPay && detailOrder.status !== "PAID" && detailOrder.status !== "RECEIVED" && detailOrder.status !== "CANCELLED" && (
+                    <div className="rounded-lg border border-[#2a2a3a] p-4 space-y-3">
+                      <h4 className="text-sm font-medium text-[#f0f0f5]">Record Payment</h4>
+                      <select value={paymentForm.method} onChange={(e) => setPaymentForm({ ...paymentForm, method: e.target.value })} className="input w-full">
+                        <option value="BANK_TRANSFER">Bank Transfer</option>
+                        <option value="CASH">Cash</option>
+                        <option value="CHECK">Check</option>
+                        <option value="ONLINE">Online</option>
+                      </select>
+                      <input type="text" placeholder="Reference number" value={paymentForm.reference} onChange={(e) => setPaymentForm({ ...paymentForm, reference: e.target.value })} className="input w-full" />
+                      <input type="text" placeholder="Notes (optional)" value={paymentForm.notes} onChange={(e) => setPaymentForm({ ...paymentForm, notes: e.target.value })} className="input w-full" />
+                      <button onClick={() => handleMarkPaid(detailOrder.id)} disabled={processing}
+                        className="btn btn-primary w-full">
+                        {processing ? "Processing..." : "Mark as Paid"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === "receive" && (
+                <div className="space-y-4">
+                  <p className="text-sm text-[#9090a0]">Enter the quantity received for each item. Product stock will be updated automatically.</p>
+                  {detailOrder.items?.map((item) => (
+                    <div key={item.id} className="flex items-center justify-between rounded-lg bg-[#12121a] p-3">
+                      <div>
+                        <span className="text-[#f0f0f5] text-sm">{item.product.name}</span>
+                        <div className="text-xs text-[#606070]">
+                          Ordered: {item.quantity} | Already received: {item.receivedQty} | Remaining: {item.quantity - item.receivedQty}
+                        </div>
+                      </div>
+                      <input type="number" min={0} max={item.quantity - item.receivedQty}
+                        value={receiveForm[item.id] || ""}
+                        onChange={(e) => setReceiveForm({ ...receiveForm, [item.id]: parseInt(e.target.value) || 0 })}
+                        className="input w-24 text-center" placeholder="Qty" />
+                    </div>
+                  ))}
+                  {canReceive && detailOrder.status !== "RECEIVED" && detailOrder.status !== "CANCELLED" && detailOrder.status !== "PENDING" && (
+                    <button onClick={() => handleReceive(detailOrder.id)} disabled={processing}
+                      className="btn btn-primary w-full">
+                      {processing ? "Processing..." : "Receive Goods & Update Stock"}
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}
