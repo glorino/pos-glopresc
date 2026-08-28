@@ -150,7 +150,7 @@ export default function BusinessSettingsPage() {
       title: t("currencyTax"),
       icon: Coins,
       fields: [
-        { key: "code", label: t("currencyLabel"), type: "select", options: ["NGN"] },
+        { key: "code", label: t("currencyLabel"), type: "select", options: ["NGN", "USD", "EUR", "GBP", "KES", "GHS", "ZAR", "UGX", "TZS"] },
         { key: "symbol", label: t("symbolLabel"), type: "text" },
         { key: "taxRate", label: t("taxRatePercent"), type: "number" },
       ],

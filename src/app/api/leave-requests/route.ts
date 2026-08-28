@@ -35,10 +35,15 @@ export async function POST(req: NextRequest) {
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { userId, type, startDate, endDate, reason } = body;
+  const { type, startDate, endDate, reason } = body;
 
-  if (!userId || !type || !startDate || !endDate) {
+  if (!type || !startDate || !endDate) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  const userId = (session.user as { id?: string }).id;
+  if (!userId) {
+    return NextResponse.json({ error: "User ID not found in session" }, { status: 400 });
   }
 
   const request = await db.leaveRequest.create({

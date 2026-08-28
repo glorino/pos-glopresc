@@ -6,6 +6,9 @@ import { authOptions } from "@/lib/auth";
 export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!["BUSINESS_EFFICIENCY_MANAGER", "OWNER", "MANAGER", "CFO"].includes(session.user.role)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   const kpis = await db.kPI.findMany({
     orderBy: { createdAt: "desc" },
@@ -17,6 +20,9 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!["BUSINESS_EFFICIENCY_MANAGER", "OWNER", "MANAGER"].includes(session.user.role)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   const body = await req.json();
   const { name, target, current, unit } = body;
@@ -40,6 +46,9 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!["BUSINESS_EFFICIENCY_MANAGER", "OWNER", "MANAGER"].includes(session.user.role)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   const body = await req.json();
   const { id, current, target, trend } = body;

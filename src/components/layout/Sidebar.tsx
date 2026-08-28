@@ -81,6 +81,12 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
         { icon: Settings, label: "settings", href: "/dashboard/owner/settings" },
       ],
     },
+    {
+      title: "finance",
+      items: [
+        { icon: Truck, label: "procurementPayments", href: "/dashboard/accounting/procurement-payments" },
+      ],
+    },
   ],
   MANAGER: [
     {
@@ -105,6 +111,7 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
       title: "finance",
       items: [
         { icon: BarChart3, label: "reports", href: "/dashboard/owner/reports" },
+        { icon: Truck, label: "procurementPayments", href: "/dashboard/accounting/procurement-payments" },
       ],
     },
   ],
@@ -223,6 +230,7 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
         { icon: CreditCard, label: "expenses", href: "/dashboard/accounting/expenses" },
         { icon: FileText, label: "invoices", href: "/dashboard/accounting/invoices" },
         { icon: DollarSign, label: "cashDrawerReports", href: "/dashboard/accounting/cash-reports" },
+        { icon: Truck, label: "procurementPayments", href: "/dashboard/accounting/procurement-payments" },
       ],
     },
   ],
@@ -283,6 +291,7 @@ const roleNavConfig: Record<UserRole, NavSection[]> = {
         { icon: CreditCard, label: "expenses", href: "/dashboard/accounting/expenses" },
         { icon: FileText, label: "invoices", href: "/dashboard/accounting/invoices" },
         { icon: DollarSign, label: "cashDrawerReports", href: "/dashboard/accounting/cash-reports" },
+        { icon: Truck, label: "procurementPayments", href: "/dashboard/accounting/procurement-payments" },
       ],
     },
   ],

@@ -60,10 +60,6 @@ export async function POST(request: NextRequest) {
     }
 
     const response: Record<string, unknown> = { message: successMessage };
-    if (process.env.NODE_ENV !== "production") {
-      response._debug_token = token;
-      response._debug_reset_url = resetUrl;
-    }
 
     return NextResponse.json(response);
   } catch (error) {

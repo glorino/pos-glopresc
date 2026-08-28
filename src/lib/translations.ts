@@ -1190,6 +1190,7 @@ export const en = {
   viewBtn: "View",
 
   // Procurement Payments (new keys only)
+  procurementPayments: "Procurement Payments",
   procurementPaymentsTitle: "Procurement Payments",
   purchaseOrdersLabel: "Purchase Orders",
   paymentsLabel: "Payments",
@@ -2427,6 +2428,7 @@ export const fr: Record<TranslationKey, string> = {
   viewBtn: "Voir",
 
   // Paiements Approvisionnement
+  procurementPayments: "Paiements Approvisionnement",
   procurementPaymentsTitle: "Paiements Approvisionnement",
   purchaseOrdersLabel: "Bons de commande",
   paymentsLabel: "Paiements",

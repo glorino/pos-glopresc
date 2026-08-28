@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/api-auth";
-import { Prisma, UserRole } from "@prisma/client";
+import { Prisma, UserRole, PurchaseStatus } from "@prisma/client";
 
 interface ReceiveItem {
   id: string;
@@ -77,12 +77,12 @@ export async function POST(
       }
     );
 
-    const newStatus = allReceived ? "RECEIVED" : "PARTIALLY_RECEIVED";
+    const newStatus: PurchaseStatus = allReceived ? "RECEIVED" : "PARTIALLY_RECEIVED";
 
     const updatedOrder = await db.purchaseOrder.update({
       where: { id },
       data: {
-        status: newStatus as any,
+        status: newStatus,
         notes: notes ? `${purchaseOrder.notes || ""}\n\nReceipt notes: ${notes}` : purchaseOrder.notes
       },
       include: {

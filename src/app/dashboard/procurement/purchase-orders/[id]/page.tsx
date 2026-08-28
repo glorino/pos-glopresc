@@ -65,6 +65,7 @@ export default function PurchaseOrderDetailPage() {
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
   const [payError, setPayError] = useState("");
+  const [activeTab, setActiveTab] = useState<"items" | "payments">("items");
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentData, setPaymentData] = useState({
     amount: "",
@@ -300,15 +301,15 @@ export default function PurchaseOrderDetailPage() {
           <div className="border-b border-[#2a2a3a]">
             <nav className="flex gap-1 p-1" aria-label="Tabs">
               <button
-                onClick={() => {}}
-                className="tab-active flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-[#d4a843]"
+                onClick={() => setActiveTab("items")}
+                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium ${activeTab === "items" ? "tab-active text-[#d4a843]" : "tab-inactive text-[#9090a0] hover:text-[#f0f0f5] hover:bg-[#2a2a3a]"}`}
               >
                 <Package size={14} />
                 {t("itemsHeading")}
               </button>
               <button
-                onClick={() => {}}
-                className="tab-inactive flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-[#9090a0] hover:text-[#f0f0f5] hover:bg-[#2a2a3a]"
+                onClick={() => setActiveTab("payments")}
+                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium ${activeTab === "payments" ? "tab-active text-[#d4a843]" : "tab-inactive text-[#9090a0] hover:text-[#f0f0f5] hover:bg-[#2a2a3a]"}`}
               >
                 <CreditCard size={14} />
                 {t("paymentsLabel")}
@@ -317,6 +318,7 @@ export default function PurchaseOrderDetailPage() {
           </div>
 
           {/* Items Tab */}
+          {activeTab === "items" && (
           <div className="p-6">
             {error && (
               <div className="mb-4 rounded-lg border border-[#f43f5e]/20 bg-[#f43f5e]/10 p-3 text-sm text-[#f43f5e]">
@@ -397,8 +399,10 @@ export default function PurchaseOrderDetailPage() {
               </div>
             )}
           </div>
+          )}
 
           {/* Payments Tab */}
+          {activeTab === "payments" && (
           <div className="p-6">
             {payError && (
               <div className="mb-4 rounded-lg border border-[#f43f5e]/20 bg-[#f43f5e]/10 p-3 text-sm text-[#f43f5e]">
@@ -455,9 +459,8 @@ export default function PurchaseOrderDetailPage() {
               </div>
             )}
           </div>
+          )}
         </div>
-
-        {/* Payment Modal */}
         {showPaymentModal && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
             <div className="glass-card w-full max-w-md p-6">

@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import crypto from "crypto";
+
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  return crypto.timingSafeEqual(bufA, bufB);
+}
 
 export async function POST(request: NextRequest) {
   let webhookLog: { id: string } | null = null;
@@ -27,7 +35,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Webhook not configured" }, { status: 500 });
     }
 
-    if (!signature || signature !== secretHash) {
+    if (!signature || !timingSafeEqual(signature, secretHash)) {
       await db.webhook.update({
         where: { id: webhookLog.id },
         data: { status: "ERROR", error: "Invalid signature" },
