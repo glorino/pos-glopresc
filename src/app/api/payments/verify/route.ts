@@ -91,13 +91,13 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { status: "error", message: data.message || "Transaction verification failed" },
+      { error: data.message || "Transaction verification failed" },
       { status: 400 }
     );
   } catch (error) {
     console.error("Flutterwave verification error:", error);
     return NextResponse.json(
-      { status: "error", message: "Failed to verify transaction" },
+      { error: "Failed to verify transaction" },
       { status: 500 }
     );
   }

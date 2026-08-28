@@ -15,6 +15,9 @@ function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   return R * c;
 }
 
+// NOTE: Google Maps Geocoding API only supports key via query param (no header option).
+// This is a server-side-only call — the key is never exposed to the browser.
+// Ensure FLW_SECRET_HASH and NEXT_PUBLIC_GOOGLE_MAPS_API_KEY are set in Vercel env vars.
 async function geocode(address: string, apiKey: string): Promise<{ lat: number; lng: number } | null> {
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
   const res = await fetch(url);
