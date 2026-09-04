@@ -87,7 +87,7 @@ export default function PurchaseOrderDetailPage() {
       const res = await fetch(`/api/purchase-orders/${orderId}`);
       if (res.ok) {
         const json = await res.json();
-        setOrder(json);
+        setOrder(json.purchaseOrder || json);
       }
     } catch (err) {
       console.error("Failed to fetch order:", err);
@@ -109,13 +109,14 @@ export default function PurchaseOrderDetailPage() {
   }
 
   const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
-  const remainingAmount = (order?.total || 0) - totalPaid;
+  const remainingAmount = Math.max(0, (order?.total || 0) - totalPaid);
 
   const statusColors: Record<string, string> = {
     PENDING: "badge-warning",
     APPROVED: "badge-info",
     ORDERED: "badge-purple",
     PAID: "badge-blue",
+    PARTIALLY_RECEIVED: "badge-warning",
     RECEIVED: "badge-success",
     CANCELLED: "badge-danger",
   };
@@ -125,6 +126,7 @@ export default function PurchaseOrderDetailPage() {
     APPROVED: CheckCircle,
     ORDERED: Truck,
     PAID: DollarSign,
+    PARTIALLY_RECEIVED: Package,
     RECEIVED: Package,
     CANCELLED: XCircle,
   };
@@ -269,9 +271,9 @@ export default function PurchaseOrderDetailPage() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <span className={`badge ${statusColors[order.status]}`}>
+              <span className={`badge ${statusColors[order.status] || "badge-info"}`}>
                 <StatusIcon size={10} className="mr-1" />
-                {order.status}
+                {order.status.replace("_", " ")}
               </span>
             </div>
           </div>
@@ -377,7 +379,7 @@ export default function PurchaseOrderDetailPage() {
             </div>
 
             {/* Receive Button */}
-            {["PENDING", "APPROVED", "ORDERED", "PAID"].includes(order.status) && (
+            {["PAID", "PARTIALLY_RECEIVED"].includes(order.status) && (
               <div className="mt-4 flex justify-end">
                 <button
                   onClick={handleReceive}

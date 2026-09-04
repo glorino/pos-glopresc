@@ -1,21 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/api-auth";
-import { UserRole } from "@prisma/client";
+import { UserRole, PaymentMethod } from "@prisma/client";
+
+const PAYABLE_STATUSES = ["APPROVED", "ORDERED", "PAID", "PARTIALLY_RECEIVED"];
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { error } = await requireAuth(["OWNER", "MANAGER", "ACCOUNTANT", "CFO"]);
+  const { error, session } = await requireAuth(["OWNER", "MANAGER", "ACCOUNTANT", "CFO"]);
   if (error) return error;
+
+  const userId = (session?.user as { id?: string })?.id;
+  if (!userId) {
+    return NextResponse.json(
+      { error: "User ID not found in session" },
+      { status: 401 }
+    );
+  }
 
   try {
     const { id } = await params;
     const body = await request.json();
-    const { amount, method, reference, notes, paidBy } = body;
+    const { amount, method, reference, notes } = body;
 
-    if (!amount || amount <= 0) {
+    const amountNum = Number(amount);
+    if (!Number.isFinite(amountNum) || amountNum <= 0) {
       return NextResponse.json(
         { error: "Valid amount is required" },
         { status: 400 }
@@ -25,6 +36,14 @@ export async function POST(
     if (!method) {
       return NextResponse.json(
         { error: "Payment method is required" },
+        { status: 400 }
+      );
+    }
+
+    const validMethods = Object.values(PaymentMethod) as string[];
+    if (!validMethods.includes(String(method).toUpperCase())) {
+      return NextResponse.json(
+        { error: `Invalid payment method. Must be one of: ${validMethods.join(", ")}` },
         { status: 400 }
       );
     }
@@ -41,67 +60,82 @@ export async function POST(
       );
     }
 
-    if (purchaseOrder.status === "CANCELLED") {
+    if (purchaseOrder.status === "CANCELLED" || purchaseOrder.status === "RECEIVED") {
       return NextResponse.json(
-        { error: "Cannot pay a cancelled order" },
+        { error: `Cannot pay a ${purchaseOrder.status.toLowerCase()} order` },
         { status: 400 }
       );
     }
 
-    // Calculate total paid so far
-    const totalPaid = purchaseOrder.payments.reduce((sum, p) => sum + Number(p.amount), 0);
-    const newTotalPaid = totalPaid + amount;
-
-    // Check if payment exceeds order total
-    if (newTotalPaid > Number(purchaseOrder.total)) {
+    if (!PAYABLE_STATUSES.includes(purchaseOrder.status)) {
       return NextResponse.json(
-        { error: `Payment exceeds order total. Already paid: ${totalPaid}, Order total: ${purchaseOrder.total}` },
+        { error: `Cannot pay an order in ${purchaseOrder.status} status` },
         { status: 400 }
       );
     }
 
-    const payment = await db.procurementPayment.create({
-      data: {
-        purchaseOrderId: id,
-        amount,
-        method,
-        reference: reference || null,
-        notes: notes || null,
-        paidBy: paidBy || "system",
-      },
-      include: {
-        purchaseOrder: true,
-        payer: { select: { id: true, firstName: true, lastName: true } }
-      }
-    });
-
-    // Update order status based on payment completion
-    let newStatus = purchaseOrder.status;
-    if (newTotalPaid >= Number(purchaseOrder.total)) {
-      newStatus = "PAID";
-    } else if (purchaseOrder.status === "PENDING" || purchaseOrder.status === "APPROVED") {
-      newStatus = "PAID"; // Partial payment - but status should reflect payment
-    }
-
-    if (newStatus !== purchaseOrder.status) {
-      await db.purchaseOrder.update({
+    // Atomic payment + status update so concurrent payments can't overpay
+    const result = await db.$transaction(async (tx) => {
+      const current = await tx.purchaseOrder.findUnique({
         where: { id },
-        data: { status: newStatus }
+        include: { payments: { select: { amount: true } } },
       });
-    }
-
-    // Create audit log
-    await db.auditLog.create({
-      data: {
-        userId: paidBy || "system",
-        action: "CREATE_PROCUREMENT_PAYMENT",
-        resource: "ProcurementPayment",
-        resourceId: payment.id,
-        details: { amount, method, purchaseOrderId: id }
+      if (!current) {
+        throw new Error("Purchase order not found");
       }
+
+      const totalPaid = current.payments.reduce((sum, p) => sum + Number(p.amount), 0);
+      const orderTotal = Number(current.total);
+      const newTotalPaid = totalPaid + amountNum;
+
+      if (newTotalPaid > orderTotal) {
+        const error: any = new Error("Payment exceeds order total");
+        error.status = 400;
+        error.expose = true;
+        error.details = { totalPaid, orderTotal };
+        throw error;
+      }
+
+      const payment = await tx.procurementPayment.create({
+        data: {
+          purchaseOrderId: id,
+          amount: amountNum,
+          method: String(method).toUpperCase() as PaymentMethod,
+          reference: reference || null,
+          notes: notes || null,
+          paidBy: userId,
+        },
+        include: {
+          purchaseOrder: true,
+          payer: { select: { id: true, firstName: true, lastName: true } },
+        },
+      });
+
+      // Only mark PAID when fully paid
+      let newStatus = current.status;
+      if (newTotalPaid >= orderTotal) {
+        newStatus = "PAID";
+      }
+
+      const order = await tx.purchaseOrder.update({
+        where: { id },
+        data: { status: newStatus },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId,
+          action: "CREATE_PROCUREMENT_PAYMENT",
+          resource: "ProcurementPayment",
+          resourceId: payment.id,
+          details: { amount: amountNum, method, purchaseOrderId: id },
+        },
+      });
+
+      return { payment, newStatus, orderNumber: order.orderNumber };
     });
 
-    // Notify procurement and warehouse staff
+    // Notify procurement and warehouse staff (best-effort, outside transaction)
     const notifyRoles: UserRole[] = ["OWNER", "MANAGER", "PROCUREMENT_MANAGER", "WAREHOUSE_MANAGER"];
     const notifyUsers = await db.user.findMany({
       where: { role: { in: notifyRoles }, isActive: true },
@@ -111,8 +145,8 @@ export async function POST(
       await db.notification.createMany({
         data: notifyUsers.map((u) => ({
           userId: u.id,
-          title: newStatus === "PAID" ? "Purchase Order Fully Paid" : "Payment Recorded",
-          message: `Payment of ${amount} recorded for PO ${purchaseOrder.orderNumber}. ${newStatus === "PAID" ? "Order is now fully paid." : ""}`,
+          title: result.newStatus === "PAID" ? "Purchase Order Fully Paid" : "Payment Recorded",
+          message: `Payment of ${amountNum} recorded for PO ${result.orderNumber}. ${result.newStatus === "PAID" ? "Order is now fully paid." : ""}`,
           type: "SUCCESS",
           link: "/dashboard/procurement/purchase-orders",
         })),
@@ -120,13 +154,19 @@ export async function POST(
     }
 
     return NextResponse.json({
-      ...payment,
-      amount: Number(payment.amount),
+      ...result.payment,
+      amount: Number(result.payment.amount),
     }, { status: 201 });
   } catch (error: any) {
     console.error("Create procurement payment error:", error);
+    if (error?.status) {
+      return NextResponse.json(
+        { error: error.details ? `Payment exceeds order total. Already paid: ${error.details.totalPaid}, Order total: ${error.details.orderTotal}` : error.message },
+        { status: error.status }
+      );
+    }
     return NextResponse.json(
-      { error: error.message || "Failed to create payment" },
+      { error: "Failed to create payment" },
       { status: 500 }
     );
   }
@@ -173,7 +213,7 @@ export async function GET(
   } catch (error: any) {
     console.error("Get procurement payments error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch payments" },
+      { error: "Failed to fetch payments" },
       { status: 500 }
     );
   }

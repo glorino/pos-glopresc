@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAuth } from "@/lib/api-auth";
 
 export async function GET(request: NextRequest) {
   try {
+    const { error } = await requireAuth();
+    if (error) return error;
     const { searchParams } = new URL(request.url);
     const saleId = searchParams.get("saleId");
 
@@ -55,6 +58,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const { error } = await requireAuth();
+    if (error) return error;
     const body = await request.json();
     const { saleId, paymentId, amount, reason, status, processedBy } = body;
 

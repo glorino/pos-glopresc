@@ -4,6 +4,10 @@ import { getToken } from "next-auth/jwt";
 
 export async function GET(request: NextRequest) {
   try {
+    const token = await getToken({ req: request as any });
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") ?? "1");
     const limit = parseInt(searchParams.get("limit") ?? "20");

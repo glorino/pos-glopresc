@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-  const { error } = await requireAuth(["OWNER", "MANAGER"]);
+  const { error, session } = await requireAuth(["OWNER", "MANAGER"]);
   if (error) return error;
   try {
     const body = await request.json();
@@ -134,6 +134,34 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json(
         { error: "User ID is required" },
         { status: 400 }
+      );
+    }
+
+    const target = await db.user.findUnique({
+      where: { id },
+      select: { id: true, role: true },
+    });
+
+    if (!target) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    const isOwner = session?.user?.role === "OWNER";
+
+    if (target.role === "OWNER" && !isOwner) {
+      return NextResponse.json(
+        { error: "Only an OWNER can modify an OWNER account" },
+        { status: 403 }
+      );
+    }
+
+    if (!isOwner && rawData.role) {
+      return NextResponse.json(
+        { error: "Only an OWNER can change roles" },
+        { status: 403 }
       );
     }
 

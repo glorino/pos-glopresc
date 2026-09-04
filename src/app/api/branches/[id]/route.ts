@@ -7,6 +7,8 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { error } = await requireAuth();
+    if (error) return error;
     const { id } = params;
 
     const branch = await db.branch.findUnique({

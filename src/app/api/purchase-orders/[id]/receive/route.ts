@@ -1,24 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/api-auth";
-import { Prisma, UserRole, PurchaseStatus } from "@prisma/client";
+import { UserRole, PurchaseStatus } from "@prisma/client";
 
 interface ReceiveItem {
   id: string;
   receivedQty: number;
 }
 
+const RECEIVABLE_STATUSES = ["PAID", "PARTIALLY_RECEIVED"];
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { error } = await requireAuth(["OWNER", "MANAGER", "PROCUREMENT_MANAGER", "WAREHOUSE_MANAGER", "WAREHOUSE_REP"]);
+  const { error, session } = await requireAuth(["OWNER", "MANAGER", "PROCUREMENT_MANAGER", "WAREHOUSE_MANAGER", "WAREHOUSE_REP"]);
   if (error) return error;
+
+  const userId = (session?.user as { id?: string })?.id;
+  if (!userId) {
+    return NextResponse.json(
+      { error: "User ID not found in session" },
+      { status: 401 }
+    );
+  }
 
   try {
     const { id } = await params;
     const body = await request.json();
-    const { items, notes } = body as { items: ReceiveItem[]; notes?: string };
+    const { items, notes } = body as { items?: ReceiveItem[]; notes?: string };
+
+    if (!Array.isArray(items) || items.length === 0) {
+      return NextResponse.json(
+        { error: "Items with received quantities are required" },
+        { status: 400 }
+      );
+    }
 
     const purchaseOrder = await db.purchaseOrder.findUnique({
       where: { id },
@@ -36,77 +53,102 @@ export async function POST(
       );
     }
 
-    if (purchaseOrder.status === "RECEIVED" || purchaseOrder.status === "CANCELLED") {
+    if (purchaseOrder.status !== "PAID" && purchaseOrder.status !== "PARTIALLY_RECEIVED") {
       return NextResponse.json(
-        { error: `Cannot receive a ${purchaseOrder.status.toLowerCase()} order` },
+        { error: "Goods can only be received on a PAID order" },
         { status: 400 }
       );
     }
 
-    // Update each item's received quantity and product stock
-    const updatedItems: Array<{ id: string; receivedQty: number }> = [];
-    for (const item of items || []) {
-      const poItem = purchaseOrder.items.find((i) => i.id === item.id);
-      if (!poItem) continue;
-
-      const newReceivedQty = Math.min(item.receivedQty, poItem.quantity);
-      
-      await db.purchaseOrderItem.update({
-        where: { id: item.id },
-        data: { receivedQty: newReceivedQty }
-      });
-
-      // Update product stock
-      await db.product.update({
-        where: { id: poItem.productId },
-        data: {
-          stockQuantity: {
-            increment: newReceivedQty
-          }
-        }
-      });
-
-      updatedItems.push({ ...poItem, receivedQty: newReceivedQty });
+    // Validate all submitted item IDs belong to this order
+    const orderItemIds = new Set(purchaseOrder.items.map((i) => i.id));
+    for (const item of items) {
+      if (!orderItemIds.has(item.id)) {
+        return NextResponse.json(
+          { error: `Item ${item.id} does not belong to this purchase order` },
+          { status: 400 }
+        );
+      }
     }
 
-    // Check if all items are fully received
-    const allReceived = purchaseOrder.items.every(
-      (item) => {
-        const updated = updatedItems.find((u) => u.id === item.id);
-        return (updated?.receivedQty ?? item.receivedQty) >= item.quantity;
-      }
-    );
+    const receiptUpdates: Array<{ id: string; receivedQty: number; delta: number }> = [];
 
-    const newStatus: PurchaseStatus = allReceived ? "RECEIVED" : "PARTIALLY_RECEIVED";
+    // Apply all updates atomically
+    const result = await db.$transaction(async (tx) => {
+      for (const item of items) {
+        const poItem = purchaseOrder.items.find((i) => i.id === item.id);
+        if (!poItem) continue;
 
-    const updatedOrder = await db.purchaseOrder.update({
-      where: { id },
-      data: {
-        status: newStatus,
-        notes: notes ? `${purchaseOrder.notes || ""}\n\nReceipt notes: ${notes}` : purchaseOrder.notes
-      },
-      include: {
-        supplier: { select: { id: true, name: true } },
-        items: {
-          include: {
-            product: { select: { id: true, name: true, sku: true } }
-          }
+        const submitted = Number(item.receivedQty);
+        if (!Number.isFinite(submitted) || !Number.isInteger(submitted)) {
+          throw new Error(`Invalid received quantity for item ${poItem.product.name}`);
         }
+
+        const newReceivedQty = Math.max(0, Math.min(submitted, poItem.quantity - 0));
+        // Idempotency: only increment stock by the delta from the stored value
+        const delta = newReceivedQty - poItem.receivedQty;
+        if (delta === 0) continue;
+
+        await tx.purchaseOrderItem.update({
+          where: { id: poItem.id },
+          data: { receivedQty: newReceivedQty },
+        });
+
+        await tx.product.update({
+          where: { id: poItem.productId },
+          data: {
+            stockQuantity: {
+              increment: delta,
+            },
+          },
+        });
+
+        receiptUpdates.push({ id: poItem.id, receivedQty: newReceivedQty, delta });
       }
+
+      // Recompute all items from the DB state inside the transaction
+      const updatedItems = await tx.purchaseOrderItem.findMany({
+        where: { purchaseOrderId: id },
+        select: { id: true, receivedQty: true, quantity: true },
+      });
+
+      const allReceived = updatedItems.every((i) => i.receivedQty >= i.quantity);
+
+      const newStatus: PurchaseStatus = allReceived ? "RECEIVED" : "PARTIALLY_RECEIVED";
+
+      const updatedOrder = await tx.purchaseOrder.update({
+        where: { id },
+        data: {
+          status: newStatus,
+          notes: notes ? `${purchaseOrder.notes || ""}\n\nReceipt notes: ${notes}` : purchaseOrder.notes,
+        },
+        include: {
+          supplier: { select: { id: true, name: true } },
+          items: {
+            include: {
+              product: { select: { id: true, name: true, sku: true } },
+            },
+          },
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId,
+          action: "RECEIVE_PURCHASE_ORDER",
+          resource: "PurchaseOrder",
+          resourceId: id,
+          details: {
+            items: receiptUpdates,
+            status: newStatus,
+          },
+        },
+      });
+
+      return { updatedOrder, newStatus };
     });
 
-    // Create audit log
-    await db.auditLog.create({
-      data: {
-        userId: "system",
-        action: "RECEIVE_PURCHASE_ORDER",
-        resource: "PurchaseOrder",
-        resourceId: id,
-        details: { items: updatedItems.map(i => ({ id: i.id, receivedQty: i.receivedQty })) }
-      }
-    });
-
-    // Notify relevant users
+    // Notify relevant users (outside the transaction, best-effort)
     const notifyRoles: UserRole[] = ["OWNER", "MANAGER", "PROCUREMENT_MANAGER"];
     const notifyUsers = await db.user.findMany({
       where: { role: { in: notifyRoles }, isActive: true },
@@ -116,18 +158,18 @@ export async function POST(
       await db.notification.createMany({
         data: notifyUsers.map((u) => ({
           userId: u.id,
-          title: `Purchase Order ${newStatus === "RECEIVED" ? "Fully Received" : "Partially Received"}`,
-          message: `PO ${purchaseOrder.orderNumber} has been ${newStatus === "RECEIVED" ? "fully received" : "partially received"}.`,
-          type: newStatus === "RECEIVED" ? "SUCCESS" : "INFO",
+          title: `Purchase Order ${result.newStatus === "RECEIVED" ? "Fully Received" : "Partially Received"}`,
+          message: `PO ${purchaseOrder.orderNumber} has been ${result.newStatus === "RECEIVED" ? "fully received" : "partially received"}.`,
+          type: result.newStatus === "RECEIVED" ? "SUCCESS" : "INFO",
           link: "/dashboard/procurement/purchase-orders",
         })),
       });
     }
 
     return NextResponse.json({
-      ...updatedOrder,
-      total: Number(updatedOrder.total),
-      items: updatedOrder.items.map((item) => ({
+      ...result.updatedOrder,
+      total: Number(result.updatedOrder.total),
+      items: result.updatedOrder.items.map((item) => ({
         ...item,
         unitCost: Number(item.unitCost),
         total: Number(item.total),
@@ -135,8 +177,11 @@ export async function POST(
     });
   } catch (error: any) {
     console.error("Receive purchase order error:", error);
+    if (error instanceof Error && error.message.startsWith("Invalid received quantity")) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     return NextResponse.json(
-      { error: error.message || "Failed to receive purchase order" },
+      { error: "Failed to receive purchase order" },
       { status: 500 }
     );
   }

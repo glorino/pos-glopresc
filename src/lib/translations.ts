@@ -1213,6 +1213,11 @@ export const en = {
   maxAmount: "Max amount:",
   noPaymentsFound: "No payments found",
   paymentsWillAppear: "Payments will appear here once recorded.",
+  itemsCount: "Items Count",
+  methodCol: "Method",
+  partiallyReceived: "Partially Received",
+  receiptUploaded: "Receipt uploaded",
+  missingReceipt: "Receipt missing",
 
   // Shop remaining
   cartEmptyShop: "Your cart is empty",
@@ -2451,6 +2456,11 @@ export const fr: Record<TranslationKey, string> = {
   maxAmount: "Montant max :",
   noPaymentsFound: "Aucun paiement trouvé",
   paymentsWillAppear: "Les paiements apparaîtront ici une fois enregistrés.",
+  itemsCount: "Nombre d'articles",
+  methodCol: "Méthode",
+  partiallyReceived: "Partiellement reçu",
+  receiptUploaded: "Reçu téléversé",
+  missingReceipt: "Reçu manquant",
 
   // Boutique restant (nouvelles clés FR)
   cartEmptyShop: "Votre panier est vide",

@@ -50,6 +50,10 @@ export async function GET(request: NextRequest) {
 
     const isPublic = searchParams.get("public") === "true";
     if (!isPublic) {
+      const token = await getToken({ req: request as any });
+      if (!token) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
       const branchFilter = await getBranchFilter(request);
       if (branchFilter) {
         where.AND = [branchFilter];
@@ -82,12 +86,15 @@ export async function GET(request: NextRequest) {
     };
 
     return NextResponse.json({
-      products: products.map((p) => ({
-        ...p,
-        price: Number(p.price),
-        costPrice: Number(p.costPrice),
-        image: p.image || categoryImageMap[p.category?.name as string] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop",
-      })),
+      products: products.map((p) => {
+        const { costPrice, ...publicFields } = p;
+        return {
+          ...(isPublic ? publicFields : p),
+          price: Number(p.price),
+          ...(!isPublic ? { costPrice: Number(p.costPrice) } : {}),
+          image: p.image || categoryImageMap[p.category?.name as string] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop",
+        };
+      }),
       total,
       page,
       totalPages: Math.ceil(total / limit),

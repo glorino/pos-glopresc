@@ -23,10 +23,12 @@ export async function GET(
       );
     }
 
+    const publicData = { ...product };
+    delete (publicData as Record<string, unknown>).costPrice;
+
     return NextResponse.json({
-      ...product,
-      price: Number(product.price),
-      costPrice: Number(product.costPrice),
+      ...publicData,
+      price: Number((publicData as any).price),
     });
   } catch (error) {
     console.error("Product GET error:", error);

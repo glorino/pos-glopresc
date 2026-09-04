@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
@@ -28,7 +28,7 @@ interface PurchaseOrder {
   expectedDate: string | null;
   createdAt: string;
   supplier: { id: string; name: string };
-  payments: { amount: number }[];
+  payments?: { amount: number }[];
 }
 
 interface Payment {
@@ -54,15 +54,7 @@ export default function ProcurementPaymentsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
 
-  useEffect(() => {
-    if (view === "orders") {
-      fetchOrders();
-    } else {
-      fetchPayments();
-    }
-  }, [view, page, statusFilter, search, fetchOrders, fetchPayments]);
-
-  async function fetchOrders() {
+  const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -83,9 +75,9 @@ export default function ProcurementPaymentsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [statusFilter, search, page]);
 
-  async function fetchPayments() {
+  const fetchPayments = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -104,13 +96,22 @@ export default function ProcurementPaymentsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [page]);
+
+  useEffect(() => {
+    if (view === "orders") {
+      fetchOrders();
+    } else {
+      fetchPayments();
+    }
+  }, [view, fetchOrders, fetchPayments]);
 
   const statusColors: Record<string, string> = {
     PENDING: "badge-warning",
     APPROVED: "badge-info",
     ORDERED: "badge-purple",
     PAID: "badge-blue",
+    PARTIALLY_RECEIVED: "badge-warning",
     RECEIVED: "badge-success",
     CANCELLED: "badge-danger",
   };
@@ -120,6 +121,7 @@ export default function ProcurementPaymentsPage() {
     APPROVED: CheckCircle,
     ORDERED: Truck,
     PAID: DollarSign,
+    PARTIALLY_RECEIVED: Package,
     RECEIVED: Package,
     CANCELLED: XCircle,
   };
@@ -130,10 +132,10 @@ export default function ProcurementPaymentsPage() {
     o.supplier.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const totalPaid = orders.reduce((sum, o) => sum + o.payments.reduce((s, p) => s + p.amount, 0), 0);
+  const totalPaid = orders.reduce((sum, o) => sum + (o.payments ?? []).reduce((s, p) => s + p.amount, 0), 0);
   const totalPending = orders
     .filter((o) => ["PENDING", "APPROVED", "ORDERED"].includes(o.status))
-    .reduce((sum, o) => sum + (o.total - o.payments.reduce((s, p) => s + p.amount, 0)), 0);
+    .reduce((sum, o) => sum + (o.total - (o.payments ?? []).reduce((s, p) => s + p.amount, 0)), 0);
 
   const stats = [
     { label: t("totalPurchaseOrders"), value: total, icon: CreditCard, color: "from-[#3b82f6]/20 to-[#3b82f6]/5", iconColor: "text-[#3b82f6]" },
@@ -213,6 +215,7 @@ export default function ProcurementPaymentsPage() {
               <option value="APPROVED">{t("approvedLabel")}</option>
               <option value="ORDERED">{t("orderedLabel")}</option>
               <option value="PAID">{t("paidLabel")}</option>
+              <option value="PARTIALLY_RECEIVED">{t("partiallyReceived")}</option>
               <option value="RECEIVED">{t("receivedLabel")}</option>
               <option value="CANCELLED">{t("cancelledLabel")}</option>
             </select>
@@ -251,7 +254,7 @@ export default function ProcurementPaymentsPage() {
                   </thead>
                   <tbody>
                     {filteredOrders.map((order) => {
-                      const paid = order.payments.reduce((s, p) => s + p.amount, 0);
+                      const paid = (order.payments ?? []).reduce((s, p) => s + p.amount, 0);
                       const remaining = order.total - paid;
                       const StatusIcon = statusIcons[order.status] || Clock;
                       return (
@@ -265,15 +268,15 @@ export default function ProcurementPaymentsPage() {
                           </td>
                           <td className="text-sm text-[#9090a0]">{order.expectedDate ? formatDate(order.expectedDate) : "—"}</td>
                           <td>
-                            <span className={`badge ${statusColors[order.status]}`}>
+                            <span className={`badge ${statusColors[order.status] || "badge-info"}`}>
                               <StatusIcon size={10} className="mr-1" />
-                              {order.status}
+                              {order.status.replace("_", " ")}
                             </span>
                           </td>
                           <td>
-                            <button onClick={() => {}} className="rounded-lg p-2 text-[#9090a0] hover:bg-[#2a2a3a] hover:text-[#3b82f6]" title={t("viewDetails")}>
+                            <a href={`/dashboard/procurement/purchase-orders/${order.id}`} className="rounded-lg p-2 text-[#9090a0] hover:bg-[#2a2a3a] hover:text-[#3b82f6] inline-flex" title={t("viewDetails")}>
                               <Eye size={14} />
-                            </button>
+                            </a>
                           </td>
                         </tr>
                       );

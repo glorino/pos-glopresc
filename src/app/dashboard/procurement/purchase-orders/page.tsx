@@ -52,7 +52,8 @@ export default function PurchaseOrdersPage() {
   const [userRole, setUserRole] = useState("");
   const [processing, setProcessing] = useState(false);
   const [receiveForm, setReceiveForm] = useState<Record<string, number>>({});
-  const [paymentForm, setPaymentForm] = useState({ amount: "", method: "BANK_TRANSFER", reference: "", notes: "" });
+  const [paymentForm, setPaymentForm] = useState({ amount: "", method: "TRANSFER", reference: "", notes: "" });
+  const [formError, setFormError] = useState("");
   const [activeTab, setActiveTab] = useState<"details" | "payments" | "receive">("details");
 
   useEffect(() => {
@@ -78,23 +79,20 @@ export default function PurchaseOrdersPage() {
   async function fetchOrderDetail(id: string) {
     try {
       const [poRes, payRes] = await Promise.all([
-        fetch(`/api/purchase-orders`),
+        fetch(`/api/purchase-orders/${id}`),
         fetch(`/api/purchase-orders/${id}/payments`),
       ]);
       if (poRes.ok) {
         const json = await poRes.json();
-        const all = json.purchaseOrders || [];
-        const found = all.find((o: PurchaseOrder) => o.id === id);
-        if (found) {
-          if (payRes.ok) {
-            const payJson = await payRes.json();
-            found.payments = payJson.purchaseOrder?.payments || [];
-          }
-          setDetailOrder(found);
-          const recv: Record<string, number> = {};
-          (found.items || []).forEach((item: POItem) => { recv[item.id] = 0; });
-          setReceiveForm(recv);
+        const found = json.purchaseOrder || json;
+        if (payRes.ok) {
+          const payJson = await payRes.json();
+          found.payments = payJson.purchaseOrder?.payments || [];
         }
+        setDetailOrder(found);
+        const recv: Record<string, number> = {};
+        (found.items || []).forEach((item: POItem) => { recv[item.id] = item.receivedQty || 0; });
+        setReceiveForm(recv);
       }
     } catch (err) { console.error("Failed to fetch order detail:", err); }
   }
@@ -117,14 +115,17 @@ export default function PurchaseOrdersPage() {
   async function handleMarkPaid(id: string) {
     if (!detailOrder) return;
     setProcessing(true);
+    setFormError("");
     try {
-      const totalPaid = (detailOrder.payments || []).reduce((s, p) => s + p.amount, 0);
-      const remaining = detailOrder.total - totalPaid;
+      if (!PaymentMethodValid(paymentForm.method)) {
+        setFormError("Please select a valid payment method.");
+        setProcessing(false);
+        return;
+      }
       const res = await fetch(`/api/purchase-orders/${id}/payments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: remaining,
           method: paymentForm.method,
           reference: paymentForm.reference || undefined,
           notes: paymentForm.notes || "Full payment",
@@ -133,20 +134,40 @@ export default function PurchaseOrdersPage() {
       if (res.ok) {
         fetchOrders();
         fetchOrderDetail(id);
-        setPaymentForm({ amount: "", method: "BANK_TRANSFER", reference: "", notes: "" });
+        setPaymentForm({ amount: "", method: "TRANSFER", reference: "", notes: "" });
+      } else {
+        const json = await res.json().catch(() => ({}));
+        setFormError(json.error || "Failed to record payment.");
       }
-    } finally { setProcessing(false); }
+    } catch (err) { console.error(err); setFormError("Failed to record payment."); }
+    finally { setProcessing(false); }
+  }
+
+  function PaymentMethodValid(method: string) {
+    return ["CASH", "CARD", "TRANSFER", "USSD", "MOBILE", "ONLINE"].includes(method);
   }
 
   async function handleReceive(id: string) {
     if (!detailOrder) return;
     setProcessing(true);
+    setFormError("");
     try {
-      const items = Object.entries(receiveForm)
-        .filter(([, qty]) => qty > 0)
-        .map(([itemId, receivedQty]) => ({ id: itemId, receivedQty }));
+      const entered = detailOrder.items
+        .map((item) => ({ id: item.id, quantity: item.quantity, receivedQty: receiveForm[item.id] ?? item.receivedQty }));
 
-      if (items.length === 0) { setProcessing(false); return; }
+      const invalid = entered.find((item) => item.receivedQty < 0 || item.receivedQty > item.quantity);
+      if (invalid) {
+        setProcessing(false);
+        setFormError("Received quantity cannot be negative or exceed the ordered quantity.");
+        return;
+      }
+
+      const items = entered.filter((item) => item.receivedQty > 0 && item.receivedQty !== (detailOrder.items.find((i) => i.id === item.id)?.receivedQty ?? 0));
+      if (items.length === 0) {
+        setProcessing(false);
+        setFormError("Enter a received quantity for at least one item.");
+        return;
+      }
 
       const res = await fetch(`/api/purchase-orders/${id}/receive`, {
         method: "POST",
@@ -157,8 +178,12 @@ export default function PurchaseOrdersPage() {
         fetchOrders();
         fetchOrderDetail(id);
         setActiveTab("details");
+      } else {
+        const json = await res.json().catch(() => ({}));
+        setFormError(json.error || "Failed to record receive.");
       }
-    } finally { setProcessing(false); }
+    } catch (err) { console.error(err); setFormError("Failed to record receive."); }
+    finally { setProcessing(false); }
   }
 
   const statusColors: Record<string, string> = {
@@ -354,6 +379,7 @@ export default function PurchaseOrdersPage() {
 
               {activeTab === "payments" && (
                 <div className="space-y-4">
+                  {formError && <div className="rounded-lg bg-[#f43f5e]/10 p-3 text-sm text-[#f43f5e]">{formError}</div>}
                   <div className="rounded-lg bg-[#12121a] p-4">
                     <div className="flex justify-between text-sm mb-2"><span className="text-[#9090a0]">Order Total</span><span className="font-medium text-[#d4a843]">{formatCurrency(detailOrder.total)}</span></div>
                     <div className="flex justify-between text-sm mb-2"><span className="text-[#9090a0]">Total Paid</span><span className="font-medium text-[#10b981]">{formatCurrency((detailOrder.payments || []).reduce((s, p) => s + p.amount, 0))}</span></div>
@@ -375,13 +401,15 @@ export default function PurchaseOrdersPage() {
                     </div>
                   )}
 
-                  {canPay && detailOrder.status !== "PAID" && detailOrder.status !== "RECEIVED" && detailOrder.status !== "CANCELLED" && (
+                  {canPay && detailOrder.status !== "PAID" && detailOrder.status !== "RECEIVED" && detailOrder.status !== "CANCELLED" && detailOrder.status !== "PARTIALLY_RECEIVED" && (
                     <div className="rounded-lg border border-[#2a2a3a] p-4 space-y-3">
                       <h4 className="text-sm font-medium text-[#f0f0f5]">Record Payment</h4>
                       <select value={paymentForm.method} onChange={(e) => setPaymentForm({ ...paymentForm, method: e.target.value })} className="input w-full">
-                        <option value="BANK_TRANSFER">Bank Transfer</option>
+                        <option value="TRANSFER">Bank Transfer</option>
                         <option value="CASH">Cash</option>
-                        <option value="CHECK">Check</option>
+                        <option value="CARD">Card</option>
+                        <option value="USSD">USSD</option>
+                        <option value="MOBILE">Mobile</option>
                         <option value="ONLINE">Online</option>
                       </select>
                       <input type="text" placeholder="Reference number" value={paymentForm.reference} onChange={(e) => setPaymentForm({ ...paymentForm, reference: e.target.value })} className="input w-full" />
@@ -397,21 +425,28 @@ export default function PurchaseOrdersPage() {
 
               {activeTab === "receive" && (
                 <div className="space-y-4">
-                  <p className="text-sm text-[#9090a0]">Enter the quantity received for each item. Product stock will be updated automatically.</p>
-                  {detailOrder.items?.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between rounded-lg bg-[#12121a] p-3">
-                      <div>
-                        <span className="text-[#f0f0f5] text-sm">{item.product.name}</span>
-                        <div className="text-xs text-[#606070]">
-                          Ordered: {item.quantity} | Already received: {item.receivedQty} | Remaining: {item.quantity - item.receivedQty}
+                  {formError && <div className="rounded-lg bg-[#f43f5e]/10 p-3 text-sm text-[#f43f5e]">{formError}</div>}
+                  <p className="text-sm text-[#9090a0]">Enter the total quantity received so far for each item. Stock is updated by the difference from the last recorded value.</p>
+                  {detailOrder.items?.map((item) => {
+                    const remaining = item.quantity - item.receivedQty;
+                    return (
+                      <div key={item.id} className="flex items-center justify-between rounded-lg bg-[#12121a] p-3">
+                        <div>
+                          <span className="text-[#f0f0f5] text-sm">{item.product.name}</span>
+                          <div className="text-xs text-[#606070]">
+                            Ordered: {item.quantity} | Already received: {item.receivedQty} | Remaining: {remaining}
+                          </div>
                         </div>
+                        <input type="number" min={0} max={item.quantity}
+                          value={receiveForm[item.id] ?? item.receivedQty}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value) || 0;
+                            setReceiveForm({ ...receiveForm, [item.id]: val });
+                          }}
+                          className="input w-24 text-center" placeholder="Qty" />
                       </div>
-                      <input type="number" min={0} max={item.quantity - item.receivedQty}
-                        value={receiveForm[item.id] || ""}
-                        onChange={(e) => setReceiveForm({ ...receiveForm, [item.id]: parseInt(e.target.value) || 0 })}
-                        className="input w-24 text-center" placeholder="Qty" />
-                    </div>
-                  ))}
+                    );
+                  })}
                   {canReceive && detailOrder.status !== "RECEIVED" && detailOrder.status !== "CANCELLED" && detailOrder.status !== "PENDING" && (
                     <button onClick={() => handleReceive(detailOrder.id)} disabled={processing}
                       className="btn btn-primary w-full">
